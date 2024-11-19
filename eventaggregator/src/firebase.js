@@ -1,3 +1,4 @@
+
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
@@ -8,14 +9,13 @@ import { getFirestore } from "@firebase/firestore";
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyDdcM1LM8-ZxALOmy_CtVjh_aSsSZ7yFNY",
-  authDomain: "event-aggregator-d08a5.firebaseapp.com",
-  databaseURL: "https://event-aggregator-d08a5-default-rtdb.firebaseio.com",
-  projectId: "event-aggregator-d08a5",
-  storageBucket: "event-aggregator-d08a5.firebasestorage.app",
-  messagingSenderId: "529849907947",
-  appId: "1:529849907947:web:567136f3bb7fe139321cae",
-  measurementId: "G-MFXNZHCF01"
+  apiKey: "AIzaSyDqgtkpby4KM9jJN6dESZ2hLUuYnAFq63o",
+  authDomain: "event-aggregator-b95e6.firebaseapp.com",
+  projectId: "event-aggregator-b95e6",
+  storageBucket: "event-aggregator-b95e6.firebasestorage.app",
+  messagingSenderId: "570659202335",
+  appId: "1:570659202335:web:a3358cbe03b63440993c2a",
+  measurementId: "G-3ZJNGQZLBS"
 };
 
 // Initialize Firebase
