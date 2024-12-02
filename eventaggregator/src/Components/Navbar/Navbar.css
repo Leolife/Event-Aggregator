@@ -1,0 +1,71 @@
+nav {
+    padding: 10px 2%;
+    justify-content: space-between;
+    width: 100%;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    background: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.nav-left .menu-icon {
+    width: 25px;
+    height: 25px;
+    fill: grey;
+}
+
+.nav-left .logo {
+    width: 200px;
+    height: 24px;
+    padding: 0px 12px;
+}
+
+.nav-left h3 {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.nav-middle {
+    width: 100%;
+    justify-content: center;
+}
+
+.nav-middle .search-box {
+    border: 1px solid #ccc;
+    margin-right: 15px;
+    padding: 8px 12px;
+    border-radius: 10px;
+}
+
+.nav-middle .search-box input {
+    width: 400px;
+    border: 0;
+    outline: 0;
+    background: transparent;
+}
+
+.nav-middle .search-icon {
+    width: 20px;
+    height: 20px;
+    stroke: grey;
+}
+
+.nav-right .button{
+    margin: 0px 2px;
+}
+
+.nav-right .log-in {
+    background-color: rgb(240, 240, 240);
+    color: black;
+}
+
+.nav-right .profile-icon {
+    width: 30px;
+    height: 30px;
+}
+
+.nav-right .profile-icon path {
+    stroke: black;
+    stroke-width: 10%;
+}
