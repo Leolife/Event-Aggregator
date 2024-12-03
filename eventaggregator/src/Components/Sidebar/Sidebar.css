@@ -39,6 +39,7 @@
 
 }
 
+
 .sidebar svg path {
     stroke: #5a5a5a;
 }
@@ -54,4 +55,16 @@
 
 .sidebar .heart-icon path{
     stroke: none;
+}
+
+.small-sidebar {
+    width: 5%;
+}
+
+.small-sidebar p {
+    display: none;
+}
+
+.small-sidebar h3 {
+    display: none;
 }

@@ -13,6 +13,7 @@ nav {
     width: 25px;
     height: 25px;
     fill: grey;
+    cursor: pointer;
 }
 
 .nav-left .logo {

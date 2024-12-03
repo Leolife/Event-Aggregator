@@ -10,9 +10,9 @@ import { ReactComponent as HeartIcon } from '../../assets/heart-icon.svg';
 import { ReactComponent as BoltIcon } from '../../assets/bolt-icon.svg';
 import { ReactComponent as TriangleIcon } from '../../assets/triangle-icon.svg';
 
-const Sidebar = () => {
+const Sidebar = ({sidebar}) => {
   return (
-    <div className='sidebar'>
+    <div className={`sidebar ${sidebar?"":"small-sidebar"}`}>
       <div className="events">
         <div className="side-link">
           <CalendarIcon className="calendar-icon" /><h3>Events</h3><TriangleIcon className="triangle-icon" />
@@ -43,6 +43,9 @@ const Sidebar = () => {
       <div className="profile">
         <div className="side-link">
           <ProfileIcon className="profile-icon" /><h3>Profile</h3><TriangleIcon className="triangle-icon" />
+        </div>
+        <div className="side-link">
+          <ProfileIcon className="profile-icon" /><p>My Profile</p>
         </div>
         <div className="side-link">
           <FriendIcon className="friend-icon" /><p>Friends</p>
