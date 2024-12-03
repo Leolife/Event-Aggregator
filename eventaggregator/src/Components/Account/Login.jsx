@@ -12,7 +12,7 @@ const Login = ({ isOpen, onClose }) => {
                     <h2>Login to Event Aggregator</h2>
                 </div>
                 <form>
-                    <div className="container username">
+                    <div className="username">
                         <div>
                             <h4>Username/Email</h4>
                         </div>
@@ -20,7 +20,7 @@ const Login = ({ isOpen, onClose }) => {
                             <input type="text" />
                         </div>
                     </div>
-                    <div className="container password">
+                    <div className="password">
                         <div>
                             <h4> Password </h4>
                         </div>

@@ -12,7 +12,7 @@ const Signup = ({ isOpen, onClose }) => {
                     <h2>Sign up to Event Aggregator</h2>
                 </div>
                 <form>
-                    <div className="container username">
+                    <div className="username">
                         <div>
                             <h4>Username</h4>
                         </div>
@@ -20,7 +20,7 @@ const Signup = ({ isOpen, onClose }) => {
                             <input type="text" />
                         </div>
                     </div>
-                    <div className="container password">
+                    <div className="password">
                         <div>
                             <h4> Password </h4>
                         </div>
@@ -28,7 +28,7 @@ const Signup = ({ isOpen, onClose }) => {
                             <input type="text" />
                         </div>
                     </div>
-                    <div className="container email">
+                    <div className="email">
                         <div>
                             <h4>Email</h4>
                         </div>
@@ -36,7 +36,7 @@ const Signup = ({ isOpen, onClose }) => {
                             <input type="text" />
                         </div>
                     </div>
-                    <div className="container birthday">
+                    <div className="birthday">
                         <div>
                             <h4>Date of Birth</h4>
                         </div>
