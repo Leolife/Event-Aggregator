@@ -49,6 +49,7 @@
 
 .modal-content h2 {
     margin-top: 50px;
+    margin-bottom: 25px;
     text-align: center;
     width: 50%;
 }
@@ -57,6 +58,7 @@
     display: flex;
     justify-content: center;
     margin-top: 10px;
+    margin-bottom: 5px;
 }
 
 .input-box input {
@@ -68,7 +70,7 @@
 }
 
 .input-box input:focus {
-    border-color:  #3ed0e4;
+    border-color: #3ed0e4;
     box-shadow: 0 0 0 2px #3ed0e4;
 }
 
