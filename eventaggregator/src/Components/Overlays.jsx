@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import Login from './Account/Login';
 import Signup from './Account/Signup';
 
+
 const mountElement = document.getElementById("overlays")
 
 const Overlays = ({ modalType, isOpen, onClose }) => {

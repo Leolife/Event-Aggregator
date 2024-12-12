@@ -4,6 +4,7 @@
   box-sizing:border-box;
   font-family: sans-serif;
 }
+
 a{
   text-decoration: none;
   columns: #5a5a5a;
@@ -16,15 +17,18 @@ a{
   justify-content: center;
 }
 
-.button {
+button {
   background-color: #3ed0e4;
   border: none;
   color: white;
   height: 35px;
-  width: 80px;
+  padding: 0px 10px;
+  width: fit-content;
   text-align: center;
   display: inline-block;
   font-weight: bold;
   border-radius: 10px;
   cursor: pointer;
+  white-space: nowrap;
 }
+

@@ -14,6 +14,7 @@ import thumbnail9 from '../../assets/thumbnail9.jpg'
 import thumbnail10 from '../../assets/thumbnail10.png'
 import thumbnail11 from '../../assets/thumbnail11.jpg'
 import thumbnail12 from '../../assets/thumbnail12.png'
+import { Link } from 'react-router-dom'
 
 
 export const Home = ({ sidebar }) => {
@@ -22,13 +23,13 @@ export const Home = ({ sidebar }) => {
       <Sidebar sidebar={sidebar} />
       <div className={`container ${sidebar ? "" : 'large-container'}`}>
         <div className="feed">
-          <div className='card'>
+          <Link to = {'event/category/league-of-legends'} className='card'>
             <div className='img-sizer'>
               <img src={thumbnail1} alt="" />
             </div>
             <h2> League of Legends </h2>
             <h3> 25 Events • 6 Upcoming </h3>
-          </div>
+          </Link>
           <div className='card'>
             <div className='img-sizer'>
               <img src={thumbnail2} alt="" />
