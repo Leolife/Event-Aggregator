@@ -19,11 +19,11 @@ export const Settings = ({ sidebar }) => {
     // Change the Values to rename the tabs as displayed on the website
     
     const TABS = Object.freeze({
+        YOURACCOUNT: 'Your Account',
         INTERESTS: 'Interests',
         NOTIFICATIONS: 'Notifications',
         PRIVACY: 'Privacy',
         SECURITY: 'Security',
-        YOURACCOUNT: 'Your Account',
       });
 
     const handleDeleteAccount = async () => {
@@ -43,6 +43,8 @@ export const Settings = ({ sidebar }) => {
     
     function renderTab(tab) {
         switch (tab) {
+            case TABS.YOURACCOUNT:
+                return <YourAccount />;
             case TABS.INTERESTS:
                 return <Interests />;
             case TABS.NOTIFICATIONS:
@@ -51,8 +53,6 @@ export const Settings = ({ sidebar }) => {
                 return <Privacy/>
             case TABS.SECURITY:
                 return <Security />;
-            case TABS.YOURACCOUNT:
-                return <YourAccount />;
             default:
                 return null; // or a default page
         }
