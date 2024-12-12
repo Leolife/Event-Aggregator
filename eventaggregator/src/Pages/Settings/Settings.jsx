@@ -19,11 +19,11 @@ export const Settings = ({ sidebar }) => {
     // Change the Values to rename the tabs as displayed on the website
     
     const TABS = Object.freeze({
+        YOURACCOUNT: 'Your Account',
         INTERESTS: 'Interests',
         NOTIFICATIONS: 'Notifications',
         PRIVACY: 'Privacy',
         SECURITY: 'Security',
-        YOURACCOUNT: 'Your Account',
       });
 
     const handleDeleteAccount = async () => {
@@ -43,6 +43,8 @@ export const Settings = ({ sidebar }) => {
     
     function renderTab(tab) {
         switch (tab) {
+            case TABS.YOURACCOUNT:
+                return <YourAccount />;
             case TABS.INTERESTS:
                 return <Interests />;
             case TABS.NOTIFICATIONS:
@@ -51,21 +53,50 @@ export const Settings = ({ sidebar }) => {
                 return <Privacy/>
             case TABS.SECURITY:
                 return <Security />;
-            case TABS.YOURACCOUNT:
-                return <YourAccount />;
             default:
                 return null; // or a default page
         }
       }
-      
+
+const styles = {
+  container: {
+    display: 'flex',
+    height: '100vh', // full height container
+  },
+  buttonColumn: {
+    width: '25%', // Left side takes up 25% of the space
+    height: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'flex-start', //align buttons to the left
+    padding: '20px',
+    backgroundColor: '#f0f0f0', // Light background for distinction
+    gap: '10px', // space between buttons
+  },
+  button: {
+    width: '100%', // button column should be full width, similar to figma
+    padding: '10px 20px',
+  },
+  infoColumn: {
+    width: '75%', // right side takes up 75% of the space
+    padding: '20px',
+    backgroundColor: '#ffffff', // white background for the content area
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+  },
+};
+
     return (
         <>
             <Sidebar sidebar={sidebar} />
             <div className={`container ${sidebar ? "" : 'large-container'}`}>
-                <div className="settings">
-                <div className="settings-tabs">
+                <div className="settings" style={styles.container}>
+                    <div className="settings-tabs" style={styles.buttonColumn}>
                         {Object.entries(TABS).map(([tabKey, tabName]) => (
                         <button 
+                            style={styles.button}
                             key={tabName} 
                             className={`tab-link ${activeTab === tabKey ? 'active' : ''}`} 
                             onClick={() => setActiveTab(tabName)}
@@ -77,18 +108,23 @@ export const Settings = ({ sidebar }) => {
                         <br/>
                         <hr />
                     </div>
-                </div>
-                <div className="section-content">
-                    <div className="settings-content">
-                        <div className="content-tabs">
-                            {renderTab(activeTab)}
+                    <div className="section-content">
+                        <div className="settings-content">
+                            <div className="content-tabs" style={styles.infoColumn}>
+                                {renderTab(activeTab)}
+                            </div>
                         </div>
                     </div>
+
                 </div>
+                
             </div>
         </>
 
     )
+
+    
+
 }
 
 export default Settings;

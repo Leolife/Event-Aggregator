@@ -63,6 +63,13 @@ nav {
 }
 
 .nav-right .profile-icon {
+    margin: 2px 5px;
+    width: 30px;
+    height: 30px;
+}
+
+.nav-right .settings-icon {
+    margin: 2px 5px;
     width: 30px;
     height: 30px;
 }
