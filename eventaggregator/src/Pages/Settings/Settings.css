@@ -108,6 +108,7 @@
     margin-top: 10px;
     margin-bottom: 20px;
 }
+
 .button.delete-account {
     background-color: red;
     color: white;
@@ -132,6 +133,7 @@
     margin-bottom: 20px;
 }
 
+/* PASSWORD STUFF BELOW */
 .button.change-password {
     background-color: #3498db;
     color: white;
@@ -205,5 +207,74 @@
 }
 
 .password-modal .update-password-btn:hover {
+    background-color: #3bb3cb;
+}
+
+
+/* USERNAME STUFF BELOW */
+.button.change-username {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 20px;
+    margin-top: 10px;
+    margin-right: 10px;
+    width: fit-content;
+}
+
+.button.change-username:hover {
+    background-color: #2980b9;
+}
+
+.username-modal .modal-content {
+    padding: 1rem;
+    width: 30rem;
+    height: auto;
+    min-height: auto;
+}
+
+.username-modal h2 {
+    margin-top: 5px;
+    margin-bottom: 15px;
+    text-align: center;
+    width: 100%;
+}
+
+.username-modal .container {
+    margin-bottom: 0px;
+    padding-left: 0;
+}
+
+.username-modal h4 {
+    margin-bottom: 10px;
+    margin-top: 0px;
+    text-align: left;
+}
+
+.username-modal .input-box {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.username-modal .input-box input {
+    width: 100%;
+    padding: 8px 12px;
+    display: block;
+}
+
+.username-modal .update-username-btn {
+    width: 100%;
+    padding: 12px;
+    margin-top: 20px;
+    background-color: #48cae4;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.username-modal .update-username-btn:hover {
     background-color: #3bb3cb;
 }
