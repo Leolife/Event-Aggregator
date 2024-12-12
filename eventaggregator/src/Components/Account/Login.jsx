@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import bcrypt from 'bcryptjs';
 import './Account.css';
 import { ReactComponent as Logo } from '../../assets/calendar-icon.svg';
 import { auth } from '../../firebase';
@@ -11,10 +12,12 @@ const Login = ({ isOpen, onClose }) => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
 
+    
+
     const handleLogin = async (e) => {
         e.preventDefault();
         setError('');
-        
+
         try {
             // First, look up the email associated with the username
             const usersRef = collection(firestore, "users");
@@ -69,6 +72,7 @@ const Login = ({ isOpen, onClose }) => {
                         <div className="input-box username">
                             <input 
                                 type="text" 
+                                placeholder="Username"
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
                                 required
@@ -82,6 +86,7 @@ const Login = ({ isOpen, onClose }) => {
                         <div className="input-box password">
                             <input 
                                 type="password"
+                                placeholder="Password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
