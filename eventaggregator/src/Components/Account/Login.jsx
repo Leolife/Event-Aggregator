@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import bcrypt from 'bcryptjs';
+//import bcrypt from 'bcryptjs';  // commented until use
 import './Account.css';
 import { ReactComponent as Logo } from '../../assets/calendar-icon.svg';
 import { auth } from '../../firebase';
