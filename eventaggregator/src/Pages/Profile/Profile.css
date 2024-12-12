@@ -108,3 +108,17 @@
     margin-top: 10px;
     margin-bottom: 20px;
 }
+.button.delete-account {
+    background-color: red;
+    color: white;
+    border: none;
+    padding: -10px 50px;
+    cursor: pointer;
+    border-radius: 20px;
+    margin-top: 10px;
+    margin-left: 250px;  
+}
+
+.button.delete-account:hover {
+    background-color: darkred;
+}
