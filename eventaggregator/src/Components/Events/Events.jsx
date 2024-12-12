@@ -6,11 +6,18 @@ import { ReactComponent as HeartIcon } from '../../assets/heart-icon.svg';
 import { ReactComponent as SaveIcon } from '../../assets/save-icon.svg';
 import thumbnail1 from '../../assets/wide-thumbnail1.jpg'
 
-const Events = () => {
+function formatCategoryName(categoryName) {
+  return categoryName
+    .split('-')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+}
+
+const Events = ({categoryName}) => {
   return (
     <div className="events">
       <div className="topbar">
-        <h1> League of Legends </h1>
+        <h1> {formatCategoryName(categoryName)} </h1>
       </div>
       <div className="feed">
         <div className="event-card">

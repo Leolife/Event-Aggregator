@@ -11,19 +11,23 @@ import { ReactComponent as BoltIcon } from '../../assets/bolt-icon.svg';
 import { ReactComponent as TriangleIcon } from '../../assets/triangle-icon.svg';
 import { Link } from 'react-router-dom';
 
-const Sidebar = ({sidebar}) => {
+const Sidebar = ({ sidebar }) => {
   return (
-    <div className={`sidebar ${sidebar?"":"small-sidebar"}`}>
+    <div className={`sidebar ${sidebar ? "" : "small-sidebar"}`}>
       <div className="events">
         <div className="side-link">
           <CalendarIcon className="calendar-icon" /><h3>Events</h3><TriangleIcon className="triangle-icon" />
         </div>
-        <div className="side-link">
-          <StarIcon className="star-icon" /><p>Recommended Events</p>
-        </div>
-        <div className="side-link">
-          <TrendIcon className="trend-icon" /><p>All Categories</p>
-        </div>
+        <Link to={'/event/category/recommended'}>
+          <div className="side-link">
+            <StarIcon className="star-icon" /><p> Recommended Events </p>
+          </div>
+        </Link>
+        <Link to={'/'}>
+          <div className="side-link">
+            <TrendIcon className="trend-icon" /><p>  All Categories </p>
+          </div>
+        </Link>
         <hr />
       </div>
       <div className="forums">
@@ -45,9 +49,11 @@ const Sidebar = ({sidebar}) => {
         <div className="side-link">
           <ProfileIcon className="profile-icon" /><h3>Profile</h3><TriangleIcon className="triangle-icon" />
         </div>
+        <Link to={'/profile'}>
         <div className="side-link">
-          <ProfileIcon className="profile-icon" /><p> <Link to = {'/profile'}> My Profile </Link> </p>
+          <ProfileIcon className="profile-icon" /><p> My Profile </p>
         </div>
+        </Link>
         <div className="side-link">
           <FriendIcon className="friend-icon" /><p>Friends</p>
         </div>
