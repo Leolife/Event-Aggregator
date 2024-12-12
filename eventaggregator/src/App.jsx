@@ -3,6 +3,7 @@ import Navbar from './Components/Navbar/Navbar';
 import { Route, Routes } from 'react-router-dom';
 import Home from './Pages/Home/Home';
 import { Profile } from './Pages/Profile/Profile';
+import { EventCategory } from './Pages/EventCategory/EventCategory';
 import { auth } from './firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 
@@ -32,6 +33,7 @@ function App() {
       <Routes>
         <Route path='/' element={<Home sidebar={sidebar} user={user} />} />
         <Route path='/profile' element={ <Profile sidebar={sidebar} user={user} />} />
+        <Route path='/event/category/:categoryName' element={ <EventCategory sidebar={sidebar} user={user} />} />
       </Routes>
     </div>
   );
