@@ -1,11 +1,54 @@
-import React from 'react'
+import React, { useState } from 'react'
 import './Profile.css'
 import Sidebar from '../../Components/Sidebar/Sidebar'
 import headerimage from '../../assets/profile-header-image.png';
 import profileimage from '../../assets/profile-picture.png';
 
+// Included all tabs from tabs folder to be rendered under the profile section
+import About from './Tabs/About'
+import UserCalendar from './Tabs/UserCalendar'
+import UsersPosts from './Tabs/UserPosts';
+import Comments from './Tabs/Comments'
+import UpVoted from './Tabs/UpVoted';
+import DownVoted from './Tabs/DownVoted';
+
+
 
 export const Profile = ({ sidebar }) => {
+    
+    const [activeTab, setActiveTab] = useState('About');
+
+    // Connects the tab logic with the naming convention-
+    // Change the Values to rename the tabs as displayed on the website
+    const TABS = Object.freeze({
+        ABOUT: 'About',
+        USERCALENDAR: 'My Calendar',
+        USERPOSTS: 'My Posts',
+        COMMENTS: 'Comments',
+        UPVOTED: 'Up Voted',
+        DOWNVOTED: 'Down Voted'
+      });
+
+    // Basically: if statements that determine which tab to render given a button press
+    function renderTab(tab) {
+        switch (tab) {
+            case TABS.ABOUT:
+                return <About />;
+            case TABS.USERCALENDAR:
+                return <UserCalendar />;
+            case TABS.USERPOSTS:
+                return <UsersPosts/>
+            case TABS.COMMENTS:
+                return <Comments />;
+            case TABS.UPVOTED:
+                return <UpVoted />;
+            case TABS.DOWNVOTED:
+                return <DownVoted />;
+            default:
+                return null; // or a default page
+        }
+      }
+
     return (
         <>
             <Sidebar sidebar={sidebar} />
@@ -33,26 +76,15 @@ export const Profile = ({ sidebar }) => {
                         </div>
                     </div>
                     <div className="profile-tabs">
-                        <div className="horizontal-tabs">
-                            <div className="tab-link">
-                                <h3> About </h3>
-                            </div>
-                            <div className="tab-link">
-                                <h3> My Calendars </h3>
-                            </div>
-                            <div className="tab-link">
-                                <h3> Posts </h3>
-                            </div>
-                            <div className="tab-link">
-                                <h3> Comments </h3>
-                            </div>
-                            <div className="tab-link">
-                                <h3> Upvoted </h3>
-                            </div>
-                            <div className="tab-link">
-                                <h3> Downvoted </h3>
-                            </div>
-                        </div>
+                        {Object.entries(TABS).map(([tabKey, tabName]) => (
+                        <button 
+                            key={tabName} 
+                            className={`tab-link ${activeTab === tabKey ? 'active' : ''}`} 
+                            onClick={() => setActiveTab(tabName)}
+                        >
+                            {tabName}
+                        </button>
+                        ))}
                         <hr />
                     </div>
                 </div>
@@ -60,12 +92,7 @@ export const Profile = ({ sidebar }) => {
                 <div className="section-content">
                     <div className="profile-content">
                         <div className="content-tabs">
-                            <h2> About </h2>
-                            <p> My name is Yoshikage Kira. I'm 33 years old. My house is in the northeast section of Morioh, where all the villas are, and I am not married. I work as an employee for the Kame Yu department stores, and I get home every day by 8 PM at the latest. I don't smoke, but I occasionally drink. I'm in bed by 11 PM, and make sure I get eight hours of sleep, no matter what. After having a glass of warm milk and doing about twenty minutes of stretches before going to bed, I usually have no problems sleeping until morning. Just like a baby, I wake up without any fatigue or stress in the morning. I was told there were no issues at my last check-up. I'm trying to explain that I'm a person who wishes to live a very quiet life. I take care not to trouble myself with any enemies, like winning and losing, that would cause me to lose sleep at night. That is how I deal with society, and I know that is what brings me happiness. Although, if I were to fight I wouldn't lose to anyone. </p>
-                            <hr />
-                            <div className="profile-friends">
-                                <h2> Friends (30) </h2>
-                            </div>
+                            {renderTab(activeTab)}
                         </div>
                     </div>
                 </div>
