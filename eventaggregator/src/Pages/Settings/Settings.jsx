@@ -61,26 +61,26 @@ export const Settings = ({ sidebar }) => {
 const styles = {
   container: {
     display: 'flex',
-    height: '100vh', // Full height container
+    height: '100vh', // full height container
   },
   buttonColumn: {
     width: '25%', // Left side takes up 25% of the space
     height: '100%',
     display: 'flex',
     flexDirection: 'column',
-    alignItems: 'flex-start', // Align buttons to the left
+    alignItems: 'flex-start', //align buttons to the left
     padding: '20px',
     backgroundColor: '#f0f0f0', // Light background for distinction
-    gap: '10px', // Space between buttons
+    gap: '10px', // space between buttons
   },
   button: {
-    width: '100%', // Full width of button column
+    width: '100%', // button column should be full width, similar to figma
     padding: '10px 20px',
   },
   infoColumn: {
-    width: '75%', // Right side takes up 75% of the space
+    width: '75%', // right side takes up 75% of the space
     padding: '20px',
-    backgroundColor: '#ffffff', // White background for the content area
+    backgroundColor: '#ffffff', // white background for the content area
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
@@ -92,10 +92,7 @@ const styles = {
         <>
             <Sidebar sidebar={sidebar} />
             <div className={`container ${sidebar ? "" : 'large-container'}`}>
-                <div className="settings">
-
-
-
+                <div className="settings" style={styles.container}>
                     <div className="settings-tabs" style={styles.buttonColumn}>
                         {Object.entries(TABS).map(([tabKey, tabName]) => (
                         <button 
@@ -111,16 +108,16 @@ const styles = {
                         <br/>
                         <hr />
                     </div>
-
-
-                </div>
-                <div className="section-content">
-                    <div className="settings-content">
-                        <div className="content-tabs" style={styles.infoColumn}>
-                            {renderTab(activeTab)}
+                    <div className="section-content">
+                        <div className="settings-content">
+                            <div className="content-tabs" style={styles.infoColumn}>
+                                {renderTab(activeTab)}
+                            </div>
                         </div>
                     </div>
+
                 </div>
+                
             </div>
         </>
 
