@@ -94,6 +94,7 @@ const styles = {
             <div className={`container ${sidebar ? "" : 'large-container'}`}>
                 <div className="settings" style={styles.container}>
                     <div className="settings-tabs" style={styles.buttonColumn}>
+                        <h1>Settings</h1>
                         {Object.entries(TABS).map(([tabKey, tabName]) => (
                         <button 
                             style={styles.button}
