@@ -9,6 +9,7 @@ import { ReactComponent as FriendIcon } from '../../assets/friend-icon.svg';
 import { ReactComponent as HeartIcon } from '../../assets/heart-icon.svg';
 import { ReactComponent as BoltIcon } from '../../assets/bolt-icon.svg';
 import { ReactComponent as TriangleIcon } from '../../assets/triangle-icon.svg';
+import { Link } from 'react-router-dom';
 
 const Sidebar = ({sidebar}) => {
   return (
@@ -45,7 +46,7 @@ const Sidebar = ({sidebar}) => {
           <ProfileIcon className="profile-icon" /><h3>Profile</h3><TriangleIcon className="triangle-icon" />
         </div>
         <div className="side-link">
-          <ProfileIcon className="profile-icon" /><p>My Profile</p>
+          <ProfileIcon className="profile-icon" /><p> <Link to = {'/profile'}> My Profile </Link> </p>
         </div>
         <div className="side-link">
           <FriendIcon className="friend-icon" /><p>Friends</p>

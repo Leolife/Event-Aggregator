@@ -3,6 +3,7 @@ import './Profile.css'
 import Sidebar from '../../Components/Sidebar/Sidebar'
 import headerimage from '../../assets/profile-header-image.png';
 import profileimage from '../../assets/profile-picture.png';
+import { deleteUserAccount } from '../../firebase'; 
 
 // Included all tabs from tabs folder to be rendered under the profile section
 import About from './Tabs/About'
@@ -49,6 +50,22 @@ export const Profile = ({ sidebar }) => {
         }
       }
 
+
+    const handleDeleteAccount = async () => {
+        const confirmation = window.confirm(
+            "Are you sure you want to delete your account? This action cannot be undone."
+        );
+        if (!confirmation) return;
+
+        const result = await deleteUserAccount();
+        if (result.success) {
+            alert("Account deleted successfully.");
+            window.location.href = '/'; // Redirect to home page or login page
+        } else {
+            alert(`Failed to delete account: ${result.error?.message || result.error}`);
+        }
+    };
+  
     return (
         <>
             <Sidebar sidebar={sidebar} />
@@ -72,7 +89,16 @@ export const Profile = ({ sidebar }) => {
                                     <h2><span>30</span> Posts</h2>
                                 </div>
                             </div>
+                             <div className="profile-header-more">
 
+                            <button 
+                                className="button delete-account" 
+                                onClick={handleDeleteAccount}>
+                                     Delete Account
+                            </button>
+                            
+
+                        </div>
                         </div>
                     </div>
                     <div className="profile-tabs">
@@ -88,7 +114,6 @@ export const Profile = ({ sidebar }) => {
                         <hr />
                     </div>
                 </div>
-
                 <div className="section-content">
                     <div className="profile-content">
                         <div className="content-tabs">
@@ -98,12 +123,7 @@ export const Profile = ({ sidebar }) => {
                 </div>
             </div>
             </div>
-
-
         </>
-
-
-
 
     )
 }

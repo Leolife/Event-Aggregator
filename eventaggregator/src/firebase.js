@@ -3,7 +3,7 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getFirestore } from "@firebase/firestore";
-import { getAuth } from "firebase/auth";
+import { getAuth, deleteUser } from "firebase/auth";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -28,3 +28,20 @@ export const auth = getAuth(app);  // currently using for login authentication
 export const firestore = getFirestore(app);
 
 
+// function to delete a user's account
+export const deleteUserAccount = async () => {
+  const auth = getAuth();
+  const user = auth.currentUser;
+
+  if (user) {
+    try {
+      await deleteUser(user);
+      return { success: true };
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      return { success: false, error };
+    }
+  } else {
+    return { success: false, error: "No user is currently signed in." };
+  }
+};
