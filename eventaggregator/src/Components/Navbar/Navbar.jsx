@@ -4,6 +4,7 @@ import './Navbar.css';
 import { ReactComponent as MenuIcon } from '../../assets/menu-icon.svg';
 import { ReactComponent as SearchIcon } from '../../assets/search-icon.svg';
 import { ReactComponent as ProfileIcon } from '../../assets/profile-icon.svg';
+import { ReactComponent as SettingsIcon } from '../../assets/settings.svg';
 import { Link } from 'react-router-dom';
 import logo from '../../assets/logo-text.png';
 import Overlays from '../Overlays';
@@ -40,6 +41,8 @@ const Navbar = ({setSidebar}) => {
           <button class="button sign-up" onClick={() => openModal('signup')}> Sign Up</button>
           <Overlays modalType={modalType} isOpen={isOpen}  onClose={() => setIsOpen(false)} />
           <ProfileIcon className="profile-icon" />
+
+          <Link to = {'/settings'}><SettingsIcon className="settings-icon"></SettingsIcon></Link>
         </div>
       </nav>
     </>
