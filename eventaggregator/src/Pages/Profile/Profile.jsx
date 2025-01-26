@@ -91,11 +91,6 @@ export const Profile = ({ sidebar }) => {
                             </div>
                              <div className="profile-header-more">
 
-                            <button 
-                                className="button delete-account" 
-                                onClick={handleDeleteAccount}>
-                                     Delete Account
-                            </button>
                             
 
                         </div>
