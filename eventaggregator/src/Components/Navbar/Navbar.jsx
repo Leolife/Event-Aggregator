@@ -25,7 +25,7 @@ const Navbar = ({setSidebar}) => {
           <MenuIcon className="menu-icon" onClick={()=>setSidebar(prev=>prev===false?true:false)}/>
           <Link to = {'/'}><img  className='logo' src={logo} alt="" /></Link>
           <h3>Events</h3>
-          <h3>Forums</h3>
+          <h3><Link to = {'/Forum'}> Forum </Link></h3>
           <h3><Link to = {'/profile'}> Profile </Link></h3>
         </div>
         <div className="nav-middle flex-div">
