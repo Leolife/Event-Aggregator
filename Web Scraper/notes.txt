@@ -2,3 +2,6 @@ https://www.predicthq.com/pricing
 
 
 https://docs.python.org/3/library/unittest.html
+
+To-Do:
+Create a simple server with item-to-item reccomendation.
