@@ -74,8 +74,8 @@
     border-radius: 6px;
     border: 1px solid #000000;
     margin-left: 16px;
-    flex-shrink: 0;
     max-width: 500px;
+    min-height: 200px;
     max-height: 200px;
 }
 

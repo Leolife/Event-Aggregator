@@ -27,6 +27,17 @@ export const Forum = ({ sidebar }) => {
             downvotes: 1,
             replies: 7,
             thumbnail: thumbnail1
+        },
+        {
+            event: "League LAN party at ya motha's house",
+            title: "We need to do this again guys, wasn't it fun?",
+            preview: "Man it was so fun, you guys are straight garbo ngl. But i appreciate the games and it was fun nonetheless!! much love <3",
+            author: "Pompompurin",
+            timestamp: "120 mins ago",
+            upvotes: 4,
+            downvotes: -31,
+            replies: 22,
+            thumbnail: thumbnail1
         }
     ];
 
