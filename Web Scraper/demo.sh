@@ -9,10 +9,10 @@ flask run
 # read -p "Press enter to continue"
 
 # # Request an update by sending the link
-# curl -i http://127.0.0.1:5000/events \
-# -X POST \
-# -H 'Content-Type: application/json' \
-# -d '{"link":"https://news.ycombinator.com/"}' 
+curl -i http://127.0.0.1:5000/games \
+-X POST \
+-H 'Content-Type: application/json' \
+-d '{"Number":"8"}' 
 
 # read -p "Press enter to continue"
 

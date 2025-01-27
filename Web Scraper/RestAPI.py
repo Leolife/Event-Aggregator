@@ -1,13 +1,13 @@
-#import requests
+import requests
 from flask import Flask, request, jsonify
 import pandas as pd
 import random
+import numpy as np
 #from bs4 import BeautifulSoup
 
 app = Flask(__name__)
 
 events_titles = []
-
 
 class event_listings:
     def __init__(self,i: pd.DataFrame):
@@ -22,27 +22,32 @@ event_titles_c = event_listings(i = df)
 def get_events():
     select_row = random.randint(a = 0, b = event_titles_c.rows)
     title = event_titles_c.data.iloc[select_row,0]
+    incoming_request = request.get_json()
     return jsonify(title)
 
 @app.post("/games")
 def add_events():
-    # if request.is_json:
-    #     event_titles_c.items = []
-    #     incoming_request = request.get_json()
-    #     r = requests.get(url = incoming_request['link'])
-    #     soup   = BeautifulSoup(r.content, 'html.parser')
-    #     quote  = soup.findAll("a")
-    #     quote  = [str(item) for item in quote]
-    #     titles = [item for item in quote if item.startswith("<a href=\"https:")][1:-3]
+    if request.is_json:
+        incoming_request     = request.get_json()
+        n = incoming_request['Number']
+        random_row = int(n)
 
-    #     start_idx = len("<a href=\"")
-    #     end_idx    = len("</a>")
-    #     for idx,t in enumerate(titles):
-    #         link, event_title = t[start_idx:-end_idx].split(">")
-    #         data_to_append = {"id"   : idx,
-    #                           "links": link,
-    #                           "title": event_title}
-    #         event_titles_c.items.append(data_to_append)
-    #         #print(f'{{"id": {idx},"link":"{link} ,"title":"{event_title}"}},')
-    #     return event_titles_c.items, 201
+        titles = event_titles_c.data[['Title']]
+        genres = event_titles_c.data.iloc[:,1:]
+
+        # Select one -> random_row
+        t = titles.iloc[random_row]
+        g = genres.iloc[random_row].to_numpy()
+
+        titles = titles.drop(index = random_row)
+        genres = genres.drop(index = random_row)
+
+        distances = [ np.linalg.norm(x = row - g, ord = 1) for row in genres.to_numpy()]
+        genres['distance'] = distances/ np.sum(a = distances)
+
+        reccs = random.choices(population = list(titles['Title']),
+                       weights    = list(genres['distance']),
+                       k = 5)
+
+        return reccs, 201
     return {"error": "Request must be JSON"}, 415
