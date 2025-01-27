@@ -1,4 +1,4 @@
-import requests
+#import requests
 from flask import Flask, request, jsonify
 import pandas as pd
 import random
@@ -15,14 +15,14 @@ class event_listings:
         self.rows,self.cols = i.shape
 
 
-df = pd.read_csv(filepath_or_buffer = '/Users/andrew/Documents/GitHub/Event-Aggregator/Web Scraper/Data/video_games.csv', index_col = 0)
+df = pd.read_csv(filepath_or_buffer = 'Data/video_games.csv', index_col = 0)
 event_titles_c = event_listings(i = df)
 
 @app.get("/games")
 def get_events():
     select_row = random.randint(a = 0, b = event_titles_c.rows)
     title = event_titles_c.data.iloc[select_row,0]
-    incoming_request = request.get_json()
+    #incoming_request = request.get_json()
     return jsonify(title)
 
 @app.post("/games")

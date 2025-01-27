@@ -10,9 +10,22 @@ import Settings from './Pages/Settings/Settings';
 
 
 function App() {
+
+  const [data, setData] = useState([{}])
+
   const [sidebar, setSidebar] = useState(true);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/games").then(
+      res => res.json()
+    ).then(
+      data => {
+        setData(data)
+      }
+    )
+    }, [])
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -30,13 +43,15 @@ function App() {
 
   return (
     <div>
+
       <Navbar setSidebar={setSidebar} user={user} />
       <Routes>
-        <Route path='/' element={<Home sidebar={sidebar} user={user} />} />
+        <Route path='/' element={<Home sidebar={sidebar} user={user} data={data}/>} />
         <Route path='/profile' element={ <Profile sidebar={sidebar} user={user} />} />
         <Route path='settings' element={<Settings />}/>
         <Route path='/event/category/:categoryName' element={ <EventCategory sidebar={sidebar} user={user} />} />
       </Routes>
+      
     </div>
   );
 }

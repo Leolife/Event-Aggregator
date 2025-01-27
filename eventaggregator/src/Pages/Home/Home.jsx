@@ -17,7 +17,7 @@ import thumbnail12 from '../../assets/thumbnail12.png'
 import { Link } from 'react-router-dom'
 
 
-export const Home = ({ sidebar }) => {
+export const Home = ({ sidebar, user, data}) => {
   return (
     <>
       <Sidebar sidebar={sidebar} />
@@ -27,7 +27,7 @@ export const Home = ({ sidebar }) => {
             <div className='img-sizer'>
               <img src={thumbnail1} alt="" />
             </div>
-            <h2> League of Legends </h2>
+            <h2> {data} </h2>
             <h3> 25 Events • 6 Upcoming </h3>
           </Link>
           <div className='card'>
