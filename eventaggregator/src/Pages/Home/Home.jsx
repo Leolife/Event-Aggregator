@@ -1,5 +1,5 @@
 //home.jsx
-import React from 'react'
+import React, { useState } from 'react'
 import './Home.css'
 import Sidebar from '../../Components/Sidebar/Sidebar'
 import thumbnail1 from '../../assets/thumbnail1.png'
@@ -18,10 +18,31 @@ import { Link } from 'react-router-dom'
 
 
 export const Home = ({ sidebar, user, data}) => {
+  const [Number, setNum] = useState("");
+  const [Reccs, setReccs] = useState(null);
+
   return (
     <>
       <Sidebar sidebar={sidebar} />
       <div className={`container ${sidebar ? "" : 'large-container'}`}>
+
+          <button
+          onClick = {async () =>  {
+            const game = {Number: "8"};
+            const response = await fetch("/games", {
+              method: "POST",
+              headers: {
+                "Content-Type" : "application/json"
+              },
+              body: JSON.stringify(game)
+            });
+            setReccs(await response.json())
+            
+          }}
+          
+          > Post Tester </button>
+     
+        
         <div className="feed">
           <Link to = {'event/category/league-of-legends'} className='card'>
             <div className='img-sizer'>
@@ -30,6 +51,18 @@ export const Home = ({ sidebar, user, data}) => {
             <h2> {data} </h2>
             <h3> 25 Events • 6 Upcoming </h3>
           </Link>
+          
+          
+          {Reccs && Reccs.map((item, index) => (
+              <div className='card' key = {index}>
+              <div className='img-sizer'>
+                <img src={thumbnail2} alt="" />
+              </div>
+              <h2> {item} </h2>
+              <h3> 25 Events • 6 Upcoming </h3>
+            </div>
+            ))}
+
           <div className='card'>
             <div className='img-sizer'>
               <img src={thumbnail2} alt="" />
