@@ -37,6 +37,8 @@ const Navbar = ({setSidebar}) => {
         </div>
 
         <div className="nav-right flex-div">
+          <Link to = {'/debug'}><button class="button userdebug">UserDebug</button>
+          </Link>
           <button class="button log-in" onClick={() => openModal('login')}>Login</button>
           <button class="button sign-up" onClick={() => openModal('signup')}> Sign Up</button>
           <Overlays modalType={modalType} isOpen={isOpen}  onClose={() => setIsOpen(false)} />

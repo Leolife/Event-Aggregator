@@ -8,6 +8,7 @@ import { EventCategory } from './Pages/EventCategory/EventCategory';
 import { auth } from './firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import Settings from './Pages/Settings/Settings';
+import TestUserData from './utils/Debuguser';
 
 
 function App() {
@@ -38,6 +39,7 @@ function App() {
         <Route path='/forum' element={<Forum sidebar={sidebar} user={user} />}/>
         <Route path='settings' element={<Settings />}/>
         <Route path='/event/category/:categoryName' element={ <EventCategory sidebar={sidebar} user={user} />} />
+        <Route path='/debug' element={<TestUserData/>}/>
       </Routes>
     </div>
   );
