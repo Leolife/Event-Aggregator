@@ -50,7 +50,7 @@ export const Profile = ({ sidebar }) => {
         }
       }
 
-
+    // Todo: migrate to backend
     const handleDeleteAccount = async () => {
         const confirmation = window.confirm(
             "Are you sure you want to delete your account? This action cannot be undone."
@@ -75,6 +75,9 @@ export const Profile = ({ sidebar }) => {
                     <div className="profile-header">
                         <div className="profile-banner">
                             <div className="profile-banner-sizer">
+                                <button className="edit-profile-button">
+                                    Edit Profile
+                                </button>
                                 <img className="profile-banner-image" src={headerimage} alt=""></img>
                             </div>
                             <img className="profile-picture" src={profileimage} alt=""></img>
