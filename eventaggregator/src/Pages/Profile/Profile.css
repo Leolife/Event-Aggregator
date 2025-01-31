@@ -41,8 +41,6 @@
 }
 
 
-
-
 .profile-header-content {
     position: relative;
     width: 100%;
@@ -108,6 +106,7 @@
     margin-top: 10px;
     margin-bottom: 20px;
 }
+
 .button.delete-account {
     background-color: red;
     color: white;
@@ -121,4 +120,15 @@
 
 .button.delete-account:hover {
     background-color: darkred;
+}
+
+.edit-profile-button {
+    color: white;
+    position: fixed;
+    right: 0;
+    border: none;
+}
+
+.edit-profile-button:hover {
+    background-color: rgb(108, 6, 148);
 }
