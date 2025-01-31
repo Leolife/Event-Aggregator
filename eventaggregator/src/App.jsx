@@ -39,7 +39,7 @@ function App() {
         <Route path='/forum' element={<Forum sidebar={sidebar} user={user} />}/>
         <Route path='settings' element={<Settings />}/>
         <Route path='/event/category/:categoryName' element={ <EventCategory sidebar={sidebar} user={user} />} />
-        <Route path='/debug' element={<TestUserData/>}/>
+        <Route path='/debug' element={<TestUserData />}/>
       </Routes>
     </div>
   );

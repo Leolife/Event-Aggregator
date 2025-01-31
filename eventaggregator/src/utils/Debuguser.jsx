@@ -21,6 +21,7 @@ function TestUserData() {
   return (
     <div>
       <h1>Test User Data</h1>
+      <p>Oddest bug ever: be sure to disable your ad blocker before making any calls to firebase.</p>
       <p>To change this information, head to: eventaggregator\src\utils\Debuguser.jsx, and paste your desired userID into testUID</p>
       <pre>{JSON.stringify(userData, null, 2)}</pre>
     </div>
