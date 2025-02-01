@@ -34,9 +34,11 @@ const Sidebar = ({ sidebar }) => {
         <div className="side-link">
           <ForumsIcon className="forums-icon" /><h3>Forums</h3><TriangleIcon className="triangle-icon" />
         </div>
+        <Link to={'/Forum'}>
         <div className="side-link">
           <StarIcon className="star-icon" /><p>Recommended Posts</p>
         </div>
+        </Link>
         <div className="side-link">
           <TrendIcon className="trend-icon" /><p>Hottest</p>
         </div>
