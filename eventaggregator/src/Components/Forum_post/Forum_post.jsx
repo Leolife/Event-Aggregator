@@ -15,7 +15,7 @@ const Forum_post = ({ event, title, preview, author, timestamp, upvotes, downvot
         </div>
         <div className="post-info">
           <div className="post-meta">
-            <span>{timestamp} • {author}</span>
+            <span>{timestamp} minutes ago • {author}</span>
           </div>
           
           <div className="post-stats">

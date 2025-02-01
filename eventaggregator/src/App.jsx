@@ -4,6 +4,9 @@ import { Route, Routes } from 'react-router-dom';
 import Home from './Pages/Home/Home';
 import { Profile } from './Pages/Profile/Profile';
 import { Forum } from './Pages/Forum/Forum';
+import { RecommendedForum } from './Pages/Forum/Recommended/RecommendedForum';
+import { HottestForum } from './Pages/Forum//Hottest/HottestForum';
+import { LatestForum } from './Pages/Forum/Latest/LatestForum';
 import { EventCategory } from './Pages/EventCategory/EventCategory';
 import { auth } from './firebase';
 import { onAuthStateChanged } from 'firebase/auth';
@@ -37,6 +40,9 @@ function App() {
         <Route path='/' element={<Home sidebar={sidebar} user={user} />} />
         <Route path='/profile' element={ <Profile sidebar={sidebar} user={user} />} />
         <Route path='/forum' element={<Forum sidebar={sidebar} user={user} />}/>
+        <Route path='/forum/recommended' element={<RecommendedForum sidebar={sidebar} user={user} />}/>
+        <Route path='/forum/hottest' element={<HottestForum sidebar={sidebar} user={user} />}/>
+        <Route path='/forum/latest' element={<LatestForum sidebar={sidebar} user={user} />}/>
         <Route path='settings' element={<Settings />}/>
         <Route path='/event/category/:categoryName' element={ <EventCategory sidebar={sidebar} user={user} />} />
         <Route path='/debug' element={<TestUserData />}/>

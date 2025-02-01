@@ -34,15 +34,21 @@ const Sidebar = ({ sidebar }) => {
         <div className="side-link">
           <ForumsIcon className="forums-icon" /><h3>Forums</h3><TriangleIcon className="triangle-icon" />
         </div>
+        <Link to={'/Forum/Recommended'}>
         <div className="side-link">
           <StarIcon className="star-icon" /><p>Recommended Posts</p>
         </div>
+        </Link>
+        <Link to={'/Forum/Hottest'}>
         <div className="side-link">
           <TrendIcon className="trend-icon" /><p>Hottest</p>
         </div>
+        </Link>
+        <Link to={'/Forum/Latest'}>
         <div className="side-link">
           <BoltIcon className="bolt-icon" /><p>Latest</p>
         </div>
+        </Link>
       </div>
       <hr />
       <div className="profile">
