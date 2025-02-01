@@ -6,14 +6,22 @@ function TestUserData() {
 
   useEffect(() => {
     async function fetchData() {
-      const testUID = "GwulCuTcoDb8lreTMoA3q9ZHXIt2"; // Replace with actual user ID
-      const user = new UserData(testUID);
+
       try {
-        const data = await user.getUserData();
-        setUserData(data);
-      } catch (error) {
-        console.error("Error fetching user data:", error);
+        const testUID = sessionStorage.getItem("userUid");
+        // const testUID = "GwulCuTcoDb8lreTMoA3q9ZHXIt2"; // to test 
+        const user = new UserData(testUID);
+        try {
+          const data = await user.getUserData();
+          setUserData(data);
+        } catch (errorusername) {
+          console.error("Error fetching user data:", errorusername);
+        }
+      } catch (erroruid) {
+        console.error("User ID Not found, please log in.", erroruid);
       }
+      
+      
     }
     fetchData();
   }, []);
@@ -22,7 +30,8 @@ function TestUserData() {
     <div>
       <h1>Test User Data</h1>
       <p>Oddest bug ever: be sure to disable your ad blocker before making any calls to firebase.</p>
-      <p>To change this information, head to: eventaggregator\src\utils\Debuguser.jsx, and paste your desired userID into testUID</p>
+      <p>Defaults to current logged in user, displays null if not logged in</p>
+      <p>to test other users, see eventaggregator\src\utils\Debuguser.jsx</p>
       <pre>{JSON.stringify(userData, null, 2)}</pre>
     </div>
   );
