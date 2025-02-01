@@ -31,11 +31,19 @@ const Login = ({ isOpen, onClose }) => {
 
             // Get the email associated with the username
             const userDoc = querySnapshot.docs[0];
+            const userData = userDoc.data();
             const email = userDoc.data().email;
 
             // Now sign in with the email
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             console.log('Logged in user:', userCredential.user);
+
+            // Store user info in session storage
+            sessionStorage.setItem("userEmail", userData.email);
+            sessionStorage.setItem("userName", userData.name);
+            sessionStorage.setItem("userDob", userData.dob);
+            sessionStorage.setItem("userUid", userData.uid);
+
             onClose();
         } catch (error) {
             console.error('Login error:', error);
