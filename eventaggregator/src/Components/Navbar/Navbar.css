@@ -35,20 +35,31 @@ nav {
 .nav-middle .search-box {
     border: 1px solid #ccc;
     margin-right: 15px;
-    padding: 8px 12px;
-    border-radius: 10px;
+    height: 40px;
+    border-radius: 28px;
+    padding: 14px;
+    width: max-content;
 }
 
 .nav-middle .search-box input {
-    width: 400px;
-    border: 0;
-    outline: 0;
+    margin-left: 14px;
+    height: 40px;
+    outline: none;
+    border: none;
     background: transparent;
+    width: 600px;
+    font-size: 16px;
 }
 
 .nav-middle .search-icon {
     width: 20px;
     height: 20px;
+    stroke: grey;
+}
+
+.nav-middle .sliders-icon {
+    width: 24px;
+    height: 24px;
     stroke: grey;
 }
 
