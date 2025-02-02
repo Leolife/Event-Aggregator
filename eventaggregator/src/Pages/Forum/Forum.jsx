@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Outlet } from 'react-router-dom';
 /* 
 *  below this comment is the temporary use of the imported image to fill the thumbnail
 *  until we incorporate the posting functionality where the user can choose the thumbnail
@@ -9,6 +9,7 @@ import thumbnail1 from '../../assets/thumbnail1.png';
 
 export const forumPosts = [
     {
+        postId: 0,
         event: "League LAN party at ya motha's house",
         title: "We need to do this again guys, wasn't it fun?",
         preview: "Man it was so fun, you guys are straight garbo ngl. But i appreciate the games and it was fun nonetheless!! much love <3",
@@ -20,6 +21,7 @@ export const forumPosts = [
         thumbnail: thumbnail1
     },
     {
+        postId: 1,
         event: "YFP VS Fly Quest",
         title: "Recap discussion of the League match last night. I can't believe theBausffs man! Why would he do that?",
         preview: "What an intense match! The teamfight at Baron really turned things around. I noticed theBausffs goofing " + 
@@ -41,9 +43,13 @@ export const Forum = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Redirect to /Forum/Recommended when component mounts
-        navigate('/Forum/Recommended');
+        // redirect if exactly at /forum
+        if (window.location.pathname === '/Forum') {
+            navigate('/forum/recommended');
+        }
     }, [navigate]);
+    
+    return <Outlet />;
 }
 
 export default Forum;
