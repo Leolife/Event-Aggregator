@@ -1,7 +1,16 @@
+https://serpapi.com/pricing
 https://www.predicthq.com/pricing
 
-
 https://docs.python.org/3/library/unittest.html
+https://pypi.org/project/random-address/
+
+# Dataset for content moderation
+https://www.kaggle.com/datasets/uetchy/vtuber-livechat?select=ban_events.parquet
+
+# Dataset for Popular Video Games
+https://www.kaggle.com/datasets/arnabchaki/popular-video-games-1980-2023
+
+# Steam Video games
+https://www.kaggle.com/datasets/srgiomanhes/steam-games-dataset-2025
 
 To-Do:
-Create a simple server with item-to-item reccomendation.
