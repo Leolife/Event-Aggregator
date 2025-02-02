@@ -1,4 +1,10 @@
-
+.profile-container {
+    display: flex;
+    align-items: flex-start; /* Aligns elements at the top */
+    width: 1280px; /* Adjust as needed */
+    margin: auto;
+    position: relative;
+}
 
 .profile-header {
     margin: auto;
@@ -17,8 +23,13 @@
 }
 
 
-.profile-banner {
-    position: relative;
+.profile-banner-sizer {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    flex-direction: column; /* Stacks buttons vertically */
+    gap: 5px; /* Adds spacing between buttons */
 }
 
 
@@ -72,7 +83,6 @@
     z-index: 1;
 }
 
-
 .profile-tabs {
     margin: auto;
     width: 1280px;
@@ -92,6 +102,9 @@
     overflow: hidden;
 }
 
+.profile-header {
+    flex-grow: 1; /* Allows the profile header to take available space */
+}
 
 .profile hr {
     margin-top: 10px;
@@ -107,26 +120,42 @@
     margin-bottom: 20px;
 }
 
-.button.delete-account {
-    background-color: red;
+.save-changes {
+    background-color: greenyellow;
     color: white;
-    border: none;
-    padding: -10px 50px;
-    cursor: pointer;
-    border-radius: 20px;
-    margin-top: 10px;
-    margin-left: 250px;  
 }
 
-.button.delete-account:hover {
+.profile-buttons {
+    position: absolute;
+    right: 20px; /* Adjust this value to bring it closer to the banner */
+    top: 20px; /* Align it with the top of the banner */
+    display: flex;
+    flex-direction: column; /* Stack buttons vertically */
+}
+
+.save-changes, .delete-account, .edit-profile-button {
+    position: relative; /* Remove fixed positioning */
+    width: 150px; /* Adjust width if necessary */
+    padding: 10px;
+    text-align: center;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.save-changes:hover {
+    background-color: green;
+}
+
+.delete-account {
+    background-color: red;
+    color: white;
+}
+
+.delete-account:hover {
     background-color: darkred;
 }
 
 .edit-profile-button {
     color: white;
-    position: fixed;
-    right: 0;
-    border: none;
 }
 
 .edit-profile-button:hover {
