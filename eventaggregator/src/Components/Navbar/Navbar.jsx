@@ -5,11 +5,12 @@ import { ReactComponent as MenuIcon } from '../../assets/menu-icon.svg';
 import { ReactComponent as SearchIcon } from '../../assets/search-icon.svg';
 import { ReactComponent as ProfileIcon } from '../../assets/profile-icon.svg';
 import { ReactComponent as SettingsIcon } from '../../assets/settings.svg';
+import { ReactComponent as SlidersIcon } from '../../assets/sliders.svg';
 import { Link } from 'react-router-dom';
 import logo from '../../assets/logo-text.png';
 import Overlays from '../Overlays';
 
-const Navbar = ({setSidebar}) => {
+const Navbar = ({ setSidebar }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [modalType, setModalType] = useState('');
 
@@ -22,29 +23,30 @@ const Navbar = ({setSidebar}) => {
       <Overlays isOpen={isOpen} />
       <nav className='flex-div'>
         <div className='nav-left flex-div'>
-          <MenuIcon className="menu-icon" onClick={()=>setSidebar(prev=>prev===false?true:false)}/>
-          <Link to = {'/'}><img  className='logo' src={logo} alt="" /></Link>
+          <MenuIcon className="menu-icon" onClick={() => setSidebar(prev => prev === false ? true : false)} />
+          <Link to={'/'}><img className='logo' src={logo} alt="" /></Link>
           <h3>Events</h3>
-          <h3><Link to = {'/Forum'}> Forum </Link></h3>
-          <h3><Link to = {'/profile'}> Profile </Link></h3>
+          <h3><Link to={'/Forum'}> Forum </Link></h3>
+          <h3><Link to={'/profile'}> Profile </Link></h3>
         </div>
         <div className="nav-middle flex-div">
           <div className="search-box flex-div">
-            <input type="text" placeholder='Search' />
             <SearchIcon className="search-icon" />
+            <input type="text" placeholder='Search' />
+            <SlidersIcon className="sliders-icon" onClick={() => openModal('filters')} />
           </div>
 
         </div>
 
         <div className="nav-right flex-div">
-          <Link to = {'/debug'}><button class="button userdebug">UserDebug</button>
+          <Link to={'/debug'}><button class="button userdebug">UserDebug</button>
           </Link>
           <button class="button log-in" onClick={() => openModal('login')}>Login</button>
           <button class="button sign-up" onClick={() => openModal('signup')}> Sign Up</button>
-          <Overlays modalType={modalType} isOpen={isOpen}  onClose={() => setIsOpen(false)} />
+          <Overlays modalType={modalType} isOpen={isOpen} onClose={() => setIsOpen(false)} />
           <ProfileIcon className="profile-icon" />
 
-          <Link to = {'/settings'}><SettingsIcon className="settings-icon"></SettingsIcon></Link>
+          <Link to={'/settings'}><SettingsIcon className="settings-icon"></SettingsIcon></Link>
         </div>
       </nav>
     </>
