@@ -128,3 +128,8 @@
     font-size: 14px;
     color: #667;
 }
+
+.forum-post {
+    cursor: pointer;
+  }
+  
