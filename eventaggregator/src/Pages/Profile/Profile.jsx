@@ -4,6 +4,7 @@ import Sidebar from '../../Components/Sidebar/Sidebar'
 import headerimage from '../../assets/profile-header-image.png';
 import profileimage from '../../assets/profile-picture.png';
 import { deleteUserAccount } from '../../firebase'; 
+import { Link } from "react-router-dom";
 
 // Included all tabs from tabs folder to be rendered under the profile section
 import About from './Tabs/About'
@@ -17,6 +18,13 @@ import DownVoted from './Tabs/DownVoted';
 
 export const Profile = ({ sidebar }) => {
     
+    const [editMode, setEditMode] =useState(false);
+    const handleEditClick = () => {
+        setEditMode(true);
+    };
+    const handleSaveClick = () => {
+        setEditMode(false);
+    };
     const [activeTab, setActiveTab] = useState('About');
 
     // Connects the tab logic with the naming convention-
@@ -72,33 +80,47 @@ export const Profile = ({ sidebar }) => {
             <div className={`container ${sidebar ? "" : 'large-container'}`}>
                 <div className="profile">
                 <div className="section-header">
-                    <div className="profile-header">
-                        <div className="profile-banner">
-                            <div className="profile-banner-sizer">
-                                <button className="edit-profile-button">
-                                    Edit Profile
-                                </button>
-                                <img className="profile-banner-image" src={headerimage} alt=""></img>
-                            </div>
-                            <img className="profile-picture" src={profileimage} alt=""></img>
-                        </div>
-                        <div className="profile-header-content">
-                            <div className="header-caption">
-                                <div className="header-names">
-                                    <h1>Freakbob</h1>
+                    <div className="profile-container">
+                        <div className="profile-header">
+                            <div className="profile-banner">
+                                <div className="profile-banner-sizer">                                  
+                                    <img className="profile-banner-image" src={headerimage} alt=""></img>
                                 </div>
-                                <div className="header-details">
-                                    <h2><span>30</span> Friends</h2>
-                                    <h2><span>30</span> Posts</h2>
+                                <img className="profile-picture" src={profileimage} alt=""></img>
+                            </div>
+                                <div className="profile-header-content">
+                                    <div className="header-caption">
+                                        <div className="header-names">
+                                            <h1>Freakbob</h1>
+                                        </div>
+                                        <div className="header-details">
+                                            <h2><span>30</span> Friends</h2>
+                                            <h2><span>30</span> Posts</h2>
+                                        </div>
+                                    </div>
+                                    <div className="profile-header-more">
                                 </div>
                             </div>
-                             <div className="profile-header-more">
-
-                            
-
-                        </div>
+                            <div className="profile-buttons">
+                                {!editMode && (
+                                    <button className="edit-profile-button" onClick={handleEditClick}>
+                                        Edit Profile
+                                    </button>
+                                )}
+                                {editMode && (
+                                    <>
+                                        <button className="save-changes" onClick={handleSaveClick}>
+                                            Save Changes
+                                        </button>
+                                        <button className="delete-account">
+                                            Delete Profile
+                                        </button>
+                                    </>
+                                )}
+                            </div>
                         </div>
                     </div>
+                    
                     <div className="profile-tabs">
                         {Object.entries(TABS).map(([tabKey, tabName]) => (
                         <button 
