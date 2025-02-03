@@ -4,3 +4,6 @@ Name       : str       -> The name of the Events.
 Location   : str       -> The address of where the event will take place.
 Start time : datetime  -> The time the event will start.
 End time   : datetime  -> The time the event will end. 
+
+
+Items with ranking preprocessing attributes (Final Format)(For Ranker)
