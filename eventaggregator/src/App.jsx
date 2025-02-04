@@ -9,6 +9,7 @@ import { RecommendedForum } from './Pages/Forum/Recommended/RecommendedForum';
 import { HottestForum } from './Pages/Forum//Hottest/HottestForum';
 import { LatestForum } from './Pages/Forum/Latest/LatestForum';
 import { EventCategory } from './Pages/EventCategory/EventCategory';
+import { Calendar } from './Pages/Calendar/Calendar';
 import { auth } from './firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import Settings from './Pages/Settings/Settings';
@@ -44,6 +45,7 @@ function App() {
         <Route path='/forum/hottest' element={<HottestForum sidebar={sidebar} user={user} />}/>
         <Route path='/forum/latest' element={<LatestForum sidebar={sidebar} user={user} />}/>
         <Route path="/forum/post/:postId" element={<IndividualPostView sidebar={sidebar} />} />
+        <Route path='/mycalendars' element={ <Calendar sidebar={sidebar} user={user} />} />
         <Route path='/profile' element={ <Profile sidebar={sidebar} user={user} />} />
         <Route path='settings' element={<Settings />}/>
         <Route path='/event/category/:categoryName' element={ <EventCategory sidebar={sidebar} user={user} />} />
