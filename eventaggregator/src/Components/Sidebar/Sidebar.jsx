@@ -68,7 +68,9 @@ const Sidebar = ({ sidebar }) => {
       <div className="my-calendars">
         <div className="side-link">
           <CalendarIcon className="calendar-icon" />
+          <Link to={'/mycalendars'}>
           <h3>My Calendars</h3>
+          </Link>
           <TriangleIcon className="triangle-icon" />
         </div>
         <div className="side-link">
