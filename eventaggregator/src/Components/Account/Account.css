@@ -86,3 +86,16 @@
     margin-bottom: 20px;
     width: 450px;
 }
+
+.modal-content .log-out {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    width: 450px;
+}
+
+.button-log-out {
+    background-color: red;
+}
+.button-log-out:hover {
+    background-color: darkred;
+}

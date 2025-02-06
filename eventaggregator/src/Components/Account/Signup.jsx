@@ -28,7 +28,6 @@ const Signup = ({ isOpen, onClose }) => {
                 uid: user.uid,
                 name: name,
                 email: email,
-                password: password,
                 dob: dob,
                 createdAt: new Date(), // Optionally, add a timestamp
             });
