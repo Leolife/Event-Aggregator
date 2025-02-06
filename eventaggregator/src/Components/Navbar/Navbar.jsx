@@ -68,21 +68,21 @@ const Navbar = ({ setSidebar }) => {
           <div className="user-login">
             {!isLoggedIn && (
               <>
-                <button class="button log-in" onClick={() => {openModal('login')}}>
+                <button className="button log-in" onClick={() => {openModal('login')}}>
                   Login
                 </button>
               </>
             )}
             {!isLoggedIn && (
               <>
-                <button class="button sign-up" onClick={() => openModal('signup')}> 
+                <button className="button sign-up" onClick={() => openModal('signup')}> 
                   Sign Up
                 </button>
               </>
             )}
             {isLoggedIn && (
               <>
-                <button class="button sign-up" onClick={() => {openModal('logout')}}> 
+                <button className="button sign-up" onClick={() => {openModal('logout')}}> 
                   Log out
                 </button>
               </>

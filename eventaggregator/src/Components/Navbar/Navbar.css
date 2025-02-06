@@ -78,6 +78,10 @@ nav {
     color: black;
 }
 
+.user-login {
+    display: flex;
+}
+
 .nav-right .profile-icon {
     margin: 2px 5px;
     width: 30px;
