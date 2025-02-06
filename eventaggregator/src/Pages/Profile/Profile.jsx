@@ -18,7 +18,7 @@ import DownVoted from './Tabs/DownVoted';
 
 export const Profile = ({ sidebar }) => {
     
-    const [editMode, setEditMode] =useState(false);
+    const [editMode, setEditMode] = useState(false);
     const handleEditClick = () => {
         setEditMode(true);
     };

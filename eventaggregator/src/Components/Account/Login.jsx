@@ -5,7 +5,7 @@ import { ReactComponent as Logo } from '../../assets/calendar-icon.svg';
 import { auth } from '../../firebase';
 import { firestore } from '../../firebase';
 import { collection, query, where, getDocs } from 'firebase/firestore';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, getAuth, onAuthStateChanged } from 'firebase/auth';
 
 const Login = ({ isOpen, onClose }) => {
     const [username, setUsername] = useState('');
