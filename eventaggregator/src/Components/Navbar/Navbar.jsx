@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../../App.css';
 import './Navbar.css';
 import { ReactComponent as MenuIcon } from '../../assets/menu-icon.svg';
@@ -14,11 +14,12 @@ import Overlays from '../Overlays';
 const Navbar = ({ setSidebar }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [modalType, setModalType] = useState('');
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(null);
 
   const openModal = (type) => {
     setModalType(type);
     setIsOpen(true);
+    // Purely Debugging information for the user state
     const auth = getAuth();
     // Check if the user is logged in before accessing uid
     if (auth.currentUser) {
@@ -30,12 +31,15 @@ const Navbar = ({ setSidebar }) => {
     }
   }
 
-  const handleLogin = () => {
-    setIsLoggedIn(true);
-  };
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-  };
+  useEffect(() => {
+    const auth = getAuth();
+    
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setIsLoggedIn(!!user); // `true` if user exists, `false` otherwise
+    });
+
+    return () => unsubscribe(); // Cleanup listener on unmount
+  }, []);
 
   return (
     <>
@@ -64,7 +68,7 @@ const Navbar = ({ setSidebar }) => {
           <div className="user-login">
             {!isLoggedIn && (
               <>
-                <button class="button log-in" onClick={() => {openModal('login'); handleLogin()}}>
+                <button class="button log-in" onClick={() => {openModal('login')}}>
                   Login
                 </button>
               </>
@@ -78,7 +82,7 @@ const Navbar = ({ setSidebar }) => {
             )}
             {isLoggedIn && (
               <>
-                <button class="button sign-up" onClick={() => {openModal('logout'); handleLogout()}}> 
+                <button class="button sign-up" onClick={() => {openModal('logout')}}> 
                   Log out
                 </button>
               </>
