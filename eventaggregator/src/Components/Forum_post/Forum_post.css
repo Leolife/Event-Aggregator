@@ -32,7 +32,7 @@
     flex-grow: 1;
 }
 
-.post-event {
+.post-eventName {
     font-size: 18px;
     color: rgb(64, 118, 218);
     margin-bottom: 4px;
@@ -67,7 +67,7 @@
     word-break: break-word;
 }
 
-.preview-box {
+.body-box {
     width: 500px;
     background: #ffffff;
     padding: 12px;
@@ -79,7 +79,7 @@
     max-height: 200px;
 }
 
-.post-preview {
+.post-body {
     font-size: 18px;
     color: #000000;
     margin: 0;
@@ -116,15 +116,15 @@
     gap: 8px;
 }
 
-.downvotes {
+.downvoteCount {
     color: #ef4444;
 }
 
-.upvotes {
+.upvoteCount {
     color: #22c55e;
 }
 
-.replies {
+.replyCount {
     font-size: 14px;
     color: #667;
 }
