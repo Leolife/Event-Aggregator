@@ -2,39 +2,39 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Forum_post.css';
 
-const Forum_post = ({ postId, event, title, preview, author, timestamp, upvotes, downvotes, replies, thumbnail }) => {
+const Forum_post = ({ postId, eventName, title, body, ownerName, timestamp, upvoteCount, downvoteCount, replyCount, thumbnailID }) => {
   const navigate = useNavigate();
   
   return (
     <div className="forum-post" onClick={() => navigate(`/Forum/post/${postId}`)}>
       <div className="post-thumbnail">
-        <img src={thumbnail || "/api/placeholder/64/64"} alt="" />
+        <img src={thumbnailID || "/api/placeholder/64/64"} alt="" />
       </div>
       
       <div className="post-content">
-        <span className="post-event">{event}</span>
+        <span className="post-eventName">{eventName}</span>
         <div className="title-box">
           <h3 className="post-title">{title}</h3>
         </div>
         <div className="post-info">
           <div className="post-meta">
-            <span>{timestamp} minutes ago • {author}</span>
+            <span>{timestamp} minutes ago • {ownerName}</span>
           </div>
           
           <div className="post-stats">
             <div className="votes">
-              <span className="upvotes">{upvotes}↑</span>
-              <span className="downvotes">{downvotes}↓</span>
+              <span className="upvoteCount">{upvoteCount}↑</span>
+              <span className="downvoteCount">{downvoteCount}↓</span>
             </div>
-            <div className="replies">
-              See {replies} Replies
+            <div className="replyCount">
+              See {replyCount} Replies
             </div>
           </div>
         </div>
       </div>
 
-      <div className="preview-box">
-        <p className="post-preview">{preview}</p>
+      <div className="body-box">
+        <p className="post-body">{body}</p>
       </div>
     </div>
   );
