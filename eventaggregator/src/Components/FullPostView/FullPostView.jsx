@@ -10,6 +10,7 @@ const FullPostView = ({ post, comments }) => {
     const handleReplySubmit = (e) => {
         e.preventDefault();
         setReplyText('You actually thought the reply button would work properly, LOL!');
+        window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ')
     };
 
     const toggleDropdown = () => {
