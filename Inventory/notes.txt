@@ -2,7 +2,12 @@ https://serpapi.com/pricing
 https://www.predicthq.com/pricing
 
 https://docs.python.org/3/library/unittest.html
+
+# Generate Random Addresses
 https://pypi.org/project/random-address/
+
+# Schedule Modules for scheduling tasks
+https://schedule.readthedocs.io/en/stable/
 
 # Dataset for content moderation
 https://www.kaggle.com/datasets/uetchy/vtuber-livechat?select=ban_events.parquet
@@ -14,3 +19,7 @@ https://www.kaggle.com/datasets/arnabchaki/popular-video-games-1980-2023
 https://www.kaggle.com/datasets/srgiomanhes/steam-games-dataset-2025
 
 To-Do:
+https://github.com/c00kie17/liquipediapy/blob/master/liquipediapy/liquipediapy.py
+
+
+
