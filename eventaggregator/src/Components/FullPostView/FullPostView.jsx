@@ -1,39 +1,137 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './FullPostView.css';
+import { forumPosts } from '../../Pages/Forum/Forum';
+import { useParams } from 'react-router-dom';
 
 const FullPostView = ({ post, comments }) => {
+    const [showDropdown, setShowDropdown] = useState(false);
+    const [replyText, setReplyText] = useState('');
+
+    const handleReplySubmit = (e) => {
+        e.preventDefault();
+        setReplyText('You actually thought the reply button would work properly, LOL!');
+    };
+
+    const toggleDropdown = () => {
+        setShowDropdown(!showDropdown);
+    };
+
+    const { postId } = useParams();
+    
+    // Find the specific post from your posts array
+    const forumPost = forumPosts.find(post => post.postId === parseInt(postId));
+
     return (
         <div className="full-post">
-            <div className="post-header">
-                <h2>{post.event}</h2>
-                <h1>{post.title}</h1>
-                <div className="post-meta">
-                    <span className="ownerName">Posted by {post.ownerName}</span>
-                    <span className="votes">
-                        <span className="upvoteCount">{post.upvoteCount}</span>
-                        <span className="downvoteCount">{post.downvoteCount}</span>
-                    </span>
-                </div>
-            </div>
-            
-            <div className="post-content">
-                <img src={post.thumbnailID} alt="Post thumbnail" className="post-thumbnail" />
-                <p className="post-text">{post.body}</p>
-            </div>
-
-            <div className="comments-section">
-                <h3>Comments ({comments?.length || 0})</h3>
-                <div className="comments-list">
-                    {comments?.map((comment, index) => (
-                        <div key={index} className="comment">
-                            <div className="comment-header">
-                                <span className="comment-ownerName">{comment.ownerName}</span>
-                                <span className="comment-timestamp">{comment.timestamp}</span>
+            <div className={`content-wrapper ${showDropdown ? 'with-dropdown' : ''}`}>
+                <div className="main-content">
+                    <div className="post-header">
+                        <div className="title-section">
+                            <div className="title-left">
+                                <h1 className="post-title">{post.title}</h1>
+                                <div className="author-info">
+                                    <div className="author-avatar">
+                                        {post.ownerName?.[0]?.toUpperCase() || 'U'}
+                                    </div>
+                                    <span>{post.ownerName}</span>
+                                </div>
                             </div>
-                            <p className="comment-body">{comment.commentBody}</p>
+                            <button 
+                                className={`dropdown-button ${showDropdown ? 'active' : ''}`} 
+                                onClick={toggleDropdown}>
+                                <span className="dropdown-icon">◄</span>
+                                View Event Info
+                            </button>
                         </div>
-                    ))}
+                        <div className="separator" />
+                    </div>
+                    
+                    <div className="post-content">
+                        <img 
+                            src={post.thumbnailID || "/api/placeholder/200/200"}
+                            alt=""
+                            className="post-thumbnail"
+                        />
+                        <div className="content-right">
+                            <div className="event-title">{post.event}</div>
+                            <p className="post-body">{post.body}</p>
+                        </div>
+                    </div>
+
+                    <div className="post-footer">
+                        <span className="post-time">Posted: 1 day ago</span>
+                        <div className="votes-section">
+                            <div className="vote-count upvotes">
+                                {post.upvoteCount} <span className="vote-arrow">↑</span>
+                            </div>
+                            <div className="vote-count downvotes">
+                                {post.downvoteCount} <span className="vote-arrow">↓</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="comments-section">
+                        <div className="reply-container">
+                            <textarea
+                                className="reply-input"
+                                placeholder="Comment..."
+                                value={replyText}
+                                onChange={(e) => setReplyText(e.target.value)}
+                                rows={4}
+                            />
+                            <button className="reply-button" onClick={handleReplySubmit}>
+                                Reply
+                            </button>
+                        </div>
+
+                        {comments?.map((comment, index) => (
+                            <div key={index} className="comment-box">
+                                <div className="author-info">
+                                    <div className="author-avatar">
+                                        {comment.ownerName?.[0]?.toUpperCase() || 'U'}
+                                    </div>
+                                    <span>{comment.ownerName}</span>
+                                    <span className="post-time">{comment.timestamp}</span>
+                                </div>
+                                <p className="post-body">{comment.commentBody}</p>
+                            </div>
+                        ))}
+                    </div>
                 </div>
+
+                {showDropdown && (
+                    <div className="event-sidebar">
+                        <div className="event-card">
+                            <img 
+                                src={post.thumbnailID || "/api/placeholder/400/200"}
+                                alt="Event thumbnail"
+                                className="event-logos"
+                            />
+                            <div className="event-details">
+                                <h3 className="event-name"> {forumPost.eventName} </h3>
+                                <div className="event-info">
+                                    <span>📅</span>
+                                    <span>Sat, October 19th @ 2:00 PM (PDT)</span>
+                                </div>
+                                <div className="event-info">
+                                    <span>📍</span>
+                                    <span>Riot Games Arena</span>
+                                </div>
+                            </div>
+                            <div className="event-actions">
+                                <button className="event-button primary-button">
+                                    Add to Calendar
+                                </button>
+                                <button className="event-button secondary-button">
+                                    Export (Google Calendar)
+                                </button>
+                                <button className="download-button">
+                                    ⬇️
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
