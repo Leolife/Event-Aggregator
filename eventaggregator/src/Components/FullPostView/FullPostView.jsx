@@ -8,17 +8,17 @@ const FullPostView = ({ post, comments }) => {
                 <h2>{post.event}</h2>
                 <h1>{post.title}</h1>
                 <div className="post-meta">
-                    <span className="author">Posted by {post.author}</span>
+                    <span className="ownerName">Posted by {post.ownerName}</span>
                     <span className="votes">
-                        <span className="upvotes">{post.upvotes}</span>
-                        <span className="downvotes">{post.downvotes}</span>
+                        <span className="upvoteCount">{post.upvoteCount}</span>
+                        <span className="downvoteCount">{post.downvoteCount}</span>
                     </span>
                 </div>
             </div>
             
             <div className="post-content">
-                <img src={post.thumbnail} alt="Post thumbnail" className="post-thumbnail" />
-                <p className="post-text">{post.preview}</p>
+                <img src={post.thumbnailID} alt="Post thumbnail" className="post-thumbnail" />
+                <p className="post-text">{post.body}</p>
             </div>
 
             <div className="comments-section">
@@ -27,10 +27,10 @@ const FullPostView = ({ post, comments }) => {
                     {comments?.map((comment, index) => (
                         <div key={index} className="comment">
                             <div className="comment-header">
-                                <span className="comment-author">{comment.author}</span>
+                                <span className="comment-ownerName">{comment.ownerName}</span>
                                 <span className="comment-timestamp">{comment.timestamp}</span>
                             </div>
-                            <p className="comment-content">{comment.content}</p>
+                            <p className="comment-body">{comment.commentBody}</p>
                         </div>
                     ))}
                 </div>

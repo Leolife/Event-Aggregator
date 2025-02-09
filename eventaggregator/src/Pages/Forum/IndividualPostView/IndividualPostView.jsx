@@ -14,9 +14,9 @@ const IndividualPostView = ({ sidebar }) => {
     // Temporary comments array - replace with comments from backend when ready
     const dummyComments = [
         {
-            author: "User123 ",
+            ownerName: "User123 ",
             timestamp: "2 hours ago",
-            content: "Great post!"
+            commentBody: "Great post!"
         },
     ];
 
