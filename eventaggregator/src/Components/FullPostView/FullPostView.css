@@ -87,7 +87,7 @@
     transform: rotate(180deg);
 }
 
-.event-card {
+.full-post .event-card {
     display: flex;
     flex-direction: column;
     gap: 16px;
@@ -212,7 +212,7 @@
     width: 100%;
 }
 
-.post-content {
+.full-post .post-content {
     display: flex;
     gap: 20px;
     margin-bottom: 24px;
@@ -230,7 +230,7 @@
     flex-grow: 1;
 }
 
-.post-body {
+.full-post .post-body {
     color: #333;
     line-height: 1.6;
     margin: 0;
@@ -317,7 +317,7 @@
     background-color: #e0e0e0;
 }
 
-.post-footer {
+.full-post.post-footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
