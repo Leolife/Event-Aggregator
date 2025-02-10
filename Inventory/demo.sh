@@ -1,5 +1,11 @@
+#!/bin/bash
 # export FLASK_APP=RestAPI.py
 # flask run
+python3 -m webbrowser http://127.0.0.1:5000/tags
+read -p "Press enter to continue"
+
+
+exit 1
 #################################### Obtain a random event
 python3 -m webbrowser http://127.0.0.1:5000/events/random_one
 read -p "Press enter to continue"

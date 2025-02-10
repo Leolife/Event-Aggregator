@@ -76,6 +76,12 @@ def record_seen():
         user_db.data[user_ID][event] = 0
     return {'Message': 'ok'}, 200
 
+@app.get("/tags")
+def unique_tags():
+    s = set()
+    s = {tag for tags in events.data['tags'] for tag in eval(tags)}
+    return list(s), 200
+
 
 # @app.post("/events")
 # def add_events():
