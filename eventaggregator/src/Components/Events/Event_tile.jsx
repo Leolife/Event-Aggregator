@@ -10,6 +10,7 @@ const Event_tile = ({ name, thumbnail, total_events, total_upcomming, tags, link
             <div className="name-box">
                 <h2 className="event-name"> {name} </h2>
             </div>
+            <h3 className="event-info"> {total_events} Events • {total_upcomming} Upcoming </h3>
             <div className="tag-box">
                 {tags.map((tag, index) => (
                     <div key={index} className="tag">
@@ -17,7 +18,7 @@ const Event_tile = ({ name, thumbnail, total_events, total_upcomming, tags, link
                     </div>
                 ))}
             </div>
-            <h3 className="event-info"> {total_events} Events • {total_upcomming} Upcoming </h3>
+            
         </Link>
     )
 }
