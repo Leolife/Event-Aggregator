@@ -1,24 +1,14 @@
+.feed-container {
+    display: flex;
+    align-items: center;
+}
 
-  
-.feed {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    grid-column-gap: 5px;
-    grid-row-gap: 5px;
+.feed-container .feed {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
     margin-top: 15px;
-}
-
-.card .img-sizer {
-    width: 250px;
-    height: 350px;
-    overflow: hidden;
-}
-
-.card img {
-    width: 100%;
-    height: 100%;
-    border-radius: 5px;
-    object-fit: cover;
+    justify-content: flex-start;
 }
 
 .header .filters {
@@ -42,6 +32,7 @@
     border-radius: 8px;
     padding: 14px;
     width: max-content;
+    margin-right: 6px;
 }
 
 .home .search-box input {
@@ -118,3 +109,8 @@
     border: none;
 }
 
+
+.home .tag:hover {
+    background-color: #6b34c9;
+    border: 2px solid rgba(255, 255, 255, 0.708);
+}
