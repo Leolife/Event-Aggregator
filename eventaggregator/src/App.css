@@ -8,3 +8,8 @@
 .large-container {
     padding-left: 7%;
 }
+
+
+html {
+	overflow: scroll;
+}
