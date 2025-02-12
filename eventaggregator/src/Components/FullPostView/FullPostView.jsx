@@ -18,7 +18,7 @@ const FullPostView = ({ post, comments }) => {
     };
 
     const { postId } = useParams();
-    
+
     // Find the specific post from your posts array
     const forumPost = forumPosts.find(post => post.postId === parseInt(postId));
 
@@ -37,8 +37,8 @@ const FullPostView = ({ post, comments }) => {
                                     <span>{post.ownerName}</span>
                                 </div>
                             </div>
-                            <button 
-                                className={`dropdown-button ${showDropdown ? 'active' : ''}`} 
+                            <button
+                                className={`dropdown-button ${showDropdown ? 'active' : ''}`}
                                 onClick={toggleDropdown}>
                                 <span className="dropdown-icon">◄</span>
                                 View Event Info
@@ -46,9 +46,9 @@ const FullPostView = ({ post, comments }) => {
                         </div>
                         <div className="separator" />
                     </div>
-                    
+
                     <div className="post-content">
-                        <img 
+                        <img
                             src={post.thumbnailID || "/api/placeholder/200/200"}
                             alt=""
                             className="post-thumbnail"
@@ -60,7 +60,7 @@ const FullPostView = ({ post, comments }) => {
                     </div>
 
                     <div className="post-footer">
-                        <span className="post-time">Posted: 1 day ago</span>
+                        <span className="post-time">Posted: {post.timestamp} minutes ago</span>
                         <div className="votes-section">
                             <div className="vote-count upvotes">
                                 {post.upvoteCount} <span className="vote-arrow">↑</span>
@@ -103,7 +103,7 @@ const FullPostView = ({ post, comments }) => {
                 {showDropdown && (
                     <div className="event-sidebar">
                         <div className="event-card">
-                            <img 
+                            <img
                                 src={post.thumbnailID || "/api/placeholder/400/200"}
                                 alt="Event thumbnail"
                                 className="event-logos"
