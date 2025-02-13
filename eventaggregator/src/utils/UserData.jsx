@@ -108,6 +108,39 @@ class UserData {
     async setPostsCount(newCount) {
         await this.setUserData({ postsCount: newCount });
     }
+
+    // Getter: Fetch the user's profile picture
+    async getProfilePicture() {
+        const userData = await this.getUserData();
+        return userData.profilePicture || "";
+    }
+
+    // Setter: Update the user's profile picture
+    async setProfilePicture(newPicture) {
+        await this.setUserData({ profilePicture: newPicture });
+    }
+
+    // Getter: Fetch the user's profile banner
+    async getProfileBanner() {
+        const userData = await this.getUserData();
+        return userData.profileBanner || "";
+    }
+
+    // Setter: Update the user's profile banner
+    async setProfileBanner(newBanner) {
+        await this.setUserData({ profileBanner: newBanner });
+    }
+
+    // Getter: Fetch the user's interests array
+    async getInterests() {
+        const userData = await this.getUserData();
+        return userData.interests || [];
+    }
+
+    // Setter: Update the user's interests array
+    async setInterests(newInterests) {
+        await this.setUserData({ interests: newInterests });
+    }
 }
 
 export default UserData;
