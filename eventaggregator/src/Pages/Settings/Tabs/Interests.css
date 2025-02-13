@@ -35,67 +35,20 @@
     height: 40rem;
 }
 
-.close-btn {
-    position: absolute;
-    top: 0.5rem;
-    right: 0.5rem;
-    color: gray;
-}
+.interest-box {
+    font-family: Inter;
+    font-size: 32px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 20px; /* 62.5% */
+    letter-spacing: 0.1px;
 
-.modal-content .container {
-    margin-bottom: 10px;
-    margin-top: 20px;
-}
-
-.modal-content h2 {
-    margin-top: 50px;
-    margin-bottom: 25px;
-    text-align: center;
-    width: 50%;
-}
-
-.input-box {
+    background-color: gray;
     display: flex;
-    justify-content: center;
-    margin-top: 10px;
-    margin-bottom: 5px;
-}
-
-.input-box input {
-    width: 450px;
-    border: 1px solid #ccc;
-    padding: 8px 12px;
-    border-radius: 10px;
-    outline: none;
-}
-
-.input-box input:focus {
-    border-color: #3ed0e4;
-    box-shadow: 0 0 0 2px #3ed0e4;
-}
-
-
-.modal-content .log-in {
-    margin-top: 20px;
-    margin-bottom: 20px;
-    width: 450px;
-}
-
-.modal-content .sign-up {
-    margin-top: 20px;
-    margin-bottom: 20px;
-    width: 450px;
-}
-
-.modal-content .log-out {
-    margin-top: 20px;
-    margin-bottom: 20px;
-    width: 450px;
-}
-
-.button-log-out {
-    background-color: red;
-}
-.button-log-out:hover {
-    background-color: darkred;
+    width: 1078px;
+    height: 75px;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 750px;
+    flex-shrink: 0;
 }
