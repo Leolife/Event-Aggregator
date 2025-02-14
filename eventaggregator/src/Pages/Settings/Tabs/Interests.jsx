@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './Interests.css';
 import { auth, firestore } from '../../../firebase'; // Adjusted for your firebase.js location
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { collection, addDoc } from 'firebase/firestore';
 import UserData from '../../../utils/UserData';
 
 const user = auth.currentUser;
@@ -24,7 +22,7 @@ function Interests() {
         fetchInterests();
     }, []);
 
-    const handleSubmit = async (e) => {
+    const addInterest = async (e) => {
         console.log("Current User:", auth.currentUser);
         e.preventDefault(); // Prevent form refresh
 
@@ -40,12 +38,27 @@ function Interests() {
         setNewInterest(""); //clear input box
     };
 
+    const deleteInterest = async (indexToDelete) => {
+        // Create a new array excluding the interest at the provided index
+        const updatedInterests = interests.filter((_, index) => index !== indexToDelete);
+      
+        const user = auth.currentUser;
+        if (user) {
+          const userData = new UserData(user.uid);
+          // Update the interests in Firebase
+          await userData.setInterests(updatedInterests);
+        }
+      
+        // Update the component state
+        setInterests(updatedInterests);
+      };
+
     return(
         <div className="Interests">
             <div>
                 <h2 className="interests">Add your interests</h2>
                 <p>Enter in Key Terms to help us tailor your experience!</p>
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={addInterest}>
                     <div className="interest-input">
                         <div className="input-box-key-term">
                             <input 
@@ -64,11 +77,16 @@ function Interests() {
 
                 </form>
 
-                <ul>
+                <div>
                     {interests.map((interest, index) => (
-                        <p className="interest-box" key={index}>{interest}</p>
+                        <p key={index} className="interest-item">
+                            <span className="interest-box">{interest}</span>
+                            <button className="delete-button" onClick={() => deleteInterest(index)}>
+                                Delete
+                            </button>
+                        </p>
                     ))}
-                </ul>
+                </div>
             </div>
         </div>
     );
