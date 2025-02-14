@@ -8,6 +8,7 @@ class UserData {
         }
         this.uid = uid;
         this.userRef = doc(firestore, "users", this.uid); // Direct reference using UID as document ID
+        console.log(this.userRef)
     }
 
     // Getter: Fetch user data from Firestore
