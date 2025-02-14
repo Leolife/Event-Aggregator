@@ -17,9 +17,22 @@ import TestUserData from './utils/Debuguser';
 
 
 function App() {
+
+  const [data, setData] = useState([{}])
+
   const [sidebar, setSidebar] = useState(true);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/games").then(
+      res => res.json()
+    ).then(
+      data => {
+        setData(data)
+      }
+    )
+    }, [])
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -37,20 +50,15 @@ function App() {
 
   return (
     <div>
+
       <Navbar setSidebar={setSidebar} user={user} />
       <Routes>
-        <Route path='/' element={<Home sidebar={sidebar} user={user} />} />
-        <Route path='/forum' element={<Forum sidebar={sidebar} user={user} />}/>
-        <Route path='/forum/recommended' element={<RecommendedForum sidebar={sidebar} user={user} />}/>
-        <Route path='/forum/hottest' element={<HottestForum sidebar={sidebar} user={user} />}/>
-        <Route path='/forum/latest' element={<LatestForum sidebar={sidebar} user={user} />}/>
-        <Route path="/forum/post/:postId" element={<IndividualPostView sidebar={sidebar} />} />
-        <Route path='/mycalendars' element={ <Calendar sidebar={sidebar} user={user} />} />
         <Route path='/profile' element={ <Profile sidebar={sidebar} user={user} />} />
         <Route path='settings' element={<Settings />}/>
         <Route path='/event/category/:categoryName' element={ <EventCategory sidebar={sidebar} user={user} />} />
         <Route path='/debug' element={<TestUserData />}/>
       </Routes>
+      
     </div>
   );
 }
