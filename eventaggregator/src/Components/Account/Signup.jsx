@@ -3,7 +3,7 @@ import './Account.css';
 import { ReactComponent as Logo } from '../../assets/calendar-icon.svg';
 import { auth, firestore } from '../../firebase'; // Adjusted for your firebase.js location
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { collection, addDoc } from 'firebase/firestore';
+import { collection, addDoc, doc, setDoc } from 'firebase/firestore';
 
 const Signup = ({ isOpen, onClose }) => {
     const [name, setName] = useState('');
@@ -23,12 +23,12 @@ const Signup = ({ isOpen, onClose }) => {
             // Get the user UID from Firebase Authentication
             const user = userCredential.user;
 
-            // Now, save additional user data (name, dob, etc.) to Firestore
-            await addDoc(collection(firestore, "users"), {
+            // Major change: document id is the same as the userid
+            // before: adddoc(collection(...))
+            await setDoc(doc(firestore, "users", user.uid), { //
                 uid: user.uid,
                 name: name,
                 email: email,
-                password: password,
                 dob: dob,
                 createdAt: new Date(), // Optionally, add a timestamp
             });

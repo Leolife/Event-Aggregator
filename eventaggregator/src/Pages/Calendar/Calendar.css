@@ -1,0 +1,77 @@
+.calendar {
+    display: flex;
+    align-items: center;
+    margin-top: 12px;
+}
+
+.mycalendars-section {
+    width: 25%;
+    background-color: #dadada;
+    height: 800px;
+    border-radius: 12px;
+}
+
+.mycalendars-header {
+    padding: 5%;
+}
+
+.calendar .search-box {
+    margin-top: 12px;
+    background-color: white;
+    border: 1px solid #ccc;
+    height: 30px;
+    border-radius: 28px;
+    padding: 14px;
+}
+
+.calendar .search-box input {
+    margin-left: 14px;
+    height: 30px;
+    outline: none;
+    border: none;
+    background: transparent;
+    width: 85%;
+    font-size: 16px;
+}
+
+.calendar .search-icon {
+    width: 18px;
+    height: 18px;
+    stroke: grey;
+}
+
+.calendar .sliders-icon {
+    width: 18px;
+    height: 18px;
+    stroke: grey;
+}
+
+.calendar-tile {
+    background-color: #dadada;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 12px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    height: 90px;
+}
+
+.calendar-tile:hover {
+    background-color: rgb(194, 194, 194);
+}
+
+.calendar-tile img {
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    object-fit: cover;
+}
+
+.calendar-tile .img-sizer {
+    padding: 1%;
+    height: 80px;
+    width: 80px;
+    overflow: hidden;
+    margin-right: 15px;
+}

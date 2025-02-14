@@ -2,11 +2,18 @@ import React, { useState, useEffect } from 'react';
 import Navbar from './Components/Navbar/Navbar';
 import { Route, Routes } from 'react-router-dom';
 import Home from './Pages/Home/Home';
+import IndividualPostView from './Pages/Forum/IndividualPostView/IndividualPostView';
 import { Profile } from './Pages/Profile/Profile';
+import { Forum } from './Pages/Forum/Forum';
+import { RecommendedForum } from './Pages/Forum/Recommended/RecommendedForum';
+import { HottestForum } from './Pages/Forum//Hottest/HottestForum';
+import { LatestForum } from './Pages/Forum/Latest/LatestForum';
 import { EventCategory } from './Pages/EventCategory/EventCategory';
+import { Calendar } from './Pages/Calendar/Calendar';
 import { auth } from './firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import Settings from './Pages/Settings/Settings';
+import TestUserData from './utils/Debuguser';
 
 
 function App() {
@@ -38,7 +45,7 @@ function App() {
   }, []);
 
   if (loading) {
-    return <div>Loading...</div>; // Or your loading spinner
+    return <div>Loading...</div>;
   }
 
   return (
@@ -46,10 +53,10 @@ function App() {
 
       <Navbar setSidebar={setSidebar} user={user} />
       <Routes>
-        <Route path='/' element={<Home sidebar={sidebar} user={user} data={data}/>} />
         <Route path='/profile' element={ <Profile sidebar={sidebar} user={user} />} />
         <Route path='settings' element={<Settings />}/>
         <Route path='/event/category/:categoryName' element={ <EventCategory sidebar={sidebar} user={user} />} />
+        <Route path='/debug' element={<TestUserData />}/>
       </Routes>
       
     </div>

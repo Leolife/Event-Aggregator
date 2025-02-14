@@ -1,0 +1,65 @@
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    width: 100vw;
+    height: 100vh;
+    background-color: #000000aa;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal .logo {
+    height: 40px;
+    width: 40px;
+}
+
+.modal .logo path {
+    stroke: #3ed0e4;
+}
+
+.modal-content {
+    background-color: #fff;
+    position: relative;
+    width: 30rem;
+    height: 30rem;
+    margin: 0 auto;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 0 1em #000000aa;
+}
+
+.modal-content.signup {
+    height: 40rem;
+}
+
+.interest-item {
+    background-color: gray;
+    display: flex;
+    width: 1078px;
+    height: 75px;
+    align-items: center;
+    /* Remove the fixed gap */
+    padding: 0 20px; /* Optional: Add some padding if needed */
+}
+
+.interest-box {
+    font-family: Inter;
+    font-size: 32px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 20px; /* 62.5% */
+    letter-spacing: 0.1px;
+}
+
+.delete-button {
+    background-color: red;
+    color: white;
+    margin-left: auto; /* Pushes the button to the right */
+}
+
+.delete-button:hover {
+    background-color: darkred;
+}
