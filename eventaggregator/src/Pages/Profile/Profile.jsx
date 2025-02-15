@@ -3,8 +3,9 @@ import './Profile.css'
 import Sidebar from '../../Components/Sidebar/Sidebar'
 import headerimage from '../../assets/profile-header-image.png';
 import profileimage from '../../assets/profile-picture.png';
-import { deleteUserAccount } from '../../firebase'; 
+import { auth, deleteUserAccount } from '../../firebase'; 
 import { Link } from "react-router-dom";
+import UserData from '../../utils/UserData';
 
 // Included all tabs from tabs folder to be rendered under the profile section
 import About from './Tabs/About'
@@ -14,7 +15,8 @@ import Comments from './Tabs/Comments'
 import UpVoted from './Tabs/UpVoted';
 import DownVoted from './Tabs/DownVoted';
 
-
+const user = auth.currentUser;
+const userData = user ? new UserData(user.uid) : null;
 
 export const Profile = ({ sidebar }) => {
     
