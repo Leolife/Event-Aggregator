@@ -1,8 +1,11 @@
 #!/bin/bash
 # export FLASK_APP=RestAPI.py
 # flask run
-python3 -m webbrowser http://127.0.0.1:5000/tags
-read -p "Press enter to continue"
+curl -i http://127.0.0.1:5000/events/save \
+-X POST \
+-H 'Content-Type: application/json' \
+-d '["a","b"]'
+#"[('a','b','c'),('a','b','c'),('a','b','c')]" 
 
 
 exit 1
