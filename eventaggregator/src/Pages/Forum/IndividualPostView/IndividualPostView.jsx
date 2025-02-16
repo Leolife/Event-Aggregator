@@ -1,17 +1,32 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import './IndividualPostView.css';
 import FullPostView from '../../../Components/FullPostView/FullPostView';
 import Sidebar from '../../../Components/Sidebar/Sidebar';
-import { forumPosts } from '../Forum';
+import { fetchForumPosts } from '../Forum';
 
 const IndividualPostView = ({ sidebar }) => {
     const { postId } = useParams();
+    const [post, setPost] = useState(null);
+    const [loading, setLoading] = useState(true);
     
-    // Find the specific post from your posts array
-    const post = forumPosts.find(post => post.postId === parseInt(postId));
-    
-    // Temporary comments array - replace with comments from backend when ready
+    useEffect(() => {
+        const loadPost = async () => {
+            setLoading(true);
+            try {
+                const posts = await fetchForumPosts();
+                const foundPost = posts.find(p => p.postId === parseInt(postId));
+                setPost(foundPost);
+            } catch (error) {
+                console.error("Error loading post:", error);
+            }
+            setLoading(false);
+        };
+        
+        loadPost();
+    }, [postId]);
+
+    // temp comments array - replace with comments from backend when ready
     const dummyComments = [
         {
             ownerName: "User123 ",
@@ -20,8 +35,26 @@ const IndividualPostView = ({ sidebar }) => {
         },
     ];
 
-    if (!post) {
-        return <div className="error-message">Post not found</div>;
+    if (loading) {  // if posts havent loaded in from database yet, it displays loading msg
+        return (
+            <>
+                <Sidebar sidebar={sidebar} />
+                <div className={`container ${sidebar ? "" : 'large-container'}`}>
+                    <div>Loading post...</div>
+                </div>
+            </>
+        );
+    }
+
+    if (!post) {  // error msg if post does not exist
+        return (
+            <>
+                <Sidebar sidebar={sidebar} />
+                <div className={`container ${sidebar ? "" : 'large-container'}`}>
+                    <div className="error-message">Post not found</div>
+                </div>
+            </>
+        );
     }
 
     return (
