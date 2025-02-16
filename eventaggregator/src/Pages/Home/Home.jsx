@@ -1,5 +1,5 @@
 //home.jsx
-import React, { useState, useEffect} from 'react'
+import React, { useState, useEffect } from 'react'
 import './Home.css'
 import Sidebar from '../../Components/Sidebar/Sidebar'
 import Header from '../../Components/Header/Header'
@@ -16,15 +16,14 @@ export const Home = ({ sidebar }) => {
   }
 
   useEffect(() => {
-    console.log(selectedTags)
   }, [selectedTags])
-  
+
 
   return (
     <>
       <Sidebar sidebar={sidebar} />
       <div className="home">
-      <Header title={"All Categories"} sidebar={sidebar} sendData = {sendData} />
+        <Header title={"All Categories"} sidebar={sidebar} sendData={sendData} />
         <div className={`container ${sidebar ? "" : 'large-container'}`}>
           <div className="feed-container">
             <div className="feed">
