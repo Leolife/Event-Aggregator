@@ -21,7 +21,8 @@ const Navbar = ({ setSidebar }) => {
   const openModal = (type) => {
     setModalType(type);
     setIsOpen(true);
-    // Purely Debugging information for the user state
+
+    // Below is Purely Debugging information for the user state (not critical for openModal)
     const auth = getAuth();
     // Check if the user is logged in before accessing uid
     if (auth.currentUser) {

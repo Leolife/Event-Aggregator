@@ -4,6 +4,8 @@ import Login from './Account/Login';
 import Signup from './Account/Signup';
 import Filters from './Filters/Filters';
 import Logout from './Account/Logout';
+import LinkToPhoto from './Profile/LinkToPhoto';
+
 
 const mountElement = document.getElementById("overlays")
 
@@ -17,6 +19,7 @@ const Overlays = ({ modalType, isOpen, onClose }) => {
                         {modalType === 'signup' && <Signup isOpen={isOpen} onClose={onClose} />}
                         {modalType === 'filters' && <Filters isOpen={isOpen} onClose={onClose} />}
                         {modalType === 'logout' && <Logout isOpen={isOpen} onClose={onClose}/>}
+                        {modalType === 'profile-pic-link' && <LinkToPhoto isOpen={isOpen} onClose={onClose}/>}
                     </>
                 )}
             </>, 
