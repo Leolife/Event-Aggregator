@@ -19,7 +19,7 @@ export const RecommendedForum = ({ sidebar }) => {
         loadPosts();
     }, []);
 
-    if (loading) {
+    if (loading) {  // if posts havent loaded in from database yet, it displays loading msg
         return (
             <>
                 <Sidebar sidebar={sidebar} />
