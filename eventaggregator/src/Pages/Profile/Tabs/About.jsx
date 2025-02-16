@@ -1,10 +1,16 @@
-import React, { useState, useEffect } from 'react';
-
+import { auth, firestore } from '../../../firebase'; // Adjusted for your firebase.js location
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { collection, addDoc, doc, setDoc } from 'firebase/firestore';
+import UserData from '../../../utils/UserData';
+import { useState } from 'react';
+const user = auth.currentUser;
+const userData = user ? new UserData(user.uid) : null;
 
 // import './About.css'
-
 function About() {
 
+    const [bio, setBio] =  useState("");
+    
     return(
         <div className="About">
             <p>This users about section go here</p>

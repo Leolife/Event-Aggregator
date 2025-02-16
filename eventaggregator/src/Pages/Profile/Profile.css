@@ -133,7 +133,7 @@
     flex-direction: column; /* Stack buttons vertically */
 }
 
-.save-changes, .delete-account, .edit-profile-button {
+.save-changes, .discard-changes, .edit-profile-button {
     position: relative; /* Remove fixed positioning */
     width: 150px; /* Adjust width if necessary */
     padding: 10px;
@@ -145,12 +145,12 @@
     background-color: green;
 }
 
-.delete-account {
+.discard-changes {
     background-color: red;
     color: white;
 }
 
-.delete-account:hover {
+.discard-changes:hover {
     background-color: darkred;
 }
 

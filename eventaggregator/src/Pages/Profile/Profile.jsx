@@ -1,36 +1,80 @@
-import React, { useState } from 'react'
-import './Profile.css'
-import Sidebar from '../../Components/Sidebar/Sidebar'
+import React, { useEffect, useState } from 'react';
+import './Profile.css';
+import Sidebar from '../../Components/Sidebar/Sidebar';
 import headerimage from '../../assets/profile-header-image.png';
 import profileimage from '../../assets/profile-picture.png';
-import { auth, deleteUserAccount } from '../../firebase'; 
+import { auth } from '../../firebase'; 
 import { Link } from "react-router-dom";
 import UserData from '../../utils/UserData';
+import Overlays from '../../Components/Overlays';
 
-// Included all tabs from tabs folder to be rendered under the profile section
-import About from './Tabs/About'
-import UserCalendar from './Tabs/UserCalendar'
+// Include all tabs from the tabs folder
+import About from './Tabs/About';
+import UserCalendar from './Tabs/UserCalendar';
 import UsersPosts from './Tabs/UserPosts';
-import Comments from './Tabs/Comments'
+import Comments from './Tabs/Comments';
 import UpVoted from './Tabs/UpVoted';
 import DownVoted from './Tabs/DownVoted';
 
-const user = auth.currentUser;
-const userData = user ? new UserData(user.uid) : null;
-
 export const Profile = ({ sidebar }) => {
-    
     const [editMode, setEditMode] = useState(false);
+    const [activeTab, setActiveTab] = useState('About');
+    const [profileName, setProfileName] = useState("");
+    const [profilePicture, setProfilePicture] = useState("");
+    const [profileBanner, setProfileBanner] = useState("");
+    
+    // Temporary state for holding the edited name
+    const [tempProfileName, setTempProfileName] = useState("");
+    // Flag for whether the profile name is in inline edit mode
+    const [editingProfileName, setEditingProfileName] = useState(false);
+
+    useEffect(() => {
+        const fetchProfileData = async () => {
+            const user = auth.currentUser;
+            if (user) {
+                const userData = new UserData(user.uid);
+                const userName = await userData.getName();
+                const picture = await userData.getProfilePicture();
+                const banner = await userData.getProfileBanner();
+                setProfileName(userName);
+                setProfilePicture(picture);
+                setProfileBanner(banner);
+            }
+        };
+        fetchProfileData();
+    }, []);
+
+    // Whenever the saved profileName is updated, update the temporary name
+    useEffect(() => {
+        setTempProfileName(profileName);
+    }, [profileName]);
+
     const handleEditClick = () => {
         setEditMode(true);
     };
-    const handleSaveClick = () => {
-        setEditMode(false);
-    };
-    const [activeTab, setActiveTab] = useState('About');
 
-    // Connects the tab logic with the naming convention-
-    // Change the Values to rename the tabs as displayed on the website
+    // Global "Save Changes" button handler: update database then commit changes locally
+    const handleSaveClick = async () => {
+        const user = auth.currentUser;
+        if (user) {
+            const userData = new UserData(user.uid);
+            // Update the name in backend
+            await userData.setName(tempProfileName);
+        }
+        // Commit changes locally and exit edit modes
+        setProfileName(tempProfileName);
+        setEditMode(false);
+        setEditingProfileName(false);
+    };
+
+    // Global "Discard Changes" button handler: revert temp value and exit edit modes
+    const handleDiscardChanges = () => {
+        setTempProfileName(profileName);
+        setEditMode(false);
+        setEditingProfileName(false);
+    };
+
+    // Tab definitions (original implementation)
     const TABS = Object.freeze({
         ABOUT: 'About',
         USERCALENDAR: 'My Calendar',
@@ -38,9 +82,9 @@ export const Profile = ({ sidebar }) => {
         COMMENTS: 'Comments',
         UPVOTED: 'Up Voted',
         DOWNVOTED: 'Down Voted'
-      });
+    });
 
-    // Basically: if statements that determine which tab to render given a button press
+    // Renders the active tab content
     function renderTab(tab) {
         switch (tab) {
             case TABS.ABOUT:
@@ -48,7 +92,7 @@ export const Profile = ({ sidebar }) => {
             case TABS.USERCALENDAR:
                 return <UserCalendar />;
             case TABS.USERPOSTS:
-                return <UsersPosts/>
+                return <UsersPosts />;
             case TABS.COMMENTS:
                 return <Comments />;
             case TABS.UPVOTED:
@@ -58,42 +102,64 @@ export const Profile = ({ sidebar }) => {
             default:
                 return null; // or a default page
         }
-      }
+    }
 
-    // Todo: migrate to backend
-    const handleDeleteAccount = async () => {
-        const confirmation = window.confirm(
-            "Are you sure you want to delete your account? This action cannot be undone."
-        );
-        if (!confirmation) return;
-
-        const result = await deleteUserAccount();
-        if (result.success) {
-            alert("Account deleted successfully.");
-            window.location.href = '/'; // Redirect to home page or login page
-        } else {
-            alert(`Failed to delete account: ${result.error?.message || result.error}`);
-        }
-    };
-  
     return (
         <>
             <Sidebar sidebar={sidebar} />
             <div className={`container ${sidebar ? "" : 'large-container'}`}>
                 <div className="profile">
-                <div className="section-header">
-                    <div className="profile-container">
-                        <div className="profile-header">
-                            <div className="profile-banner">
-                                <div className="profile-banner-sizer">                                  
-                                    <img className="profile-banner-image" src={headerimage} alt=""></img>
+                    <div className="section-header">
+                        <div className="profile-container">
+                            <div className="profile-header">
+                                <div className="profile-banner">
+                                    <div className="profile-banner-sizer">                                  
+                                        <img className="profile-banner-image" src={profileBanner} alt="Profile Banner" />
+                                        {editMode && (
+                                            <button className="edit-profile-banner-button">
+                                                Edit
+                                            </button>
+                                        )}
+                                    </div>
+                                    <img className="profile-picture" src={profilePicture} alt="Profile" />
+                                    {editMode && (
+                                        <button className="edit-profile-picture-button">
+                                            Edit
+                                        </button>
+                                    )}
                                 </div>
-                                <img className="profile-picture" src={profileimage} alt=""></img>
-                            </div>
                                 <div className="profile-header-content">
                                     <div className="header-caption">
                                         <div className="header-names">
-                                            <h1>Freakbob</h1>
+                                            {editingProfileName ? (
+                                                <>
+                                                    <input
+                                                        type="text"
+                                                        value={tempProfileName}
+                                                        onChange={(e) => setTempProfileName(e.target.value)}
+                                                    />
+                                                    {/* Inline save now exits inline editing mode */}
+                                                    <button
+                                                        className="save-profile-name-button"
+                                                        onClick={() => setEditingProfileName(false)}
+                                                    >
+                                                        Save
+                                                    </button>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    {/* If in edit mode, show the temporary (preview) name */}
+                                                    <h1>{editMode ? tempProfileName : profileName}</h1>
+                                                    {editMode && (
+                                                        <button
+                                                            className="edit-profile-name-button"
+                                                            onClick={() => setEditingProfileName(true)}
+                                                        >
+                                                            Edit
+                                                        </button>
+                                                    )}
+                                                </>
+                                            )}
                                         </div>
                                         <div className="header-details">
                                             <h2><span>30</span> Friends</h2>
@@ -101,51 +167,51 @@ export const Profile = ({ sidebar }) => {
                                         </div>
                                     </div>
                                     <div className="profile-header-more">
+                                        {/* Additional header content */}
+                                    </div>
+                                </div>
+                                <div className="profile-buttons">
+                                    {!editMode && (
+                                        <button className="edit-profile-button" onClick={handleEditClick}>
+                                            Edit Profile
+                                        </button>
+                                    )}
+                                    {editMode && (
+                                        <>
+                                            <button className="save-changes" onClick={handleSaveClick}>
+                                                Save Changes
+                                            </button>
+                                            <button className="discard-changes" onClick={handleDiscardChanges}>
+                                                Discard Changes
+                                            </button>
+                                        </>
+                                    )}
                                 </div>
                             </div>
-                            <div className="profile-buttons">
-                                {!editMode && (
-                                    <button className="edit-profile-button" onClick={handleEditClick}>
-                                        Edit Profile
-                                    </button>
-                                )}
-                                {editMode && (
-                                    <>
-                                        <button className="save-changes" onClick={handleSaveClick}>
-                                            Save Changes
-                                        </button>
-                                        <button className="delete-account">
-                                            Delete Profile
-                                        </button>
-                                    </>
-                                )}
+                        </div>
+                        
+                        <div className="profile-tabs">
+                            {Object.entries(TABS).map(([tabKey, tabName]) => (
+                                <button 
+                                    key={tabName} 
+                                    className={`tab-link ${activeTab === tabName ? 'active' : ''}`} 
+                                    onClick={() => setActiveTab(tabName)}
+                                >
+                                    {tabName}
+                                </button>
+                            ))}
+                            <hr />
+                        </div>
+                    </div>
+                    <div className="section-content">
+                        <div className="profile-content">
+                            <div className="content-tabs">
+                                {renderTab(activeTab)}
                             </div>
                         </div>
                     </div>
-                    
-                    <div className="profile-tabs">
-                        {Object.entries(TABS).map(([tabKey, tabName]) => (
-                        <button 
-                            key={tabName} 
-                            className={`tab-link ${activeTab === tabKey ? 'active' : ''}`} 
-                            onClick={() => setActiveTab(tabName)}
-                        >
-                            {tabName}
-                        </button>
-                        ))}
-                        <hr />
-                    </div>
                 </div>
-                <div className="section-content">
-                    <div className="profile-content">
-                        <div className="content-tabs">
-                            {renderTab(activeTab)}
-                        </div>
-                    </div>
-                </div>
-            </div>
             </div>
         </>
-
-    )
-}
+    );
+};
