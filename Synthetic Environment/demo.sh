@@ -1,12 +1,19 @@
 #!/bin/bash
 # export FLASK_APP=RestAPI.py
 # flask run
-curl -i http://127.0.0.1:5000/events/save \
+
+curl -i http://127.0.0.1:5000/events/search \
 -X POST \
 -H 'Content-Type: application/json' \
--d '["a","b"]'
-#"[('a','b','c'),('a','b','c'),('a','b','c')]" 
+-d '{"EVENT":"Super Hot"}' 
 
+echo 
+echo
+
+curl -i http://127.0.0.1:5000/events/search \
+-X POST \
+-H 'Content-Type: application/json' \
+-d '{"EVENT":"Something Random That is not in the listings"}' 
 
 exit 1
 #################################### Obtain a random event

@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+from Levenshtein import ratio
 
 import pandas as pd
 
@@ -24,6 +25,25 @@ user_db = user_metrics()
 def get_random_event():
     """Get a random events and returns the detail"""
     return eval(events.data.sample(n = 1).to_json(orient='records'))[0]
+
+@app.post("/events/search")
+def search_listing():
+    """Return the most simlar result based on the levenshtein distance"""
+    if not request.is_json:
+        return {"error": "Request must be JSON"}, 415
+    search_item: str = request.get_json()['EVENT']
+    max_r       = 0
+    curr_idx    = 0
+    for idx, item in enumerate(df['title']):
+        item: str = item.lower()
+        r = ratio(search_item,item)
+        if r > max_r:
+            curr_idx = idx
+            max_r    = r
+    if max_r < 0.6:
+        return jsonify([]),200
+    return df.iloc[curr_idx].to_json(),200
+
 
 @app.post("/events/random")
 def get_random_events():
