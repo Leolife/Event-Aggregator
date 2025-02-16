@@ -31,7 +31,7 @@ export const eventInfo = [
         thumbnail: thumbnail2,
         total_events: Math.floor(Math.random() * 20) + 1,
         total_upcomming: Math.floor(Math.random() * 5) + 1,
-        tags: ["Shooter", "Action"],
+        tags: ["Shooter"],
         link: 'event/category/league-of-legends'
     },
     {
@@ -39,7 +39,7 @@ export const eventInfo = [
         thumbnail: thumbnail3,
         total_events: Math.floor(Math.random() * 20) + 1,
         total_upcomming: Math.floor(Math.random() * 5) + 1,
-        tags: ["IRL"],
+        tags: ["Music"],
         link: 'event/category/league-of-legends'
     },
     {
@@ -47,7 +47,7 @@ export const eventInfo = [
         thumbnail: thumbnail4,
         total_events: Math.floor(Math.random() * 20) + 1,
         total_upcomming: Math.floor(Math.random() * 5) + 1,
-        tags: ["Fighting", "Platformer"],
+        tags: ["Fighting", "Platform"],
         link: 'event/category/league-of-legends'
     },
     {
@@ -55,7 +55,7 @@ export const eventInfo = [
         thumbnail: thumbnail5,
         total_events: Math.floor(Math.random() * 20) + 1,
         total_upcomming: Math.floor(Math.random() * 5) + 1,
-        tags: ["IRL"],
+        tags: ["Sport"],
         link: 'event/category/league-of-legends'
     },
     {
@@ -63,7 +63,7 @@ export const eventInfo = [
         thumbnail: thumbnail6,
         total_events: Math.floor(Math.random() * 20) + 1,
         total_upcomming: Math.floor(Math.random() * 5) + 1,
-        tags: ["Shooter", "FPS", "Action"],
+        tags: ["Shooter"],
         link: 'event/category/league-of-legends'
     },
     {
@@ -71,7 +71,7 @@ export const eventInfo = [
         thumbnail: thumbnail7,
         total_events: Math.floor(Math.random() * 20) + 1,
         total_upcomming: Math.floor(Math.random() * 5) + 1,
-        tags: ["Simulation"],
+        tags: ["Simulator"],
         link: 'event/category/league-of-legends'
     },
     {
@@ -87,7 +87,7 @@ export const eventInfo = [
         thumbnail: thumbnail9,
         total_events: Math.floor(Math.random() * 20) + 1,
         total_upcomming: Math.floor(Math.random() * 5) + 1,
-        tags: ["Rhythm & Music Game"],
+        tags: ["Music"],
         link: 'event/category/league-of-legends'
     },
     {
@@ -95,7 +95,7 @@ export const eventInfo = [
         thumbnail: thumbnail10,
         total_events: Math.floor(Math.random() * 20) + 1,
         total_upcomming: Math.floor(Math.random() * 5) + 1,
-        tags: ["Tabletop"],
+        tags: ["Card & Board Game"],
         link: 'event/category/league-of-legends'
     },
     {
@@ -103,7 +103,7 @@ export const eventInfo = [
         thumbnail: thumbnail11,
         total_events: Math.floor(Math.random() * 20) + 1,
         total_upcomming: Math.floor(Math.random() * 5) + 1,
-        tags: ["Tabletop"],
+        tags: ["Card & Board Game"],
         link: 'event/category/league-of-legends'
     },
     {
@@ -111,7 +111,7 @@ export const eventInfo = [
         thumbnail: thumbnail12,
         total_events: Math.floor(Math.random() * 20) + 1,
         total_upcomming: Math.floor(Math.random() * 5) + 1,
-        tags: ["Tabletop"],
+        tags: ["Card & Board Game"],
         link: 'event/category/league-of-legends'
     },
     
