@@ -1,16 +1,31 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import './IndividualPostView.css';
 import FullPostView from '../../../Components/FullPostView/FullPostView';
 import Sidebar from '../../../Components/Sidebar/Sidebar';
-import { forumPosts } from '../Forum';
+import { fetchForumPosts } from '../Forum';
 
 const IndividualPostView = ({ sidebar }) => {
     const { postId } = useParams();
+    const [post, setPost] = useState(null);
+    const [loading, setLoading] = useState(true);
     
-    // Find the specific post from your posts array
-    const post = forumPosts.find(post => post.postId === parseInt(postId));
-    
+    useEffect(() => {
+        const loadPost = async () => {
+            setLoading(true);
+            try {
+                const posts = await fetchForumPosts();
+                const foundPost = posts.find(p => p.postId === parseInt(postId));
+                setPost(foundPost);
+            } catch (error) {
+                console.error("Error loading post:", error);
+            }
+            setLoading(false);
+        };
+        
+        loadPost();
+    }, [postId]);
+
     // Temporary comments array - replace with comments from backend when ready
     const dummyComments = [
         {
@@ -20,8 +35,26 @@ const IndividualPostView = ({ sidebar }) => {
         },
     ];
 
+    if (loading) {
+        return (
+            <>
+                <Sidebar sidebar={sidebar} />
+                <div className={`container ${sidebar ? "" : 'large-container'}`}>
+                    <div>Loading post...</div>
+                </div>
+            </>
+        );
+    }
+
     if (!post) {
-        return <div className="error-message">Post not found</div>;
+        return (
+            <>
+                <Sidebar sidebar={sidebar} />
+                <div className={`container ${sidebar ? "" : 'large-container'}`}>
+                    <div className="error-message">Post not found</div>
+                </div>
+            </>
+        );
     }
 
     return (
