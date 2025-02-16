@@ -1,0 +1,103 @@
+.event-card {
+    width: 100%;
+    height: 250px;
+    background-color: whitesmoke;
+    display: flex;
+    align-items: center;
+    border-radius: 20px;
+    margin-top: 10px;
+}
+
+.event-card .event-content {
+    margin-right: 20px;
+    height: 80%;
+}
+
+
+.event-card .event-type {
+    font-style: italic;
+}
+
+.event-card .date-text {
+    font-weight: bold;
+    color: rgb(65, 65, 65) ;
+}
+
+.event-card .location-text {
+    font-size:small;
+    color: rgb(75, 75, 75) ;
+}
+
+.event-card .price {
+    font-style: italic;
+    color: rgb(65, 65, 65) ;
+}
+
+
+.event-card .timestamp-container {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.event-card .img-sizer {
+    margin: 20px;
+    width: 340px;
+    border-radius: 20px;
+    height: 200px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.event-card .description-box {
+    max-height: 38px;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.event-card .description {
+    text-overflow: ellipsis;
+    word-break: break-word;
+}
+
+.event-card .timestamp-container {
+    display: flex;
+}
+
+.event-card h2 {
+    color: #7c3aed;
+}
+
+.event-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.event-card .footer {
+    display: flex;
+    align-items: center;
+}
+
+.add-options {
+    position: absolute;
+    right: 0;
+    display: flex;
+    margin-right: 50px;
+}
+
+.add-options button {
+    margin-right: 5px;
+}
+
+.calendar-icon path {
+    stroke: #3ed0e4;
+}
+
+.location-icon path {
+    fill: #3ed0e4;
+}
+
+.event-card button {
+    background-color: #7c3aed;
+}

@@ -18,21 +18,9 @@ import TestUserData from './utils/Debuguser';
 
 function App() {
 
-  const [data, setData] = useState([{}])
-
   const [sidebar, setSidebar] = useState(true);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetch("/games").then(
-      res => res.json()
-    ).then(
-      data => {
-        setData(data)
-      }
-    )
-    }, [])
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {

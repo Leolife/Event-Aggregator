@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import './Event_tile.css';
 const Event_tile = ({ name, thumbnail, total_events, total_upcomming, tags, link }) => {
     return (
-        <Link to={link} className='card'>
+        <Link to={link} className='tile'>
             <div className='img-sizer'>
                 <img src={thumbnail} alt="" />
             </div>
