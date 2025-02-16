@@ -26,7 +26,7 @@ const IndividualPostView = ({ sidebar }) => {
         loadPost();
     }, [postId]);
 
-    // Temporary comments array - replace with comments from backend when ready
+    // temp comments array - replace with comments from backend when ready
     const dummyComments = [
         {
             ownerName: "User123 ",
@@ -35,7 +35,7 @@ const IndividualPostView = ({ sidebar }) => {
         },
     ];
 
-    if (loading) {
+    if (loading) {  // if posts havent loaded in from database yet, it displays loading msg
         return (
             <>
                 <Sidebar sidebar={sidebar} />
@@ -46,7 +46,7 @@ const IndividualPostView = ({ sidebar }) => {
         );
     }
 
-    if (!post) {
+    if (!post) {  // error msg if post does not exist
         return (
             <>
                 <Sidebar sidebar={sidebar} />

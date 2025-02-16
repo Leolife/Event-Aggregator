@@ -2,12 +2,12 @@ import { useEffect, useState } from 'react';
 import { useNavigate, Outlet } from 'react-router-dom';
 import { collection, getDocs } from 'firebase/firestore';
 import { firestore } from '../../firebase';
-import thumbnail1 from '../../assets/thumbnail1.png'; // using LoL as a filler image if none exists because LoL > default error pic
+import thumbnail1 from '../../assets/thumbnail1.png';
 
-// This will hold our posts data, but initialize it as empty
+// will hold post data, but initialize it as empty
 export let forumPosts = [];
 
-// Function to fetch posts that can be called when needed
+// fetches posts that can be called when needed
 export const fetchForumPosts = async () => {
     try {
         const forumCollection = collection(firestore, 'forum');
@@ -19,11 +19,11 @@ export const fetchForumPosts = async () => {
             title: doc.data().title || '',
             body: doc.data().body || '',
             ownerName: doc.data().ownerName || '',
-            timestamp: doc.data().timestamp ? Math.floor((Date.now() - doc.data().timestamp.toDate()) / 60000) : 0,
+            timestamp: doc.data().timestamp ? Math.floor((Date.now() - doc.data().timestamp.toDate()) / 60000) : 0,  // calculates in terms of minutes
             upvoteCount: doc.data().upvoteCount || 0,
             downvoteCount: doc.data().downvoteCount || 0,
             replyCount: doc.data().replyCount || 0,
-            thumbnailID: doc.data().thumbnailID || thumbnail1
+            thumbnailID: doc.data().thumbnailID || thumbnail1  // using LoL as a filler image if none exists because LoL > default error pic
         }));
 
         return forumPosts;
@@ -38,7 +38,7 @@ export const Forum = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Load initial data
+        // loads forum posts then sets loading boolean to false
         fetchForumPosts().then(() => {
             setLoading(false);
         });
