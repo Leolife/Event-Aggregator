@@ -23,6 +23,14 @@ export const EventCategory = ({ sidebar }) => {
     const { categoryName } = useParams();
     const [events, setEvents] = useState([{}])
     const [selectedTags, setSelectedTags] = useState([]);
+    // Stores the Sort By option the user has selected
+    const [selectedSort, setSelectedSort] = useState(0);
+
+    // Dropdown options for sorting
+    const options = [
+        "All",
+        "Upcoming"
+    ]
     const thumbnails = [thumbnail1, thumbnail2, thumbnail3, thumbnail4, thumbnail5];
 
     function formatDateTime(dateString, timeZone = "America/Los_Angeles") {
@@ -44,8 +52,10 @@ export const EventCategory = ({ sidebar }) => {
         return `${formattedDate} @ ${formattedTime}`;
     }
 
-    function sendData(data) {
-        setSelectedTags(data)
+    // Retrieves tags and sort options from the header
+    function sendData(tags_data, sort_data) {
+        setSelectedTags(tags_data)
+        setSelectedSort(sort_data)
     }
 
 
@@ -62,24 +72,26 @@ export const EventCategory = ({ sidebar }) => {
             });
             setEvents(await response.json())
         }
-
         fetchEvents();
     }, [])
 
     // Grabs selected tags from the header
     useEffect(() => {
-    }, [selectedTags])
+    }, [selectedTags, selectedSort])
 
     return (
         <>
             <Sidebar sidebar={sidebar} />
             <div className="events">
-                <Header title={formatCategoryName(categoryName)} sidebar={sidebar} sendData={sendData} />
+                <Header title={formatCategoryName(categoryName)} sidebar={sidebar} sendData={sendData} options={options} />
                 <div className={`container ${sidebar ? "" : 'large-container'}`}>
+                    {console.log(selectedSort)}
                     <div className="feed">
                         {events && events.length > 0 ? (
-                            // Filters the events by category tags the user has selected. If no tags are selected then displays all.
-                            events.filter(e => selectedTags.length === 0 || selectedTags.some(tag => e.tags.includes(tag.category))).map((event, index) => (
+                            events
+                            .sort((a, b) => selectedSort === 1 ? new Date(a.date) - new Date(b.date) : selectedSort === 0 ? a.title.localeCompare(b.title) : 0) // If option 0, sort events alphebatically. If option 1, sort events by upcoming.
+                            .filter(x => selectedTags.length === 0 || selectedTags.some(tag => x.tags.includes(tag.category))) // Filters the events by category tags the user has selected. If no tags are selected then displays all.
+                            .map((event, index) => (
                                 <div key={index} className="event-card">
                                     <div className='img-sizer'>
                                         {/* Selects a random thumbnail, will be changed later */}

@@ -32,7 +32,7 @@ export const eventInfo = [
         total_events: Math.floor(Math.random() * 20) + 1,
         total_upcomming: Math.floor(Math.random() * 5) + 1,
         tags: ["Shooter"],
-        link: 'event/category/league-of-legends'
+        link: 'event/category/marvel-rivals'
     },
     {
         name: "Music",
@@ -40,7 +40,7 @@ export const eventInfo = [
         total_events: Math.floor(Math.random() * 20) + 1,
         total_upcomming: Math.floor(Math.random() * 5) + 1,
         tags: ["Music"],
-        link: 'event/category/league-of-legends'
+        link: 'event/category/music'
     },
     {
         name: "Super Smash Brothers Ultimate",
@@ -48,7 +48,7 @@ export const eventInfo = [
         total_events: Math.floor(Math.random() * 20) + 1,
         total_upcomming: Math.floor(Math.random() * 5) + 1,
         tags: ["Fighting", "Platform"],
-        link: 'event/category/league-of-legends'
+        link: 'event/category/super-smash-brothers-ultimate'
     },
     {
         name: "Sports",
@@ -56,7 +56,7 @@ export const eventInfo = [
         total_events: Math.floor(Math.random() * 20) + 1,
         total_upcomming: Math.floor(Math.random() * 5) + 1,
         tags: ["Sport"],
-        link: 'event/category/league-of-legends'
+        link: 'event/category/sports'
     },
     {
         name: "Valorant",
@@ -64,7 +64,7 @@ export const eventInfo = [
         total_events: Math.floor(Math.random() * 20) + 1,
         total_upcomming: Math.floor(Math.random() * 5) + 1,
         tags: ["Shooter"],
-        link: 'event/category/league-of-legends'
+        link: 'event/category/valorant'
     },
     {
         name: "VR Chat",
@@ -72,7 +72,7 @@ export const eventInfo = [
         total_events: Math.floor(Math.random() * 20) + 1,
         total_upcomming: Math.floor(Math.random() * 5) + 1,
         tags: ["Simulator"],
-        link: 'event/category/league-of-legends'
+        link: 'event/category/vr-chat'
     },
     {
         name: "Hololive",
@@ -80,7 +80,7 @@ export const eventInfo = [
         total_events: Math.floor(Math.random() * 20) + 1,
         total_upcomming: Math.floor(Math.random() * 5) + 1,
         tags: ["VTuber"],
-        link: 'event/category/league-of-legends'
+        link: 'event/category/hololive'
     },
     {
         name: "Osu!",
@@ -88,7 +88,7 @@ export const eventInfo = [
         total_events: Math.floor(Math.random() * 20) + 1,
         total_upcomming: Math.floor(Math.random() * 5) + 1,
         tags: ["Music"],
-        link: 'event/category/league-of-legends'
+        link: 'event/category/osu'
     },
     {
         name: "Magic: The Gathering",
@@ -96,7 +96,7 @@ export const eventInfo = [
         total_events: Math.floor(Math.random() * 20) + 1,
         total_upcomming: Math.floor(Math.random() * 5) + 1,
         tags: ["Card & Board Game"],
-        link: 'event/category/league-of-legends'
+        link: 'event/category/magic-the-gathering'
     },
     {
         name: "Pokemon TCG",
@@ -104,7 +104,7 @@ export const eventInfo = [
         total_events: Math.floor(Math.random() * 20) + 1,
         total_upcomming: Math.floor(Math.random() * 5) + 1,
         tags: ["Card & Board Game"],
-        link: 'event/category/league-of-legends'
+        link: 'event/category/pokemon-TCG'
     },
     {
         name: "One Piece TCG",
@@ -112,7 +112,7 @@ export const eventInfo = [
         total_events: Math.floor(Math.random() * 20) + 1,
         total_upcomming: Math.floor(Math.random() * 5) + 1,
         tags: ["Card & Board Game"],
-        link: 'event/category/league-of-legends'
+        link: 'event/category/one-piece-TCG'
     },
     
 

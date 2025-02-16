@@ -66,6 +66,11 @@
     margin-left: auto;
 }
 
+.header .sortby {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
 .header h1 {
     color: white;
     font-size: 250%;

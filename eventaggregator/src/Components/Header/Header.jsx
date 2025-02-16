@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { ReactComponent as SearchIcon } from '../../assets/search-icon.svg';
 import './Header.css'
 
-const Header = ({ title, sidebar, sendData }) => {
+const Header = ({ title, sidebar, sendData, options }) => {
     // Whether the dropdown is active or not
     const [isActive, setActive] = useState(false);
     // Holds the category tag search query 
@@ -13,6 +13,8 @@ const Header = ({ title, sidebar, sendData }) => {
     const [nextId, setNextId] = useState(0);
     // Stores the tag the user has selected
     const [selectedTags, setSelectedTags] = useState([]);
+    // Stores the Sort By option the user has selected
+    const [selectedSort, setSelectedSort] = useState(0);
 
 
     // Fetches the tags from the API
@@ -28,8 +30,8 @@ const Header = ({ title, sidebar, sendData }) => {
 
     // Sends the selected tags to the respective components 
     useEffect(() => {
-        sendData(selectedTags);
-    }, [selectedTags, sendData])
+        sendData(selectedTags, selectedSort);
+    }, [selectedTags, selectedSort, sendData])
 
     return (
         <div className={`header-container ${sidebar ? "" : 'large-header-container'}`}>
@@ -86,12 +88,17 @@ const Header = ({ title, sidebar, sendData }) => {
                             </div>
                         ))}
                     </div>
+                    {/* Unique sort by dropdown */}
                     <div className="relevance">
                         <div className="dropdown-sort">
                             <label> Sort By: </label>
-                            <select className="sortby">
-                                <option> Recommended For You </option>
-                                <option> All </option>
+                            <select className="sortby" onChange={(e) => setSelectedSort(Number(e.target.value))}>
+                                {/* Display the dropdown options sent from the header */}
+                                {options.map((option, index) => (
+                                    <option key={index} value={index}>
+                                        {option}
+                                    </option>
+                                ))}
                             </select>
                         </div>
                     </div>
