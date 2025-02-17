@@ -133,7 +133,7 @@
 .event-button {
     padding: 10px 20px;
     border-radius: 6px;
-    font-size: 14px;
+    font-size: 0.75rem;
     cursor: pointer;
     flex: 1;
     min-width: 150px;
@@ -147,12 +147,12 @@
 }
 
 .primary-button:hover {
-    background-color: #6d28d9;
+    background-color: rgba(124, 58, 237, 0.2);
 }
 
 .secondary-button {
     background-color: rgba(124, 58, 237, 0.1);
-    color: #7c3aed;
+    color: #ffffff;
     border: none;
 }
 
