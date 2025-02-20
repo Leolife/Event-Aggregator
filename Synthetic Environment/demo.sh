@@ -1,13 +1,13 @@
 #!/bin/bash
 # export FLASK_APP=RestAPI.py
 # flask run
+# npm install nodejs
 
 curl -i http://127.0.0.1:5000/events/search \
 -X POST \
 -H 'Content-Type: application/json' \
 -d '{"EVENT":"Super Hot"}' 
 
-echo 
 echo
 
 curl -i http://127.0.0.1:5000/events/search \
