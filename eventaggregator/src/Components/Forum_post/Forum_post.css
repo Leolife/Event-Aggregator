@@ -45,7 +45,6 @@
 }
 
 .title-box {
-    width: 960px;
     background: #ffffff;
     padding: 12px;
     border-radius: 6px;
@@ -68,7 +67,8 @@
 }
 
 .body-box {
-    width: 500px;
+    width: 250px;
+    min-width: 250px;
     background: #ffffff;
     padding: 12px;
     border-radius: 6px;
