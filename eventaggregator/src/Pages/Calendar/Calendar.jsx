@@ -4,6 +4,7 @@ import Sidebar from '../../Components/Sidebar/Sidebar'
 import { ReactComponent as SlidersIcon } from '../../assets/sliders.svg';
 import { ReactComponent as SearchIcon } from '../../assets/search-icon.svg';
 import liked from '../../assets/liked.jpg'
+import Calendar_layout from '../../Components/Calendar/Calendar_layout';
 
 export const Calendar = ({ sidebar }) => {
     return (
@@ -37,7 +38,10 @@ export const Calendar = ({ sidebar }) => {
                         </div>
                     </div>
                     <div className="calendar-section">
-
+                    <Calendar_layout 
+                        calendarTitle="Favorites" 
+                        onChangeMonth={(newDate) => console.log('Month changed:', newDate)} 
+                    />
                     </div>
                 </div>
             </div>

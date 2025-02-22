@@ -1,0 +1,299 @@
+.calendar {
+    display: flex;
+    align-items: flex-start;
+    margin-top: 12px;
+    width: 100%;
+}
+
+.mycalendars-section {
+    width: 250px; /* Fixed width for the sidebar */
+    background-color: #dadada;
+    height: 800px;
+    border-radius: 12px;
+    margin-right: 15px;
+    flex-shrink: 0; /* Prevent this section from shrinking */
+}
+
+.calendar-section {
+    flex: 1; /* Take up all remaining space */
+    min-width: 0; /* Important for flex items to shrink below min-content */
+}
+
+.calendar-layout {
+    width: 100%;
+    height: 100%;
+    background-color: #dadada;
+    border-radius: 8px;
+    overflow: hidden;
+    color: rgb(0, 0, 0);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* Calendar Navigation */
+  .calendar-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background-color: #3ed0e4; /* Dark red color from the example */
+    color: rgb(0, 0, 0);
+  }
+  
+  .calendar-title {
+    font-size: 18px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+  }
+  
+  .calendar-dropdown {
+    margin-left: 8px;
+    font-size: 12px;
+  }
+  
+  .calendar-controls {
+    display: flex;
+    gap: 8px;
+  }
+  
+  .export-btn, .delete-btn {
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+  }
+  
+  .export-btn {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: rgb(0, 0, 0);
+  }
+  
+  .delete-btn {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: rgb(0, 0, 0);
+  }
+  
+  /* Calendar Toolbar */
+  .calendar-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid #333;
+  }
+  
+  .month-navigation {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .nav-btn {
+    background: none;
+    border: none;
+    color: rgb(0, 0, 0);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    font-size: 18px;
+    font-weight: bold;
+  }
+  
+  .current-month {
+    font-size: 20px;
+    font-weight: bold;
+  }
+  
+  .view-options {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  
+  .timezone-display {
+    padding: 4px 8px;
+    background-color: #3ed0e4;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+  
+  .view-toggle {
+    display: flex;
+    background-color: #3ed0e4;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  
+  .view-btn {
+    padding: 6px 12px;
+    border: none;
+    background: none;
+    color: rgb(0, 0, 0);
+    cursor: pointer;
+    font-size: 14px;
+  }
+  
+  .view-btn.active {
+    background-color: #32b3c4;
+  }
+  
+  /* Calendar Grid */
+  .calendar-container {
+    padding: 0;
+    height: calc(100% - 100px); /* Adjust based on the height of navigation and toolbar */
+    overflow-y: auto;
+  }
+  
+  .calendar-header {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+  }
+  
+  .calendar-weekday {
+    padding: 8px;
+    font-weight: bold;
+    border-bottom: 1px solid #333;
+  }
+  
+  .calendar-days {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .calendar-row {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    border-bottom: 1px solid #333;
+  }
+  
+  .calendar-day {
+    position: relative;
+    height: 120px; /* Increased height for better space usage */
+    padding: 8px;
+    border-right: 1px solid #333;
+    cursor: pointer;
+    overflow: hidden;
+  }
+  
+  .calendar-day:last-child {
+    border-right: none;
+  }
+  
+  .calendar-row:last-child {
+    border-bottom: none;
+  }
+  
+  .day-number {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+  }
+  
+  .current-month {
+    color: rgb(0, 0, 0);
+  }
+  
+  .other-month {
+    color: #666;
+  }
+  
+  .calendar-day.selected .day-number {
+    background-color: #0081ff;
+    color: white;
+  }
+  
+  /* Event dot/marker and Event styling */
+  .calendar-day .events-container {
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    overflow: hidden;
+    max-height: calc(100% - 30px);
+  }
+  
+  /* Current day highlight */
+  .calendar-day.current-date .day-number {
+    background-color: #ffd700;
+    color: #000;
+  }
+  
+  /* Event styling for future rendering */
+  .event {
+    border-radius: 4px;
+    padding: 2px 4px;
+    margin-bottom: 2px;
+    font-size: 12px;
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .event-red {
+    background-color: #ff4d4d;
+    color: white;
+  }
+  
+  .event-blue {
+    background-color: #4d79ff;
+    color: white;
+  }
+  
+  .event-green {
+    background-color: #4dff4d;
+    color: black;
+  }
+  
+  /* Upcoming View */
+  .upcoming-view {
+    padding: 16px;
+    height: 100%;
+  }
+  
+  .upcoming-events {
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .no-events {
+    color: #888;
+  }
+  
+  /* Today highlight */
+  .calendar-day.today {
+    background-color: rgba(255, 215, 0, 0.1);
+  }
+  
+  /* Circle highlight for specific dates like the "15" in the screenshot */
+  .calendar-day.highlight .day-number {
+    background-color: #ffd700;
+    color: #000;
+  }
+  
+  /* For the highlighted date events */
+  .day-with-events::after {
+    content: '';
+    position: absolute;
+    bottom: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: #0081ff;
+  }
