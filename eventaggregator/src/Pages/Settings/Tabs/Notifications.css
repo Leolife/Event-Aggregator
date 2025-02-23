@@ -1,0 +1,93 @@
+.notification-modal {
+    width: 450px;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    margin: 20px auto;
+    text-align: left;
+}
+
+h2 {
+    font-size: 18px;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.radio-option {
+    display: block;
+    padding: 10px 0;
+    cursor: pointer;
+}
+
+.radio-option input[type="radio"] {
+    margin-right: 10px;
+}
+
+.radio-option span {
+    font-weight: bold;
+}
+
+.radio-option p {
+    font-size: 12px;
+    color: #666;
+    margin-left: 25px;
+}
+
+.custom-options {
+    background: #f9f9f9;
+    padding: 10px;
+    margin-top: 15px;
+    border-radius: 5px;
+}
+
+h3 {
+    font-size: 16px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.checkbox-option {
+    display: flex;
+    align-items: center;
+    padding: 5px 0;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.checkbox-option input {
+    margin-right: 10px;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.cancel-btn {
+    background-color: #f0f0f0;
+    color: #333;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.cancel-btn:hover {
+    background-color: #e0e0e0;
+}
+
+.save-btn {
+    background-color: #1d1d1d;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.save-btn:hover {
+    background-color: #000;
+}
