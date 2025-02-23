@@ -4,12 +4,13 @@ import Login from './Account/Login';
 import Signup from './Account/Signup';
 import Filters from './Filters/Filters';
 import Logout from './Account/Logout';
-import LinkToPhoto from './Profile/LinkToPhoto';
+import SubmitProfilePicture from './Profile/SubmitProfilePicture';
+import SubmitProfileBanner from './Profile/SubmitProfileBanner';
 
 
 const mountElement = document.getElementById("overlays")
 
-const Overlays = ({ modalType, isOpen, onClose }) => {
+const Overlays = ({ modalType, isOpen, onClose, onSubmitBanner, onSubmitPicture }) => {
     return (
         createPortal(
             <>
@@ -19,7 +20,8 @@ const Overlays = ({ modalType, isOpen, onClose }) => {
                         {modalType === 'signup' && <Signup isOpen={isOpen} onClose={onClose} />}
                         {modalType === 'filters' && <Filters isOpen={isOpen} onClose={onClose} />}
                         {modalType === 'logout' && <Logout isOpen={isOpen} onClose={onClose}/>}
-                        {modalType === 'profile-pic-link' && <LinkToPhoto isOpen={isOpen} onClose={onClose}/>}
+                        {modalType === 'submit-prof-pic' && <SubmitProfilePicture isOpen={isOpen} onClose={onClose} onSubmit={onSubmitPicture}/>}
+                        {modalType === 'submit-prof-ban' && <SubmitProfileBanner isOpen={isOpen} onClose={onClose} onSubmit={onSubmitBanner} />}
                     </>
                 )}
             </>, 

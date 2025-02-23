@@ -20,9 +20,6 @@ function TestUserData() {
       } catch (erroruid) {
         console.error("User ID Not found, please log in.", erroruid);
       }
-      
-
-      
     }
     fetchData();
   }, []);
