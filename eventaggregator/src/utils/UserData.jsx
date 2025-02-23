@@ -142,6 +142,18 @@ class UserData {
     async setInterests(newInterests) {
         await this.setUserData({ interests: newInterests });
     }
+
+    // Getter: Fetch the user's bio
+    async getBio() {
+        const userData = await this.getUserData();
+        return userData.bio || "";
+    }
+
+    // Setter: Update the user's bio
+    async setBio(newBio) {
+        await this.setUserData({ bio: newBio });
+    }
+
 }
 
 export default UserData;
