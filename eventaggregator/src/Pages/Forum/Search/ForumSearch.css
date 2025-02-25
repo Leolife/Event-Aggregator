@@ -1,0 +1,25 @@
+.forum-search button{
+    background-color: rgb(22, 70, 128);
+    border-radius: 20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    margin-right: 10px;
+}
+
+
+.forum-search select {
+    background-color: rgb(22, 70, 128);
+    font-weight: bold;
+    color: white;
+    border: 0px;
+    border-radius: 20px;
+    padding-left: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border-right: 16px solid transparent;
+    margin-right: 10px;
+}
+
+.forum-search .forum-sort {
+    margin-left: auto;
+}
