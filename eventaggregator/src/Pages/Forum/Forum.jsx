@@ -1,61 +1,115 @@
-import { useEffect, useState } from 'react';
-import { useNavigate, Outlet } from 'react-router-dom';
-import { collection, getDocs } from 'firebase/firestore';
-import { firestore } from '../../firebase';
-import thumbnail1 from '../../assets/thumbnail1.png';
+import React, { useEffect, useState } from 'react';
+import './Forum.css';
+import Sidebar from '../../Components/Sidebar/Sidebar';
+import Forum_post from '../../Components/Forum_post/Forum_post';
+import { fetchForumPosts } from '../Forum/ForumPosts';
+import { useSearchParams } from 'react-router-dom';
 
-// will hold post data, but initialize it as empty
-export let forumPosts = [];
-
-// fetches posts that can be called when needed
-export const fetchForumPosts = async () => {
-    try {
-        const forumCollection = collection(firestore, 'forum');
-        const forumSnapshot = await getDocs(forumCollection);
-        
-        forumPosts = forumSnapshot.docs.map(doc => ({
-            postId: doc.data().postId || doc.id,
-            eventName: doc.data().eventName || '',
-            title: doc.data().title || '',
-            body: doc.data().body || '',
-            ownerName: doc.data().ownerName || '',
-            timestamp: doc.data().timestamp ? Math.floor((Date.now() - doc.data().timestamp.toDate()) / 60000) : 0,  // calculates in terms of minutes
-            upvoteCount: doc.data().upvoteCount || 0,
-            downvoteCount: doc.data().downvoteCount || 0,
-            replyCount: doc.data().replyCount || 0,
-            thumbnailID: doc.data().thumbnailID || thumbnail1  // using LoL as a filler image if none exists because LoL > default error pic
-        }));
-
-        return forumPosts;
-    } catch (error) {
-        console.error("Error fetching forum posts:", error);
-        return [];
-    }
-};
-
-export const Forum = () => {
-    const navigate = useNavigate();
+export const Forum = ({ sidebar }) => {
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [selectedType, setSelectedType] = useState('posts');
+    const [selectedSort, setSelectedSort] = useState('recommended');
+    const [selectedTime, setSelectedTime] = useState('all');
+    const queryParam = searchParams.get('q');
+    const [posts, setPosts] = useState([]);
+    const [filteredPosts, setFilteredPosts] = useState([]);
     const [loading, setLoading] = useState(true);
 
+    function setParams() {
+        // Removes the paramater if they're null, such as when the user hasn't searched anything yet.
+        setSearchParams(Object.fromEntries(Object.entries({ q: queryParam, type: selectedType, sort: selectedSort, t: selectedTime }).filter(([_, v]) => v != null)));
+    }
+
     useEffect(() => {
-        // loads forum posts then sets loading boolean to false
-        fetchForumPosts().then(() => {
+        const loadPosts = async () => {
+            setLoading(true);
+            const fetchedPosts = await fetchForumPosts();
+            // Sort posts by timestamp
+            const sortedPosts = [...fetchedPosts].sort((a, b) => a.timestamp - b.timestamp);
+            setPosts(sortedPosts);
             setLoading(false);
-        });
+        };
+        loadPosts();
     }, []);
 
     useEffect(() => {
-        // redirect if exactly at /forum
-        if (window.location.pathname === '/Forum') {
-            navigate('/forum/recommended');
-        }
-    }, [navigate]);
-    
-    if (loading) {
-        return <div>Loading forum posts...</div>;
+        let sortedPosts = [...posts];
+        if (selectedSort === "top" || selectedSort === "hot") {
+            sortedPosts.sort((a, b) => b.upvoteCount - a.upvoteCount);
+        } else if (selectedSort == "latest")
+            sortedPosts.sort((a, b) => a.timestamp - b.timestamp);
+        setFilteredPosts(sortedPosts);
+    }, [selectedSort, posts])
+
+    useEffect(() => {
+        setSelectedSort(searchParams.get('sort'))
+    }, [searchParams.get('sort')])
+
+    if (loading) {  // if posts havent loaded in from database yet, it displays loading msg
+        return (
+            <>
+                <Sidebar sidebar={sidebar} />
+                <div className={`container ${sidebar ? "" : 'large-container'}`}>
+                    <div className="forum-feed">
+                        <h1>Forums</h1>
+                        <div>Loading posts...</div>
+                    </div>
+                </div>
+            </>
+        );
     }
-    
-    return <Outlet />;
-}
+
+    return (
+        <>
+            <div className="forum-page">
+                <Sidebar sidebar={sidebar} />
+                <div className={`header-container ${sidebar ? "" : 'large-header-container'}`}>
+                    <div className="header">
+                        <h1> Forums </h1>
+                        <div className="filters">
+                            <div className="forum-type">
+                                <button className="posts-sort-btn"> Posts </button>
+                                <button className="comments-sort-btn"> Comments </button>
+                            </div>
+                            <div className="forum-sort">
+                                <select className="post-sort-dropdown"
+                                    value={selectedSort}
+                                    onChange={e => setSelectedSort(e.target.value)}
+                                    onClick={() => setParams()}
+                                >
+                                    <option value="recommended"> Recommended </option>
+                                    <option value="hot"> Hot </option>
+                                    <option value="top"> Top </option>
+                                    <option value="latest"> Latest </option>
+                                    <option value="comment"> Comment count </option>
+                                </select>
+                                <select className="time-sort-dropdown"
+                                    value={selectedTime}
+                                    onChange={e => setSelectedTime(e.target.value)}
+                                    onClick={() => setParams()}
+                                >
+                                    <option value="all"> All time </option>
+                                    <option value="year"> Past year </option>
+                                    <option value="month"> Past month </option>
+                                    <option value="week"> Past week </option>
+                                    <option value="day"> Today </option>
+                                    <option value="hour"> Past hour </option>
+                                </select>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div className={`container ${sidebar ? "" : 'large-container'}`}>
+                    <div className="forum-feed">
+                        {filteredPosts.map((post, index) => (
+                            <Forum_post key={index} {...post} />
+                        ))}
+                    </div>
+                </div>
+            </div>
+        </>
+    );
+};
 
 export default Forum;

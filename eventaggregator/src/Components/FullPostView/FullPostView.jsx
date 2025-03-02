@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './FullPostView.css';
-import { forumPosts } from '../../Pages/Forum/Forum';
+import { forumPosts } from '../../Pages/Forum/ForumPosts';
 import { useParams } from 'react-router-dom';
 
 const FullPostView = ({ post, comments }) => {

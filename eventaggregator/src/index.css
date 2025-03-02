@@ -1,3 +1,8 @@
+:root {
+  --primary: #3ed0e4;
+  --background: #ffffff;
+}
+
 *{
   margin: 0;
   padding: 0;
@@ -18,7 +23,7 @@ a{
 }
 
 button {
-  background-color: #3ed0e4;
+  background-color: var(--primary);
   border: none;
   color: white;
   height: 35px;

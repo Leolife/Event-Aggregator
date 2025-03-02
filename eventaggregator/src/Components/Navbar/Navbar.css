@@ -14,17 +14,14 @@ nav {
     height: 25px;
     fill: grey;
     cursor: pointer;
+    user-select: none;
 }
 
 .nav-left .logo {
     width: 200px;
     height: 24px;
     padding: 0px 12px;
-}
-
-.nav-left h3 {
-    margin-left: 10px;
-    margin-right: 10px;
+    margin-left: 20px;
 }
 
 .nav-middle {
@@ -36,7 +33,7 @@ nav {
     border: 1px solid #ccc;
     margin-right: 15px;
     height: 40px;
-    border-radius: 28px;
+    border-radius: 12px;
     padding: 14px;
     width: max-content;
 }
@@ -47,7 +44,7 @@ nav {
     outline: none;
     border: none;
     background: transparent;
-    width: 600px;
+    width: 400px;
     font-size: 16px;
 }
 
@@ -97,4 +94,32 @@ nav {
 .nav-right .profile-icon path {
     stroke: black;
     stroke-width: 10%;
+}
+
+.nav-menu-title {
+    margin-left: 80px;
+    font-weight: bold;
+    font-size: larger;
+}
+
+.dropdown-search  .dropdown-content ul{
+    list-style: none;
+}
+
+.nav-middle .dropdown-item{
+    width: 100%;
+    align-content: center;
+    height: 50px;
+    padding: 4px 10px;
+    cursor: pointer;
+    border-bottom: 1px solid #ccc;
+} 
+
+.nav-middle .list-option-suffix {
+    color: grey;
+    font-weight: bold;
+}
+
+.dropdown-search  .dropdown-content ul li:hover {
+    background-color: rgb(230,230,230);
 }
