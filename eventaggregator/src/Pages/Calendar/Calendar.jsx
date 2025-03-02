@@ -51,11 +51,11 @@ export const Calendar = ({ sidebar, user }) => {
     ];
 
     const handleCreateCalendar = () => {
-        if (newCalendarName.trim()) {
+        if (newCalendarName.trim() && selectedImage) {
             const newCalendar = {
                 id: `calendar-${Date.now()}`,
                 name: newCalendarName,
-                image: image0,
+                image: selectedImage,
                 events: 0,
                 upcoming: 0
             };
