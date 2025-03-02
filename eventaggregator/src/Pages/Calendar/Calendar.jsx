@@ -144,7 +144,7 @@ export const Calendar = ({ sidebar, user }) => {
                 image: imageNumber,
                 events: 0,
                 upcoming: 0,
-                userId: user.uid // Add the user ID here
+                uid: user.uid
             };
             
             // Save to Firestore
