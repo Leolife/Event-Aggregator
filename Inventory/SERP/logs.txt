@@ -1,0 +1,4 @@
+Query:Dota 2; Count: 9
+Query: Valorant; Error: 'events_results'
+Query:Esports; Count: 10
+Query:Anime; Count: 10
