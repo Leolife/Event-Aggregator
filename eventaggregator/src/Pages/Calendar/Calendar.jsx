@@ -1,10 +1,12 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import './Calendar.css'
 import Sidebar from '../../Components/Sidebar/Sidebar'
 import { ReactComponent as SlidersIcon } from '../../assets/sliders.svg';
 import { ReactComponent as SearchIcon } from '../../assets/search-icon.svg';
 import image0 from '../../assets/liked.jpg'
 import CalendarLayout from '../../Components/Calendar/Calendar_layout';
+import { firestore } from '../../firebase';
+import { collection, getDocs, addDoc } from 'firebase/firestore';
 
 // Import sample images for new calendars
 import image1 from '../../assets/thumbnail1.png'
@@ -24,15 +26,70 @@ export const Calendar = ({ sidebar, user }) => {
     const [showModal, setShowModal] = useState(false);
     const [newCalendarName, setNewCalendarName] = useState('');
     const [selectedImage, setSelectedImage] = useState(null);
-    const [calendars, setCalendars] = useState([
-        {
-            id: 'favorites',
-            name: 'Favorites',
-            image: image0,
-            events: 0,
-            upcoming: 0
-        }
-    ]);
+    const [calendars, setCalendars] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    // Function to map image number from database to actual image
+    const getImageByNumber = (imageNumber) => {
+        const imageMap = {
+            0: image0,
+            1: image1,
+            2: image2,
+            3: image3,
+            4: image4,
+            5: image5,
+            6: image6,
+            7: image7,
+            8: image8,
+            9: image9,
+            10: image10,
+            11: image11,
+            12: image12
+        };
+        return imageMap[imageNumber] || image0; // Default to image0 if not found
+    };
+
+    // Fetch calendars from Firestore when component mounts
+    useEffect(() => {
+        const fetchCalendars = async () => {
+            try {
+                setLoading(true);
+                
+                // Make sure we have a user
+                if (!user) {
+                    setCalendars([]);
+                    setLoading(false);
+                    return;
+                }
+                
+                const calendarsCollection = collection(firestore, 'calendars');
+                const calendarsSnapshot = await getDocs(calendarsCollection);
+                
+                const fetchedCalendars = calendarsSnapshot.docs
+                    .map(doc => {
+                        const data = doc.data();
+                        return {
+                            id: data.id || doc.id,
+                            name: data.name || 'Unnamed Calendar',
+                            image: getImageByNumber(data.image),
+                            events: data.events || 0,
+                            upcoming: data.upcoming || 0,
+                            uid: data.uid || ''
+                        };
+                    })
+                    // Filter to only include calendars that belong to the current user
+                    .filter(calendar => calendar.uid === user.uid);
+                
+                setCalendars(fetchedCalendars);
+            } catch (error) {
+                console.error('Error fetching calendars:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchCalendars();
+    }, [user]); // Add user as a dependency so this runs when the user changes
 
     // Sample images for the modal
     const calendarImages = [
@@ -50,17 +107,55 @@ export const Calendar = ({ sidebar, user }) => {
         { id: 'img12', src: image12 }
     ];
 
+    const handleImageForDatabase = () => {
+        if (selectedImage === image0) return 0;
+        else if (selectedImage === image1) return 1;
+        else if (selectedImage === image2) return 2;
+        else if (selectedImage === image3) return 3;
+        else if (selectedImage === image4) return 4;
+        else if (selectedImage === image5) return 5;
+        else if (selectedImage === image6) return 6;
+        else if (selectedImage === image7) return 7;
+        else if (selectedImage === image8) return 8;
+        else if (selectedImage === image9) return 9;
+        else if (selectedImage === image10) return 10;
+        else if (selectedImage === image11) return 11;
+        else if (selectedImage === image12) return 12;
+    }
+
+    // Function to save calendar to Firestore
+    const saveCalendarToFirestore = async (calendarData) => {
+        try {
+            const calendarsRef = collection(firestore, 'calendars');
+            await addDoc(calendarsRef, calendarData);
+            console.log('Calendar saved to Firestore');
+        } catch (error) {
+            console.error('Error saving calendar:', error);
+        }
+    };
+
     const handleCreateCalendar = () => {
-        if (newCalendarName.trim() && selectedImage) {
+        if (newCalendarName.trim() && user) {
+            const imageNumber = handleImageForDatabase();
+            
             const newCalendar = {
                 id: `calendar-${Date.now()}`,
                 name: newCalendarName,
-                image: selectedImage,
+                image: imageNumber,
                 events: 0,
-                upcoming: 0
+                upcoming: 0,
+                userId: user.uid // Add the user ID here
             };
             
-            setCalendars([...calendars, newCalendar]);
+            // Save to Firestore
+            saveCalendarToFirestore(newCalendar);
+            
+            // Add to local state with image object instead of number
+            setCalendars([...calendars, {
+                ...newCalendar,
+                image: getImageByNumber(imageNumber)
+            }]);
+            
             setNewCalendarName('');
             setSelectedImage(null);
             setShowModal(false);
@@ -89,18 +184,24 @@ export const Calendar = ({ sidebar, user }) => {
                                 </div>
                             </div>
                             <div className="mycalendars">
-                                {calendars.map(calendar => (
-                                    <div key={calendar.id} className="calendar-tile">
-                                        <div className="img-sizer">
-                                            <img src={calendar.image} alt="" />
-                                        </div>
+                                {loading ? (
+                                    <div>Loading calendars...</div>
+                                ) : calendars.length === 0 ? (
+                                    <div>No calendars found. Create one to get started!</div>
+                                ) : (
+                                    calendars.map(calendar => (
+                                        <div key={calendar.id} className="calendar-tile">
+                                            <div className="img-sizer">
+                                                <img src={calendar.image} alt="" />
+                                            </div>
 
-                                        <div className="tile-container">
-                                            <h2 className="tile-name"> {calendar.name} </h2>
-                                            <label className="tile-info"> {calendar.events} Events • {calendar.upcoming} Upcoming </label>
+                                            <div className="tile-container">
+                                                <h2 className="tile-name"> {calendar.name} </h2>
+                                                <label className="tile-info"> {calendar.events} Events • {calendar.upcoming} Upcoming </label>
+                                            </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    ))
+                                )}
                                 
                                 <div 
                                     className="new-calendar-button" 
@@ -113,7 +214,7 @@ export const Calendar = ({ sidebar, user }) => {
                     </div>
                     <div className="calendar-section">
                     <CalendarLayout 
-                        calendarTitle="Favorites" 
+                        calendarTitle={calendars.length > 0 ? calendars[0].name : "Calendar"}
                         onChangeMonth={(newDate) => console.log('Month changed:', newDate)} 
                     />
                     </div>
@@ -162,7 +263,7 @@ export const Calendar = ({ sidebar, user }) => {
                             <button 
                                 className="create-btn"
                                 onClick={handleCreateCalendar}
-                                disabled={!newCalendarName.trim() || !selectedImage}
+                                disabled={!newCalendarName.trim() || !selectedImage || !user}
                             >
                                 Create
                             </button>
@@ -173,3 +274,5 @@ export const Calendar = ({ sidebar, user }) => {
         </>
     )
 }
+
+export default Calendar;
