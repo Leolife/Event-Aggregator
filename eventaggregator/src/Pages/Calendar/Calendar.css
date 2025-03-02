@@ -75,3 +75,162 @@
     overflow: hidden;
     margin-right: 15px;
 }
+
+/* New Calendar Button */
+.new-calendar-button {
+    background-color: #3ed0e4;
+    border-radius: 8px;
+    color: #000;
+    cursor: pointer;
+    margin: 15px;
+    padding: 15px;
+    text-align: center;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+
+.new-calendar-button:hover {
+    background-color: #32b3c4;
+}
+
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: #dadada !important;
+    border-radius: 8px;
+    padding: 20px;
+    width: 450px !important;
+    height: 535px !important;
+    max-width: 90%;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.modal-content h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #000;
+    text-align: center;
+}
+
+.modal-input-group {
+    margin-bottom: 20px;
+}
+
+.modal-input-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #000;
+}
+
+.modal-input-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: white;
+    font-size: 16px;
+}
+
+.modal-image-selection h3 {
+    margin-bottom: 15px;
+    color: #000;
+}
+
+.image-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    max-height: 280px;
+    overflow-y: auto;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    background-color: rgba(255, 255, 255, 0.750);
+}
+
+.image-option {
+    height: 80px;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 3px solid transparent;
+    transition: border-color 0.2s;
+    background-color: white;
+}
+
+.image-option img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.image-option.selected {
+    border-color: #3ed0e4;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-top: 5px;
+    padding-top: 5px;
+}
+
+.modal-actions button {
+    padding: 10px 30px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.cancel-btn {
+    background-color: #ccc;
+    color: #000;
+}
+
+.create-btn {
+    background-color: #3ed0e4;
+    color: #000;
+}
+
+.create-btn:disabled {
+    background-color: #a0a0a0;
+    cursor: not-allowed;
+}
+
+.flex-div {
+    display: flex;
+    align-items: center;
+}
+
+.tile-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.tile-name {
+    margin: 0;
+    font-size: 18px;
+}
+
+.tile-info {
+    font-size: 14px;
+    color: #666;
+}
