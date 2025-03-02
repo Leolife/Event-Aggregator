@@ -1,5 +1,5 @@
 .header-container {
-    background-color: #3ed0e4;
+    background-color: var(--primary);
     padding-left: 17%;
     padding-right: 2%;
     padding-top: 20px;

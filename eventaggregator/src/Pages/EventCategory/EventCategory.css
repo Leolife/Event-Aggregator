@@ -91,11 +91,11 @@
 }
 
 .calendar-icon path {
-    stroke: #3ed0e4;
+    stroke: var(--primary);
 }
 
 .location-icon path {
-    fill: #3ed0e4;
+    fill: var(--primary);
 }
 
 .event-card button {

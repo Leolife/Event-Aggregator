@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import './RecommendedForum.css';
 import Sidebar from '../../../Components/Sidebar/Sidebar';
 import Forum_post from '../../../Components/Forum_post/Forum_post';
-import { fetchForumPosts } from '../../Forum/Forum';
+import { fetchForumPosts } from '../../Forum/ForumPosts';
 
 export const RecommendedForum = ({ sidebar }) => {
     const [posts, setPosts] = useState([]);

@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import './IndividualPostView.css';
 import FullPostView from '../../../Components/FullPostView/FullPostView';
 import Sidebar from '../../../Components/Sidebar/Sidebar';
-import { fetchForumPosts } from '../Forum';
+import { fetchForumPosts } from '../ForumPosts';
 
 const IndividualPostView = ({ sidebar }) => {
     const { postId } = useParams();

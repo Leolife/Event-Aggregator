@@ -17,7 +17,7 @@
 }
 
 .modal .logo path {
-    stroke: #3ed0e4;
+    stroke: var(--primary);
 }
 
 .modal-content {
