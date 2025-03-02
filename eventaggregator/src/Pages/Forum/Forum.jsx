@@ -36,8 +36,10 @@ export const Forum = ({ sidebar }) => {
         let sortedPosts = [...posts];
         if (selectedSort === "top" || selectedSort === "hot") {
             sortedPosts.sort((a, b) => b.upvoteCount - a.upvoteCount);
-        } else if (selectedSort == "latest")
-            sortedPosts.sort((a, b) => a.timestamp - b.timestamp);
+        } else if (selectedSort == "latest") {
+            sortedPosts.sort((a, b) => a.timestamp - b.timestamp); 
+        } else if (selectedSort == "comment")
+            sortedPosts.sort((a, b) => b.replyCount - a.replyCount); 
         setFilteredPosts(sortedPosts);
     }, [selectedSort, posts])
 
