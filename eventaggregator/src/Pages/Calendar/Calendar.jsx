@@ -407,7 +407,7 @@ export const Calendar = ({ sidebar, user }) => {
                             </div>
                         </div>
                     </div>
-                    <div className="calendar-section">
+                    <div className="calendar-section">   {/* This is where the calendar to be displayed is chosen */}
                         <CalendarLayout 
                             calendarTitle={selectedCalendar ? selectedCalendar.name : "Calendar"}
                             onChangeMonth={(newDate) => console.log('Month changed:', newDate)} 

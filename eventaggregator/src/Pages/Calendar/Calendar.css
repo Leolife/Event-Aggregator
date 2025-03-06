@@ -1,3 +1,4 @@
+/* calendar specific attributes */
 .calendar {
     display: flex;
     align-items: center;
@@ -15,6 +16,7 @@
     padding: 5%;
 }
 
+/* next 3 sections are in regards to search bar */
 .calendar .search-box {
     margin-top: 12px;
     background-color: white;
@@ -55,7 +57,7 @@
     display: flex;
     align-items: center;
     height: 90px;
-    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease; /* better transition for UX */
 }
 
 .calendar-tile:hover {
@@ -168,6 +170,7 @@
     background-color: #d9342b;
 }
 
+/* modal styling */
 .modal-content h2 {
     margin-top: 0;
     margin-bottom: 20px;
@@ -200,6 +203,7 @@
     color: #000;
 }
 
+/* image styling */
 .image-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -232,6 +236,7 @@
     border-color: #3ed0e4;
 }
 
+/* more modal styling */
 .modal-actions {
     display: flex;
     justify-content: center;
@@ -248,6 +253,7 @@
     font-weight: bold;
 }
 
+/* next 3 sections are for cancel and create buttons */
 .cancel-btn {
     background-color: #ccc;
     color: #000;
@@ -258,9 +264,10 @@
     color: #000;
 }
 
+/* specifically for when create button is disabled */
 .create-btn:disabled {
     background-color: #a0a0a0;
-    cursor: not-allowed;
+    cursor: not-allowed; /* ensures not able to click */
 }
 
 .flex-div {
