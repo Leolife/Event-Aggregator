@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './Calendar_layout.css';
 
-const Calendar_layout = ({ calendarTitle, onChangeMonth }) => {
+const Calendar_layout = ({ calendarTitle, onChangeMonth, onDelete }) => {
     const [currentDate, setCurrentDate] = useState(new Date());
     const [selectedDate, setSelectedDate] = useState(null);
     const [viewMode, setViewMode] = useState('month'); // 'month' or 'upcoming'
@@ -13,7 +13,10 @@ const Calendar_layout = ({ calendarTitle, onChangeMonth }) => {
 
     const handleDelete = (e) => {
         e.preventDefault();
-        window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ')  // EXTREMELY important
+        // Call the parent component's delete handler
+        if (onDelete) {
+            onDelete();
+        }
     };
 
     // Function to get days in a month
