@@ -24,11 +24,19 @@ def get_next_q(FileName: str) -> str:
         f.writelines(data)
     return q.strip()
 
+def get_q_hist(fname: str | None = 'logs.txt'):
+    with open(fname,'r') as f:
+        data = f.readlines()
+    data = [dataeu.split(';')[0].split(':')[1].lower() for dataeu in data]
+    return set(data)
+
 def main():
     ################################################### Get query 
     q = get_next_q(q_file)
     if q == 'None': # Quit the program if there are no more queries
         exit()
+    if q.lower() in q_hist:
+        return 0
     ###################################################
     query   = {"q": q, "engine": "google_events", 'api_key': API_KEY}
     search = SerpApiClient(query)
@@ -41,7 +49,7 @@ def main():
             f.write(f'Query:{q}; Count: {l}' + '\n')
     except Exception as e:
         with open(logs_file,'a') as f:
-            f.write(f'Query: {q}; Error: {e}' + '\n')
+            f.write(f'Query:{q}; Error: {e}' + '\n')
         return
 
     ###################################################
@@ -67,6 +75,9 @@ if __name__ == '__main__':
     logs_file      = os.path.join(SERP_Path,'logs.txt')
     sample_file    = os.path.join(SERP_Path,'api_events.json')
     ###################################################
+    q_hist = get_q_hist(fname=logs_file) # All past Queries
+    ###################################################
+
     while True:
         main()
-        time.sleep(10)
+        time.sleep(2)
