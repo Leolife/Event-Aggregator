@@ -6,7 +6,7 @@ import { ReactComponent as SearchIcon } from '../../assets/search-icon.svg';
 import image0 from '../../assets/liked.jpg'
 import CalendarLayout from '../../Components/Calendar/Calendar_layout';
 import { firestore } from '../../firebase';
-import { collection, getDocs, addDoc, doc, deleteDoc, query, where, getDoc, setDoc } from 'firebase/firestore';
+import { collection, getDocs, addDoc, doc, deleteDoc, query, where, getDoc } from 'firebase/firestore';
 
 // Import sample images for new calendars
 import image1 from '../../assets/thumbnail1.png'
@@ -57,50 +57,50 @@ export const Calendar = ({ sidebar, user }) => {
         return calendar.name === "Favorites" && calendar.isDefault === true;
     };
 
-    // Create a Favorites calendar if one doesn't exist
-    const createFavoritesCalendar = async () => {
-        if (!user) return;
-
-        try {
-            // Check if a Favorites calendar already exists for this user
-            const calendarsCollection = collection(firestore, 'calendars');
-            const q = query(
-                calendarsCollection, 
-                where("uid", "==", user.uid),
-                where("name", "==", "Favorites"),
-                where("isDefault", "==", true)
-            );
-            
-            const querySnapshot = await getDocs(q);
-            
-            // If Favorites calendar doesn't exist, create it
-            if (querySnapshot.empty) {
-                const favoritesCalendar = {
-                    id: `favorites-${Date.now()}`,
-                    name: "Favorites",
-                    image: 0, // Using image0 (liked.jpg)
-                    events: 0,
-                    upcoming: 0,
-                    uid: user.uid,
-                    isDefault: true // Mark as default/system calendar
-                };
-                
-                // Save to Firestore
-                await addDoc(collection(firestore, 'calendars'), favoritesCalendar);
-                
-                console.log('Favorites calendar created');
-                return true;
-            }
-            
-            return false;
-        } catch (error) {
-            console.error('Error creating Favorites calendar:', error);
-            return false;
-        }
-    };
-
     // Fetch calendars from Firestore when component mounts
     useEffect(() => {
+        // Move the function definition inside the effect
+        const createFavoritesCalendar = async () => {
+            if (!user) return;
+    
+            try {
+                // Check if a Favorites calendar already exists for this user
+                const calendarsCollection = collection(firestore, 'calendars');
+                const q = query(
+                    calendarsCollection, 
+                    where("uid", "==", user.uid),
+                    where("name", "==", "Favorites"),
+                    where("isDefault", "==", true)
+                );
+                
+                const querySnapshot = await getDocs(q);
+                
+                // If Favorites calendar doesn't exist, create it
+                if (querySnapshot.empty) {
+                    const favoritesCalendar = {
+                        id: `favorites-${Date.now()}`,
+                        name: "Favorites",
+                        image: 0, // Using image0 (liked.jpg)
+                        events: 0,
+                        upcoming: 0,
+                        uid: user.uid,
+                        isDefault: true // Mark as default/system calendar
+                    };
+                    
+                    // Save to Firestore
+                    await addDoc(collection(firestore, 'calendars'), favoritesCalendar);
+                    
+                    console.log('Favorites calendar created');
+                    return true;
+                }
+                
+                return false;
+            } catch (error) {
+                console.error('Error creating Favorites calendar:', error);
+                return false;
+            }
+        };
+    
         const fetchCalendars = async () => {
             try {
                 setLoading(true);
@@ -156,9 +156,9 @@ export const Calendar = ({ sidebar, user }) => {
                 setLoading(false);
             }
         };
-
+    
         fetchCalendars();
-    }, [user]); // Add user as a dependency so this runs when the user changes
+    }, [user]);
 
     // Sample images for the modal
     const calendarImages = [
