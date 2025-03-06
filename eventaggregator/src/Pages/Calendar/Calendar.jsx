@@ -28,6 +28,8 @@ export const Calendar = ({ sidebar, user }) => {
     const [selectedImage, setSelectedImage] = useState(null);
     const [calendars, setCalendars] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [selectedCalendar, setSelectedCalendar] = useState(null);
+    const [searchTerm, setSearchTerm] = useState('');
 
     // Function to map image number from database to actual image
     const getImageByNumber = (imageNumber) => {
@@ -81,6 +83,11 @@ export const Calendar = ({ sidebar, user }) => {
                     .filter(calendar => calendar.uid === user.uid);
                 
                 setCalendars(fetchedCalendars);
+                
+                // Set the first calendar as the selected one if available
+                if (fetchedCalendars.length > 0) {
+                    setSelectedCalendar(fetchedCalendars[0]);
+                }
             } catch (error) {
                 console.error('Error fetching calendars:', error);
             } finally {
@@ -150,11 +157,17 @@ export const Calendar = ({ sidebar, user }) => {
             // Save to Firestore
             saveCalendarToFirestore(newCalendar);
             
-            // Add to local state with image object instead of number
-            setCalendars([...calendars, {
+            // Create the new calendar with image object instead of number
+            const newCalendarWithImage = {
                 ...newCalendar,
                 image: getImageByNumber(imageNumber)
-            }]);
+            };
+            
+            // Add to local state
+            setCalendars([...calendars, newCalendarWithImage]);
+            
+            // Set the newly created calendar as the selected one
+            setSelectedCalendar(newCalendarWithImage);
             
             setNewCalendarName('');
             setSelectedImage(null);
@@ -168,6 +181,16 @@ export const Calendar = ({ sidebar, user }) => {
         setShowModal(false);
     };
 
+    // Function to handle clicking on a calendar tile
+    const handleCalendarSelect = (calendar) => {
+        setSelectedCalendar(calendar);
+    };
+
+    // Function to filter calendars based on search term
+    const filteredCalendars = calendars.filter(calendar => 
+        calendar.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
     return (
         <>
             <Sidebar sidebar={sidebar} />
@@ -179,18 +202,27 @@ export const Calendar = ({ sidebar, user }) => {
                                 <h1> My Calendars </h1>
                                 <div className="search-box flex-div">
                                     <SearchIcon className="search-icon" />
-                                    <input type="text" placeholder='Search Calendars' />
+                                    <input 
+                                        type="text" 
+                                        placeholder='Search Calendars' 
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                    />
                                     <SlidersIcon className="sliders-icon" />
                                 </div>
                             </div>
                             <div className="mycalendars">
                                 {loading ? (
                                     <div>Loading calendars...</div>
-                                ) : calendars.length === 0 ? (
+                                ) : filteredCalendars.length === 0 ? (
                                     <div>No calendars found. Create one to get started!</div>
                                 ) : (
-                                    calendars.map(calendar => (
-                                        <div key={calendar.id} className="calendar-tile">
+                                    filteredCalendars.map(calendar => (
+                                        <div 
+                                            key={calendar.id} 
+                                            className={`calendar-tile ${selectedCalendar && selectedCalendar.id === calendar.id ? 'selected-calendar' : ''}`}
+                                            onClick={() => handleCalendarSelect(calendar)}
+                                        >
                                             <div className="img-sizer">
                                                 <img src={calendar.image} alt="" />
                                             </div>
@@ -213,10 +245,10 @@ export const Calendar = ({ sidebar, user }) => {
                         </div>
                     </div>
                     <div className="calendar-section">
-                    <CalendarLayout 
-                        calendarTitle={calendars.length > 0 ? calendars[0].name : "Calendar"}
-                        onChangeMonth={(newDate) => console.log('Month changed:', newDate)} 
-                    />
+                        <CalendarLayout 
+                            calendarTitle={selectedCalendar ? selectedCalendar.name : "Calendar"}
+                            onChangeMonth={(newDate) => console.log('Month changed:', newDate)} 
+                        />
                     </div>
                 </div>
             </div>

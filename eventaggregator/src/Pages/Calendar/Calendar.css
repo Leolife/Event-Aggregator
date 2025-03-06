@@ -55,10 +55,18 @@
     display: flex;
     align-items: center;
     height: 90px;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .calendar-tile:hover {
     background-color: rgb(194, 194, 194);
+}
+
+/* Style for the selected calendar */
+.calendar-tile.selected-calendar {
+    background-color: rgba(62, 208, 228, 0.5);
+    box-shadow: 0 0 5px rgba(62, 208, 228, 0.5);
+    border-left: 3px solid #3ed0e4;
 }
 
 .calendar-tile img {
@@ -233,4 +241,23 @@
 .tile-info {
     font-size: 14px;
     color: #666;
+}
+
+/* Empty state styling */
+.mycalendars div:empty + .new-calendar-button {
+    margin-top: 50px;
+}
+
+/* Search results */
+.no-results {
+    padding: 15px;
+    text-align: center;
+    color: #666;
+}
+
+/* Scrolling for calendar list when it gets too long */
+.mycalendars {
+    max-height: 700px;
+    overflow-y: auto;
+    padding: 0 15px;
 }
