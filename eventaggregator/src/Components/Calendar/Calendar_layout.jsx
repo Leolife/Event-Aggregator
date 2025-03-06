@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './Calendar_layout.css';
 
-const Calendar_layout = ({ calendarTitle, onChangeMonth, onDelete }) => {
+const Calendar_layout = ({ calendarTitle, onChangeMonth, onDelete, isDefaultCalendar }) => {
     const [currentDate, setCurrentDate] = useState(new Date());
     const [selectedDate, setSelectedDate] = useState(null);
     const [viewMode, setViewMode] = useState('month'); // 'month' or 'upcoming'
@@ -204,12 +204,15 @@ const Calendar_layout = ({ calendarTitle, onChangeMonth, onDelete }) => {
             <div className="calendar-navigation">
                 <div className="calendar-title">
                     {calendarTitle || 'Calendar'} 
-                    <span className="calendar-dropdown"></span>
+                    {calendarTitle === "Favorites"}
                 </div>
                 
                 <div className="calendar-controls">
                     <button className="export-btn" onClick={handleExport}>Export (Google Calendar)</button>
-                    <button className="delete-btn" onClick={handleDelete}>Delete</button>
+                    {/* Only show delete button if this is not the Favorites calendar */}
+                    {calendarTitle !== "Favorites" && (
+                        <button className="delete-btn" onClick={handleDelete}>Delete</button>
+                    )}
                 </div>
             </div>
             

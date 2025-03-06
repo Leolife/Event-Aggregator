@@ -46,11 +46,6 @@
     align-items: center;
   }
   
-  .calendar-dropdown {
-    margin-left: 8px;
-    font-size: 12px;
-  }
-  
   .calendar-controls {
     display: flex;
     gap: 8px;
