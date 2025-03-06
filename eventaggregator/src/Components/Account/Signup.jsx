@@ -33,7 +33,22 @@ const Signup = ({ isOpen, onClose }) => {
                 createdAt: new Date(), // Optionally, add a timestamp
             });
 
-            alert('Account created successfully!');
+            const appBaseUrl = "https://i.imgflip.com/51u7v1.jpg"; 
+
+            await addDoc(collection(firestore, "mail"), {
+                to: email,
+                message: {
+                    subject: "Welcome to Event Aggregator! 🎉",
+                    html: `Hi ${name}, welcome to our app! Click below to verify your email and start using the platform:\n\n
+            
+                    <a href="${appBaseUrl}" style="padding: 10px 15px; background-color: blue; color: white; text-decoration: none; border-radius: 5px;">Verify Email</a>`
+                },
+                status: "queued",
+                createdAt: new Date(),
+            });
+            
+
+            alert('Signup successful! A confirmation email has been sent.');
             setName('');
             setEmail('');
             setPassword('');
