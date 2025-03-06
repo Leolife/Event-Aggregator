@@ -40,8 +40,16 @@ export const Forum = ({ sidebar }) => {
             sortedPosts.sort((a, b) => a.timestamp - b.timestamp); 
         } else if (selectedSort == "comment")
             sortedPosts.sort((a, b) => b.replyCount - a.replyCount); 
+        
+
+        if (queryParam) {
+            sortedPosts = sortedPosts.filter(post => 
+                post.title.toLowerCase().includes(queryParam.toLowerCase()) 
+            );
+        }
+
         setFilteredPosts(sortedPosts);
-    }, [selectedSort, posts])
+    }, [selectedSort, posts, queryParam])
 
     useEffect(() => {
         setSelectedSort(searchParams.get('sort'))

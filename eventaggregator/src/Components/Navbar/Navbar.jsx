@@ -6,6 +6,7 @@ import { ReactComponent as SearchIcon } from '../../assets/search-icon.svg';
 import { ReactComponent as ProfileIcon } from '../../assets/profile-icon.svg';
 import { ReactComponent as SettingsIcon } from '../../assets/settings.svg';
 import { ReactComponent as SlidersIcon } from '../../assets/sliders.svg';
+import { ReactComponent as XCircle } from '../../assets/x-circle.svg';
 import { createSearchParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import logo from '../../assets/logo-text.png';
@@ -41,6 +42,15 @@ const Navbar = ({ setSidebar }) => {
     }
   }
 
+  function forumNav() {
+    navigate({
+      pathname: "forum",
+      search: createSearchParams(
+        Object.fromEntries(Object.entries({ q: query, type: typeParam, sort: sortParam, t: timeParam }).filter(([_, v]) => v != null))
+      ).toString()
+    })
+  }
+
   const handleProfileClick = () => {
     if (isLoggedIn) {
       navigate('/profile');
@@ -49,6 +59,12 @@ const Navbar = ({ setSidebar }) => {
     }
   }
 
+  useEffect(() => {
+    if (query == "") {
+      document.getElementById("search").value = ""
+      forumNav()
+    }
+  }, [query])
   useEffect(() => {
     const auth = getAuth();
 
@@ -73,88 +89,86 @@ const Navbar = ({ setSidebar }) => {
   return (
     <>
       <Overlays isOpen={isOpen} modalType={modalType} onClose={() => setIsOpen(false)} />
-        <nav className='flex-div'>
-          <div className='nav-left flex-div'>
-            <MenuIcon className="menu-icon" onClick={() => setSidebar(prev => prev === false ? true : false)} />
-            <Link to={'/'}><img className='logo' src={logo} alt="" /></Link>
-            <a className="nav-menu-title" >Events</a>
-            <a className="nav-menu-title"><Link to={'/forum'} style={{ color: 'inherit' }}> Forum </Link></a>
-            <a className="nav-menu-title" onClick={handleProfileClick} >Profile</a>
-          </div>
-          <div className="nav-middle flex-div">
-            <div className="dropdown-search" ref={queryRef}>
-              <div className="search-box flex-div">
-                <SearchIcon className="search-icon" />
-                <input autocomplete="off" id="search" type="text" placeholder='Search'
-                  onInput={e => setQuery(e.target.value) & setActive(e.target.value.length > 0)}
-                  onMouseDown={() => setActive(query.length > 0)}
-                />
-                <SlidersIcon className="sliders-icon" onClick={() => openModal('filters')} />
+      <nav className='flex-div'>
+        <div className='nav-left flex-div'>
+          <MenuIcon className="menu-icon" onClick={() => setSidebar(prev => prev === false ? true : false)} />
+          <Link to={'/'}><img className='logo' src={logo} alt="" /></Link>
+          <a className="nav-menu-title" >Events</a>
+          <a className="nav-menu-title"><Link to={'/forum'} style={{ color: 'inherit' }}> Forum </Link></a>
+          <a className="nav-menu-title" onClick={handleProfileClick} >Profile</a>
+        </div>
+        <div className="nav-middle flex-div">
+          <div className="dropdown-search" ref={queryRef}>
+            <div className="search-box flex-div">
+              <SearchIcon className="search-icon" />
+              <input autocomplete="off" id="search" type="text" placeholder='Search'
+                onInput={e => setQuery(e.target.value) & setActive(e.target.value.length > 0)}
+                onMouseDown={() => setActive(query.length > 0)}
+              />
+              <XCircle className="x-circle"
+                style={{ 
+                  visibility: isActive ? "visible" : "hidden", }}
+                onClick={() => setQuery("") & setActive(false)} />
+            </div>
+            {isActive &&
+              <div className="dropdown-content">
+                <ul>
+                  <li className="dropdown-item">
+                    <a className="search-events" onClick={() => setActive(false)}>
+                      <span className="list-option-text"> {query} </span>
+                      <span className="list-option-suffix"> in Events </span>
+                    </a>
+                  </li>
+
+                  <li className="dropdown-item" onClick={() =>
+                    forumNav()
+                    & setActive(false)} >
+                    <a className="search-forums">
+                      <span className="list-option-text"> {query} </span>
+                      <span className="list-option-suffix"> in Forums </span>
+                    </a>
+                  </li>
+
+                </ul>
               </div>
-              {isActive &&
-                <div className="dropdown-content">
-                  <ul>
-                    <li className="dropdown-item">
-                      <a className="search-events" onClick={() => setActive(false)}>
-                        <span className="list-option-text"> {query} </span>
-                        <span className="list-option-suffix"> in Events </span>
-                      </a>
-                    </li>
+            }
+          </div>
+        </div>
 
-                    <li className="dropdown-item" onClick={() =>
-                      navigate({
-                        pathname: "forum",
-                        search: createSearchParams(
-                          Object.fromEntries(Object.entries({ q: query, type: typeParam, sort: sortParam, t: timeParam }).filter(([_, v]) => v != null))
-                        ).toString()
-                      })
-                      & setActive(false)} >
-                      <a className="search-forums">
-                        <span className="list-option-text"> {query} </span>
-                        <span className="list-option-suffix"> in Forums </span>
-                      </a>
-                    </li>
+        <div className="nav-right flex-div">
+          <Link to={'/debug'}><button class="button userdebug">UserDebug</button>
+          </Link>
 
-                  </ul>
-                </div>
-              }
-            </div>
+          <div className="user-login">
+            {!isLoggedIn && (
+              <>
+                <button className="button log-in" onClick={() => { openModal('login') }}>
+                  Login
+                </button>
+              </>
+            )}
+            {!isLoggedIn && (
+              <>
+                <button className="button sign-up" onClick={() => openModal('signup')}>
+                  Sign Up
+                </button>
+              </>
+            )}
+            {isLoggedIn && (
+              <>
+                <button className="button sign-up" onClick={() => { openModal('logout') }}>
+                  Log out
+                </button>
+              </>
+            )}
           </div>
 
-          <div className="nav-right flex-div">
-            <Link to={'/debug'}><button class="button userdebug">UserDebug</button>
-            </Link>
+          <Overlays modalType={modalType} isOpen={isOpen} onClose={() => setIsOpen(false)} />
+          <ProfileIcon className="profile-icon" />
 
-            <div className="user-login">
-              {!isLoggedIn && (
-                <>
-                  <button className="button log-in" onClick={() => { openModal('login') }}>
-                    Login
-                  </button>
-                </>
-              )}
-              {!isLoggedIn && (
-                <>
-                  <button className="button sign-up" onClick={() => openModal('signup')}>
-                    Sign Up
-                  </button>
-                </>
-              )}
-              {isLoggedIn && (
-                <>
-                  <button className="button sign-up" onClick={() => { openModal('logout') }}>
-                    Log out
-                  </button>
-                </>
-              )}
-            </div>
-
-            <Overlays modalType={modalType} isOpen={isOpen} onClose={() => setIsOpen(false)} />
-            <ProfileIcon className="profile-icon" />
-
-            <Link to={'/settings'}><SettingsIcon className="settings-icon"></SettingsIcon></Link>
-          </div>
-        </nav>
+          <Link to={'/settings'}><SettingsIcon className="settings-icon"></SettingsIcon></Link>
+        </div>
+      </nav>
     </>
   )
 }

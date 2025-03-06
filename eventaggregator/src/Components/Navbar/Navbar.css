@@ -123,3 +123,16 @@ nav {
 .dropdown-search  .dropdown-content ul li:hover {
     background-color: rgb(230,230,230);
 }
+
+.search-box .x-circle {
+    width: 25px;
+    height: 25px;
+    cursor: pointer;
+    user-select: none;
+}
+
+
+.search-box .x-circle path {
+    stroke: grey;
+    stroke-width: 5%;
+}
