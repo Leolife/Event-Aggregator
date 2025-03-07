@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import './Forum.css';
 import Sidebar from '../../Components/Sidebar/Sidebar';
-import Forum_post from '../../Components/Forum_post/Forum_post';
+import ForumPost from '../../Components/Forum_post/Forum_post';
 import { fetchForumPosts } from '../Forum/ForumPosts';
 import { useSearchParams } from 'react-router-dom';
 
 export const Forum = ({ sidebar }) => {
     const [searchParams, setSearchParams] = useSearchParams();
-    const [selectedType, setSelectedType] = useState('posts');
+    const [selectedType] = useState('posts');
     const [selectedSort, setSelectedSort] = useState('recommended');
     const [selectedTime, setSelectedTime] = useState('all');
     const queryParam = searchParams.get('q');
@@ -115,7 +115,7 @@ export const Forum = ({ sidebar }) => {
                 <div className={`container ${sidebar ? "" : 'large-container'}`}>
                     <div className="forum-feed">
                         {filteredPosts.map((post, index) => (
-                            <Forum_post key={index} {...post} />
+                            <ForumPost key={index} {...post} />
                         ))}
                     </div>
                 </div>
