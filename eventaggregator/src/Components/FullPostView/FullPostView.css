@@ -73,8 +73,8 @@
 }
 
 .dropdown-button.active {
-    background-color: #7c3aed;
-    border-color: #7c3aed;
+    background-color: var(--secondary);
+    border-color: var(--secondary);
 }
 
 .dropdown-icon {
@@ -141,7 +141,7 @@
 }
 
 .primary-button {
-    background-color: #7c3aed;
+    background-color: var(--secondary);
     color: white;
     border: none;
 }
@@ -162,7 +162,7 @@
 
 .download-button {
     background-color: rgba(124, 58, 237, 0.1);
-    color: #7c3aed;
+    color: var(--secondary);
     border: none;
     padding: 10px;
     border-radius: 6px;
@@ -197,7 +197,7 @@
     width: 24px;
     height: 24px;
     border-radius: 50%;
-    background-color: #7c3aed;
+    background-color: var(--secondary);
     display: flex;
     align-items: center;
     justify-content: center;

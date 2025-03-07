@@ -5,6 +5,7 @@ import './Forum_post.css';
 const Forum_post = ({ postId, eventName, title, body, ownerName, timestamp, upvoteCount, downvoteCount, replyCount, thumbnailID }) => {
   const navigate = useNavigate();
   let timeAgo;
+  // Convert minutes to "time ago"
   if (timestamp < 60) {
     timeAgo = `${timestamp} minute${timestamp !== 1 ? 's' : ''} ago`;
   } else if (timestamp < 1440) {

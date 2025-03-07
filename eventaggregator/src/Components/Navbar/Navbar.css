@@ -107,6 +107,7 @@ nav {
 }
 
 .nav-middle .dropdown-item{
+    display: block;
     width: 100%;
     align-content: center;
     height: 50px;
@@ -127,6 +128,18 @@ nav {
 
 .dropdown-search  .dropdown-content ul li:hover {
     background-color: rgb(230,230,230);
+}
+
+.dropdown-search .event-icon{
+    fill: var(--secondary);
+}
+.dropdown-search .forum-icon path{
+    fill: var(--secondary);
+}
+
+.dropdown-search .dropdown-icons {
+    display: inline-block;
+    width: 5%;
 }
 
 .search-box .x-circle {

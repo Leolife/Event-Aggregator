@@ -5,7 +5,8 @@ import { ReactComponent as MenuIcon } from '../../assets/menu-icon.svg';
 import { ReactComponent as SearchIcon } from '../../assets/search-icon.svg';
 import { ReactComponent as ProfileIcon } from '../../assets/profile-icon.svg';
 import { ReactComponent as SettingsIcon } from '../../assets/settings.svg';
-import { ReactComponent as SlidersIcon } from '../../assets/sliders.svg';
+import { ReactComponent as ForumIcon } from '../../assets/forum-search-icon.svg';
+import { ReactComponent as EventIcon } from '../../assets/event-search-icon.svg';
 import { ReactComponent as XCircle } from '../../assets/x-circle.svg';
 import { createSearchParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
@@ -19,6 +20,7 @@ const Navbar = ({ setSidebar }) => {
   // Whether the dropdown is active or not
   const [searchParams] = useSearchParams();
   const [isActive, setActive] = useState(false);
+  const [searchText, setSearchText] = useState("");
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [modalType, setModalType] = useState('');
@@ -55,14 +57,6 @@ const Navbar = ({ setSidebar }) => {
     }
   }
 
-  function forumNav() {
-    navigate({
-      pathname: "forum",
-      search: createSearchParams(
-        Object.fromEntries(Object.entries({ q: query, type: typeParam, sort: sortParam, t: timeParam }).filter(([_, v]) => v != null))
-      ).toString()
-    })
-  }
 
   const handleProfileClick = () => {
     if (isLoggedIn) {
@@ -72,19 +66,26 @@ const Navbar = ({ setSidebar }) => {
     }
   }
 
+  // Populates the search dropdown with event name suggestions
   useEffect(() => {
     let sortedEvents = [...events];
     sortedEvents = events.filter(e =>
-      e.eventName.toLowerCase().includes(query.toLowerCase())
+      e.toLowerCase().startsWith(searchText.toLowerCase())
     )
     setFilteredEvents(sortedEvents);
-    console.log(query)
-    console.log(filteredEvents)
-    if (query == "") {
-      document.getElementById("search").value = ""
-      forumNav()
+  }, [searchText])
+
+  useEffect(() => {
+    if (query != "") {
+      navigate({
+        pathname: "forum",
+        search: createSearchParams(
+          Object.fromEntries(Object.entries({ q: query, type: typeParam, sort: sortParam, t: timeParam }).filter(([_, v]) => v != null)) // If any of these parameters are empty, then don't include them
+        ).toString()
+      })
     }
   }, [query])
+
   useEffect(() => {
     const auth = getAuth();
 
@@ -97,6 +98,7 @@ const Navbar = ({ setSidebar }) => {
 
   let queryRef = useRef(null);
 
+  // Closes the search dropdown if the user clicks anywhere else on the screen
   useEffect(() => {
     let handler = (e) => {
       if (!queryRef.current.contains(e.target)) {
@@ -122,39 +124,46 @@ const Navbar = ({ setSidebar }) => {
             <div className="search-box flex-div">
               <SearchIcon className="search-icon" />
               <input autocomplete="off" id="search" type="text" placeholder='Search'
-                onInput={e => setQuery(e.target.value) & setActive(e.target.value.length > 0)}
-                onMouseDown={() => setActive(query.length > 0)}
+                onInput={e => setSearchText(e.target.value) & setActive(e.target.value.length > 0)}  // If the user has typed into the search, display the dropdown
+                value={searchText}
+                onMouseDown={() => setActive(searchText.length > 0)}
               />
-              <XCircle className="x-circle"
+              <XCircle className="x-circle"   // Button to delete the search query 
                 style={{
-                  visibility: isActive ? "visible" : "hidden",
+                  visibility: isActive ? "visible" : "hidden",  // Only displays when the user has typed something
                 }}
-                onClick={() => setQuery("") & setActive(false)} />
+                onClick={() => setSearchText("") & setActive(false)} />
             </div>
             {isActive &&
               <div className="dropdown-content">
                 <ul>
                   <li className="dropdown-item">
-                    <a className="search-events" onClick={() => setActive(false)}>
-                      <span className="list-option-text"> {query} </span>
+                    {/* Search in events */}
+                    <a className="dropdown-anchor" onClick={() => setActive(false)}>
+                      <span className="dropdown-icons"> <EventIcon className="event-icon" /> </span>
+                      <span className="list-option-text"> {searchText} </span>
                       <span className="list-option-suffix"> in Events </span>
                     </a>
                   </li>
 
                   <li className="dropdown-item" onClick={() =>
-                    forumNav()
+                    setQuery(searchText)
                     & setActive(false)} >
-                    <a className="search-forums">
-                      <span className="list-option-text"> {query} </span>
+                    {/* Search in forums */}
+                    <a className="dropdown-anchor">
+                      <span className="dropdown-icons"> <ForumIcon className="forum-icon" /> </span>
+                      <span className="list-option-text"> {searchText} </span>
                       <span className="list-option-suffix"> in Forums </span>
                     </a>
                   </li>
-                  {filteredEvents.map((event, index) => (
-                    <li className="dropdown-item"  key={index} value={index} onClick={() =>
-                      forumNav()
+                  {filteredEvents.slice(0, 3).map((event, index) => ( // Recommends 3 event names that best match the search query in search dropdown
+                    <li className="dropdown-item" key={index} value={index} onClick={() =>
+                      setSearchText(event)
+                      & setQuery(event)
                       & setActive(false)} >
-                      <a className="search-forums">
-                        <span className="list-option-event-name"> {event.eventName} </span>
+                      <a className="dropdown-anchor">
+                        <span className="dropdown-icons"> <ForumIcon className="forum-icon" /> </span>
+                        <span className="list-option-event-name"> {event} </span>
                         <span className="list-option-suffix"> in Forums </span>
                       </a>
                     </li>

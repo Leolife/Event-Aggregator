@@ -33,15 +33,13 @@ export const fetchForumPosts = async () => {
     }
 };
 
-// fetches posts that can be called when needed
+// fetches just the event names attached to the post so that they can be searched in the search bar 
 export const fetchForumEvents = async () => {
     try {
         const forumCollection = collection(firestore, 'forum');
         const forumSnapshot = await getDocs(forumCollection);
-        forumEvents = forumSnapshot.docs.map(doc => ({
-            eventName: doc.data().eventName || ''
-        }));
-
+        // Fetches strictly distinct event names so there are no duplicates
+        forumEvents = Array.from(new Set(forumSnapshot.docs.map(doc => doc.data().eventName || '')));
         return forumEvents;
     } catch (error) {
         console.error("Error fetching forum posts:", error);
