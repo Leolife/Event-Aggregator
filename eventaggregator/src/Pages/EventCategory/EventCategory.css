@@ -65,7 +65,7 @@
 }
 
 .event-card h2 {
-    color: #7c3aed;
+    color: var(--secondary);
 }
 
 .event-card img {
@@ -99,7 +99,7 @@
 }
 
 .event-card button {
-    background-color: #7c3aed;
+    background-color: var(--secondary);
 }
 
 .event-card .category-box {

@@ -48,7 +48,7 @@
 .tag {
     display: flex;
     align-items: center;
-    background-color:#7c3aed;
+    background-color: var(--secondary);
     height: 24px;
     width: fit-content;
     border-radius: 12px;

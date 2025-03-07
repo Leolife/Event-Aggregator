@@ -40,8 +40,18 @@ export const Forum = ({ sidebar }) => {
             sortedPosts.sort((a, b) => a.timestamp - b.timestamp); 
         } else if (selectedSort === "comment")
             sortedPosts.sort((a, b) => b.replyCount - a.replyCount); 
+        
+
+        if (queryParam && selectedType === "posts") {
+            sortedPosts = sortedPosts.filter(post => 
+                post.eventName.toLowerCase().includes(queryParam.toLowerCase()) ||
+                post.title.toLowerCase().includes(queryParam.toLowerCase()) ||
+                post.body.toLowerCase().includes(queryParam.toLowerCase())
+            );
+        }
+
         setFilteredPosts(sortedPosts);
-    }, [selectedSort, posts])
+    }, [selectedSort, posts, queryParam])
 
     useEffect(() => {
         setSelectedSort(searchParams.get('sort'))

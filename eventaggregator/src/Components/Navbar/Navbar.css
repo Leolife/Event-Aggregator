@@ -108,6 +108,7 @@ nav {
 }
 
 .nav-middle .dropdown-item{
+    display: block;
     width: 100%;
     align-content: center;
     height: 50px;
@@ -116,6 +117,11 @@ nav {
     border-bottom: 1px solid #ccc;
 } 
 
+
+.nav-middle .list-option-event-name {
+    color: rgb(64, 118, 218);
+    font-weight:bolder;
+}
 .nav-middle .list-option-suffix {
     color: grey;
     font-weight: bold;
@@ -123,4 +129,29 @@ nav {
 
 .dropdown-search  .dropdown-content ul li:hover {
     background-color: rgb(230,230,230);
+}
+
+.dropdown-search .event-icon{
+    fill: var(--secondary);
+}
+.dropdown-search .forum-icon path{
+    fill: var(--secondary);
+}
+
+.dropdown-search .dropdown-icons {
+    display: inline-block;
+    width: 5%;
+}
+
+.search-box .x-circle {
+    width: 25px;
+    height: 25px;
+    cursor: pointer;
+    user-select: none;
+}
+
+
+.search-box .x-circle path {
+    stroke: grey;
+    stroke-width: 5%;
 }

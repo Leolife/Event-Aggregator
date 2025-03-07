@@ -6,13 +6,13 @@ import thumbnail1 from '../../assets/thumbnail1.png';
 
 // will hold post data, but initialize it as empty
 export let forumPosts = [];
+export let forumEvents = [];
 
 // fetches posts that can be called when needed
 export const fetchForumPosts = async () => {
     try {
         const forumCollection = collection(firestore, 'forum');
         const forumSnapshot = await getDocs(forumCollection);
-        
         forumPosts = forumSnapshot.docs.map(doc => ({
             postId: doc.data().postId || doc.id,
             eventName: doc.data().eventName || '',
@@ -33,6 +33,19 @@ export const fetchForumPosts = async () => {
     }
 };
 
+// fetches just the event names attached to the post so that they can be searched in the search bar 
+export const fetchForumEvents = async () => {
+    try {
+        const forumCollection = collection(firestore, 'forum');
+        const forumSnapshot = await getDocs(forumCollection);
+        // Fetches strictly distinct event names so there are no duplicates
+        forumEvents = Array.from(new Set(forumSnapshot.docs.map(doc => doc.data().eventName || '')));
+        return forumEvents;
+    } catch (error) {
+        console.error("Error fetching forum posts:", error);
+        return [];
+    }
+};
 export const Forum = () => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
