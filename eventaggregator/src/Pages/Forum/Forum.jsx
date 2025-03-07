@@ -36,15 +36,17 @@ export const Forum = ({ sidebar }) => {
         let sortedPosts = [...posts];
         if (selectedSort === "top" || selectedSort === "hot") {
             sortedPosts.sort((a, b) => b.upvoteCount - a.upvoteCount);
-        } else if (selectedSort == "latest") {
+        } else if (selectedSort === "latest") {
             sortedPosts.sort((a, b) => a.timestamp - b.timestamp); 
-        } else if (selectedSort == "comment")
+        } else if (selectedSort === "comment")
             sortedPosts.sort((a, b) => b.replyCount - a.replyCount); 
         
 
-        if (queryParam) {
+        if (queryParam && selectedType === "posts") {
             sortedPosts = sortedPosts.filter(post => 
-                post.title.toLowerCase().includes(queryParam.toLowerCase()) 
+                post.eventName.toLowerCase().includes(queryParam.toLowerCase()) ||
+                post.title.toLowerCase().includes(queryParam.toLowerCase()) ||
+                post.body.toLowerCase().includes(queryParam.toLowerCase())
             );
         }
 

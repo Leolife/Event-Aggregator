@@ -115,6 +115,11 @@ nav {
     border-bottom: 1px solid #ccc;
 } 
 
+
+.nav-middle .list-option-event-name {
+    color: rgb(64, 118, 218);
+    font-weight:bolder;
+}
 .nav-middle .list-option-suffix {
     color: grey;
     font-weight: bold;

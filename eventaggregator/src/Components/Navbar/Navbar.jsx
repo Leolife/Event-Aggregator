@@ -9,8 +9,11 @@ import { ReactComponent as SlidersIcon } from '../../assets/sliders.svg';
 import { ReactComponent as XCircle } from '../../assets/x-circle.svg';
 import { createSearchParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { fetchForumEvents } from '../../Pages/Forum/ForumPosts';
 import logo from '../../assets/logo-text.png';
 import Overlays from '../Overlays';
+
+
 
 const Navbar = ({ setSidebar }) => {
   // Whether the dropdown is active or not
@@ -24,6 +27,16 @@ const Navbar = ({ setSidebar }) => {
   const typeParam = searchParams.get('type');
   const sortParam = searchParams.get('sort');
   const timeParam = searchParams.get('t');
+  const [events, setEvents] = useState([]);
+  const [filteredEvents, setFilteredEvents] = useState([]);
+
+  useEffect(() => {
+    const loadEvents = async () => {
+      const fetchedEvents = await fetchForumEvents();
+      setEvents(fetchedEvents);
+    };
+    loadEvents();
+  }, []);
 
 
   const openModal = (type) => {
@@ -60,6 +73,13 @@ const Navbar = ({ setSidebar }) => {
   }
 
   useEffect(() => {
+    let sortedEvents = [...events];
+    sortedEvents = events.filter(e =>
+      e.eventName.toLowerCase().includes(query.toLowerCase())
+    )
+    setFilteredEvents(sortedEvents);
+    console.log(query)
+    console.log(filteredEvents)
     if (query == "") {
       document.getElementById("search").value = ""
       forumNav()
@@ -106,8 +126,9 @@ const Navbar = ({ setSidebar }) => {
                 onMouseDown={() => setActive(query.length > 0)}
               />
               <XCircle className="x-circle"
-                style={{ 
-                  visibility: isActive ? "visible" : "hidden", }}
+                style={{
+                  visibility: isActive ? "visible" : "hidden",
+                }}
                 onClick={() => setQuery("") & setActive(false)} />
             </div>
             {isActive &&
@@ -128,6 +149,17 @@ const Navbar = ({ setSidebar }) => {
                       <span className="list-option-suffix"> in Forums </span>
                     </a>
                   </li>
+                  {filteredEvents.map((event, index) => (
+                    <li className="dropdown-item"  key={index} value={index} onClick={() =>
+                      forumNav()
+                      & setActive(false)} >
+                      <a className="search-forums">
+                        <span className="list-option-event-name"> {event.eventName} </span>
+                        <span className="list-option-suffix"> in Forums </span>
+                      </a>
+                    </li>
+                  ))}
+
 
                 </ul>
               </div>
