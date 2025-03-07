@@ -11,7 +11,7 @@ class event_listings:
         self.data = i
 
 # Reading the file and load in the dataset
-df = pd.read_csv(filepath_or_buffer = 'Data/events.csv', index_col = 0)
+df = pd.read_csv(filepath_or_buffer = 'Data/Final_Events.csv', index_col = 0)
 events = event_listings(i = df)
 ########################################## Saving the user's data.
 class user_metrics:
@@ -21,6 +21,8 @@ class user_metrics:
 user_db = user_metrics()
 ##########################################
 
+
+###########################################################################
 @app.get("/events/random_one")
 def get_random_event():
     """Get a random events and returns the detail"""
@@ -34,7 +36,7 @@ def search_listing():
     search_item: str = request.get_json()['EVENT']
     max_r       = 0
     curr_idx    = 0
-    for idx, item in enumerate(df['title']):
+    for idx, item in enumerate(df['Title']):
         item: str = item.lower()
         r = ratio(search_item,item)
         if r > max_r:
@@ -53,6 +55,7 @@ def get_random_events():
         return eval(events.data.sample(n = n).to_json(orient='records'))
     return {"error": "Request must be JSON"}, 415
 
+###########################################################################
 @app.get("/dump_records")
 def return_records():
     """Return an internal view of the records and what users have seen"""
@@ -96,11 +99,11 @@ def record_seen():
         user_db.data[user_ID][event] = 0
     return {'Message': 'ok'}, 200
 
-@app.get("/tags")
-def unique_tags():
-    s = set()
-    s = {tag for tags in events.data['tags'] for tag in eval(tags)}
-    return list(s), 200
+# @app.get("/tags")
+# def unique_tags():
+#     s = set()
+#     s = {tag for tags in events.data['tags'] for tag in eval(tags)}
+#     return list(s), 200
 
 
 # @app.post("/events")
