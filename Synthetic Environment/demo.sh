@@ -2,6 +2,10 @@
 # export FLASK_APP=RestAPI.py
 # flask run
 # npm install nodejs
+python3 -m webbrowser http://127.0.0.1:5000/events/random_one
+
+exit 0
+
 
 curl -i http://127.0.0.1:5000/events/search \
 -X POST \

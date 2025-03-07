@@ -26,7 +26,7 @@ user_db = user_metrics()
 @app.get("/events/random_one")
 def get_random_event():
     """Get a random events and returns the detail"""
-    return eval(events.data.sample(n = 1).to_json(orient='records'))[0]
+    return (events.data.sample(n = 1).to_dict())
 
 @app.post("/events/search")
 def search_listing():
