@@ -21,7 +21,6 @@ const Navbar = ({ setSidebar }) => {
   const [searchParams] = useSearchParams();
   const [isActive, setActive] = useState(false);
   const [searchText, setSearchText] = useState("");
-  const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [modalType, setModalType] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(null);
@@ -32,6 +31,7 @@ const Navbar = ({ setSidebar }) => {
   const [events, setEvents] = useState([]);
   const [filteredEvents, setFilteredEvents] = useState([]);
 
+  // Fetches event names attached to the forums
   useEffect(() => {
     const loadEvents = async () => {
       const fetchedEvents = await fetchForumEvents();
@@ -75,16 +75,14 @@ const Navbar = ({ setSidebar }) => {
     setFilteredEvents(sortedEvents);
   }, [searchText])
 
-  useEffect(() => {
-    if (query != "") {
-      navigate({
-        pathname: "forum",
-        search: createSearchParams(
-          Object.fromEntries(Object.entries({ q: query, type: typeParam, sort: sortParam, t: timeParam }).filter(([_, v]) => v != null)) // If any of these parameters are empty, then don't include them
-        ).toString()
-      })
-    }
-  }, [query])
+  function forumNav(query) {
+    navigate({
+      pathname: "forum",
+      search: createSearchParams(
+        Object.fromEntries(Object.entries({ q: query, type: typeParam, sort: sortParam, t: timeParam }).filter(([_, v]) => v != null)) // If any of these parameters are empty, then don't include them
+      ).toString()
+    })
+  }
 
   useEffect(() => {
     const auth = getAuth();
@@ -96,9 +94,8 @@ const Navbar = ({ setSidebar }) => {
     return () => unsubscribe(); // Cleanup listener on unmount
   }, []);
 
-  let queryRef = useRef(null);
-
   // Closes the search dropdown if the user clicks anywhere else on the screen
+  let queryRef = useRef(null);
   useEffect(() => {
     let handler = (e) => {
       if (!queryRef.current.contains(e.target)) {
@@ -147,7 +144,7 @@ const Navbar = ({ setSidebar }) => {
                   </li>
 
                   <li className="dropdown-item" onClick={() =>
-                    setQuery(searchText)
+                    forumNav(searchText)
                     & setActive(false)} >
                     {/* Search in forums */}
                     <a className="dropdown-anchor">
@@ -159,7 +156,7 @@ const Navbar = ({ setSidebar }) => {
                   {filteredEvents.slice(0, 3).map((event, index) => ( // Recommends 3 event names that best match the search query in search dropdown
                     <li className="dropdown-item" key={index} value={index} onClick={() =>
                       setSearchText(event)
-                      & setQuery(event)
+                      & forumNav(event)
                       & setActive(false)} >
                       <a className="dropdown-anchor">
                         <span className="dropdown-icons"> <ForumIcon className="forum-icon" /> </span>
