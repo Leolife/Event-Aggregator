@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
 import { ReactComponent as Logo } from '../../assets/calendar-icon.svg';
 import { auth, firestore } from '../../firebase'; // Adjust for your firebase.js location
-import { collection, addDoc, doc, setDoc } from 'firebase/firestore';
+import { collection, addDoc, doc, setDoc, Timestamp } from 'firebase/firestore';
+import UserData from '../../utils/UserData';
 
-const AddForumPost = ({ isOpen, onClose }) => {
+export const AddForumPost = ({ isOpen, onClose }) => {
     const [title, setTitle] = useState('');
     const [body, setBody] = useState('');
     const [eventName, setEventName] = useState('');
 
     // Current user from Firebase Auth
     const user = auth.currentUser;
+    const userData = new UserData(user.uid);
 
     // Function to handle form submission
     const handleSubmit = async (e) => {
@@ -20,15 +22,21 @@ const AddForumPost = ({ isOpen, onClose }) => {
             alert("No user is signed in. Please log in first.");
             return;
         }
+        
+        const userName = await userData.getName();
 
         // Prepare new post data including the user's name and id
         const newPostData = {
             title,
             body,
             eventName,
-            createdAt: new Date(),
+            upvoteCount: 0,
+            downvoteCount: 0,
+            replyCount: 0,
+            thumbnailID: 0,
+            timestamp: new Date(),
             ownerId: user.uid,
-            ownerName: user.displayName || "Anonymous", // Fallback if displayName is not set
+            ownerName: userName || "Anonymous", // Fallback if displayName is not set
         };
 
         try {
