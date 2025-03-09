@@ -27,7 +27,6 @@ const Navbar = ({ setSidebar }) => {
   const navigate = useNavigate();
   const typeParam = searchParams.get('type');
   const sortParam = searchParams.get('sort');
-  const timeParam = searchParams.get('t');
   const [events, setEvents] = useState([]);
   const [filteredEvents, setFilteredEvents] = useState([]);
 
@@ -79,7 +78,7 @@ const Navbar = ({ setSidebar }) => {
     navigate({
       pathname: "forum",
       search: createSearchParams(
-        Object.fromEntries(Object.entries({ q: query, type: typeParam, sort: sortParam, t: timeParam }).filter(([_, v]) => v != null)) // If any of these parameters are empty, then don't include them
+        Object.fromEntries(Object.entries({ q: query, type: typeParam, sort: sortParam}).filter(([_, v]) => v != null)) // If any of these parameters are empty, then don't include them
       ).toString()
     })
   }

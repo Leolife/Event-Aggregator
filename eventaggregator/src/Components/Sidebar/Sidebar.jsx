@@ -18,11 +18,12 @@ const Sidebar = ({ sidebar }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [modalType, setModalType] = useState('');
 
+  // Navigates to the forum page with the respective sort 
   function forumLink(sort) {
     navigate({
       pathname: "/forum",
       search: createSearchParams(
-        { type: "post", sort: sort, t: "all" }
+        { type: "post", sort: sort}
       ).toString()
     })
   }
