@@ -3,6 +3,7 @@ import { useNavigate, Outlet } from 'react-router-dom';
 import { collection, getDocs } from 'firebase/firestore';
 import { firestore } from '../../firebase';
 import thumbnail1 from '../../assets/thumbnail1.png';
+import './AddPostButton.css'
 
 // will hold post data, but initialize it as empty
 export let forumPosts = [];

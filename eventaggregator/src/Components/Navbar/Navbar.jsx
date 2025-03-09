@@ -193,7 +193,7 @@ const Navbar = ({ setSidebar }) => {
             )}
             {isLoggedIn && (
               <>
-                <button className="button sign-up" onClick={() => { openModal('logout') }}>
+                <button className="button log-out" onClick={() => { openModal('logout') }}>
                   Log out
                 </button>
               </>

@@ -4,6 +4,9 @@ import './IndividualPostView.css';
 import FullPostView from '../../../Components/FullPostView/FullPostView';
 import Sidebar from '../../../Components/Sidebar/Sidebar';
 import { fetchForumPosts } from '../ForumPosts';
+import '../AddPostButton.css'
+import AddPostButton from '../AddPostButton';
+import Overlays from '../../../Components/Overlays';
 
 const IndividualPostView = ({ sidebar }) => {
     const { postId } = useParams();
@@ -42,6 +45,8 @@ const IndividualPostView = ({ sidebar }) => {
                 <div className={`container ${sidebar ? "" : 'large-container'}`}>
                     <div>Loading post...</div>
                 </div>
+
+                <AddPostButton />
             </>
         );
     }
@@ -53,6 +58,7 @@ const IndividualPostView = ({ sidebar }) => {
                 <div className={`container ${sidebar ? "" : 'large-container'}`}>
                     <div className="error-message">Post not found</div>
                 </div>
+                <AddPostButton />
             </>
         );
     }
@@ -63,6 +69,7 @@ const IndividualPostView = ({ sidebar }) => {
             <div className={`container ${sidebar ? "" : 'large-container'}`}>
                 <FullPostView post={post} comments={dummyComments} />
             </div>
+            <AddPostButton />
         </>
     );
 };
