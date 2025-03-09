@@ -8,24 +8,32 @@ import '../AddPostButton.css'
 import AddPostButton from '../AddPostButton';
 import Overlays from '../../../Components/Overlays';
 
+import { doc, getDoc } from "firebase/firestore";
+import { firestore } from '../../../firebase';
+
 const IndividualPostView = ({ sidebar }) => {
     const { postId } = useParams();
     const [post, setPost] = useState(null);
     const [loading, setLoading] = useState(true);
-    
+
     useEffect(() => {
         const loadPost = async () => {
             setLoading(true);
             try {
-                const posts = await fetchForumPosts();
-                const foundPost = posts.find(p => p.postId === parseInt(postId));
-                setPost(foundPost);
+                const docRef = doc(firestore, 'forum', postId);
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    // Include the document id in the post data if needed
+                    setPost({ id: docSnap.id, ...docSnap.data() });
+                } else {
+                    setPost(null);
+                }
             } catch (error) {
                 console.error("Error loading post:", error);
             }
             setLoading(false);
         };
-        
+
         loadPost();
     }, [postId]);
 
