@@ -4,6 +4,9 @@ import Sidebar from '../../Components/Sidebar/Sidebar';
 import ForumPost from '../../Components/Forum_post/Forum_post';
 import { fetchForumPosts } from '../Forum/ForumPosts';
 import { useSearchParams } from 'react-router-dom';
+import './AddPostButton'
+import './AddPostButton.css'
+import AddPostButton from './AddPostButton';
 
 export const Forum = ({ sidebar }) => {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -119,6 +122,7 @@ export const Forum = ({ sidebar }) => {
                         ))}
                     </div>
                 </div>
+                <AddPostButton />
             </div>
         </>
     );

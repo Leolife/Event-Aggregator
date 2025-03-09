@@ -1,0 +1,26 @@
+.add-post {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    color: white;
+    background-color: rgb(22, 70, 128);
+    border-radius: 20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    margin-right: 10px;
+    border: none;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 9999;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease;
+}
+
+.add-post:hover {
+    background-color: #0056b3;
+}

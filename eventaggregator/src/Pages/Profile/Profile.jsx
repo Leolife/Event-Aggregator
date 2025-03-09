@@ -68,14 +68,14 @@ export const Profile = ({ sidebar }) => {
     // Callback to receive the new banner link from the modal
     const handleBannerSubmit = (link) => {
         setTempProfileBanner(link);
-        // Optionally, you might close the modal here or leave that to the modal itself
+        // Optionally, close the modal here or leave that to the modal itself
         setIsOpen(false);
     };
 
     // Callback to receive the new picture link from the modal
     const handlePictureSubmit = (link) => {
         setTempProfilePicture(link);
-        // Optionally, you might close the modal here or leave that to the modal itself
+        // Optionally, close the modal here or leave that to the modal itself
         setIsOpen(false);
     };
 
