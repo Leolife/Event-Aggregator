@@ -33,7 +33,7 @@ const Signup = ({ isOpen, onClose }) => {
                 createdAt: new Date(), // Optionally, add a timestamp
             });
 
-            const appBaseUrl = "https://i.imgflip.com/51u7v1.jpg"; 
+            const appBaseUrl = "http://localhost:3000"; 
 
             await addDoc(collection(firestore, "mail"), {
                 to: email,
