@@ -20,20 +20,15 @@ const IndividualPostView = ({ sidebar }) => {
         const loadPost = async () => {
             setLoading(true);
             try {
-                const docRef = doc(firestore, 'forum', postId);
-                const docSnap = await getDoc(docRef);
-                if (docSnap.exists()) {
-                    // Include the document id in the post data if needed
-                    setPost({ id: docSnap.id, ...docSnap.data() });
-                } else {
-                    setPost(null);
-                }
+                const posts = await fetchForumPosts();
+                const foundPost = posts.find(p => p.postId === postId);
+                setPost(foundPost);
             } catch (error) {
                 console.error("Error loading post:", error);
             }
             setLoading(false);
         };
-
+        
         loadPost();
     }, [postId]);
 
