@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import './Account.css';
 import { ReactComponent as Logo } from '../../assets/calendar-icon.svg';
 import { auth, firestore } from '../../firebase'; // Adjusted for your firebase.js location
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, sendEmailVerification  } from 'firebase/auth';
 import { collection, addDoc, doc, setDoc } from 'firebase/firestore';
+
 
 const Signup = ({ isOpen, onClose }) => {
     const [name, setName] = useState('');
@@ -33,22 +34,9 @@ const Signup = ({ isOpen, onClose }) => {
                 createdAt: new Date(), // Optionally, add a timestamp
             });
 
-            const appBaseUrl = "http://localhost:3000"; 
-
-            await addDoc(collection(firestore, "mail"), {
-                to: email,
-                message: {
-                    subject: "Welcome to Event Aggregator! 🎉",
-                    html: `Hi ${name}, welcome to our app! Click below to verify your email and start using the platform:\n\n
-            
-                    <a href="${appBaseUrl}" style="padding: 10px 15px; background-color: blue; color: white; text-decoration: none; border-radius: 5px;">Verify Email</a>`
-                },
-                status: "queued",
-                createdAt: new Date(),
-            });
-            
-
-            alert('Signup successful! A confirmation email has been sent.');
+            // Send email verification
+            await sendEmailVerification(user);
+            alert('Signup successful! A verification email has been sent. Please check your inbox.');
             setName('');
             setEmail('');
             setPassword('');
