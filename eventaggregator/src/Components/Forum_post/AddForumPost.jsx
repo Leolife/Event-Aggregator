@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ReactComponent as Logo } from '../../assets/calendar-icon.svg';
 import { auth, firestore } from '../../firebase'; // Adjust for your firebase.js location
-import { collection, addDoc, doc, setDoc, Timestamp } from 'firebase/firestore';
+import { collection, addDoc, doc, setDoc, Timestamp, updateDoc } from 'firebase/firestore';
 import UserData from '../../utils/UserData';
 
 export const AddForumPost = ({ isOpen, onClose }) => {
@@ -46,8 +46,14 @@ export const AddForumPost = ({ isOpen, onClose }) => {
             // Create an empty "replies" subcollection by adding a placeholder doc.
             await setDoc(doc(newDocRef, 'replies', 'placeholder'), {});
 
-            console.log("Document written with ID:", newDocRef.id);
+            await updateDoc( 
+                newDocRef, {
+                    ["postId"]: newDocRef.id,
+                }
+            )
 
+            console.log("Document written with ID:", newDocRef.id);
+            
             // Reset form fields and close the modal
             setTitle('');
             setBody('');
