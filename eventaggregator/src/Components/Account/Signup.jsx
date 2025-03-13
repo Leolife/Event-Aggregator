@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import './Account.css';
 import { ReactComponent as Logo } from '../../assets/calendar-icon.svg';
 import { auth, firestore } from '../../firebase'; // Adjusted for your firebase.js location
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, sendEmailVerification  } from 'firebase/auth';
 import { collection, addDoc, doc, setDoc } from 'firebase/firestore';
+
 
 const Signup = ({ isOpen, onClose }) => {
     const [name, setName] = useState('');
@@ -33,7 +34,9 @@ const Signup = ({ isOpen, onClose }) => {
                 createdAt: new Date(), // Optionally, add a timestamp
             });
 
-            alert('Account created successfully!');
+            // Send email verification
+            await sendEmailVerification(user);
+            alert('Signup successful! A verification email has been sent. Please check your inbox.');
             setName('');
             setEmail('');
             setPassword('');
