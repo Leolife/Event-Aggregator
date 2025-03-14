@@ -6,25 +6,20 @@ import { auth } from '../../firebase';
 import ForumData from '../../utils/ForumData';
 import Replies from './Replies';
 import { onAuthStateChanged } from 'firebase/auth';
+import UserData from '../../utils/UserData';
+
 
 const FullPostView = ({ post, comments }) => {
     const [showDropdown, setShowDropdown] = useState(false);
-    const [currentUser, setCurrentUser] = useState(null);
+
+    const user = auth.currentUser;
+    const userData = user ? new UserData(user.uid) : null;
     const navigate = useNavigate();
     const { postId } = useParams();
 
-    useEffect(() => {
-        // Listen for authentication state changes
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-            setCurrentUser(user);
-        });
-
-        return () => unsubscribe(); // Cleanup the listener on unmount
-    }, []);
-
     const handleDeletion = async (e) => {
         e.preventDefault();
-        if (currentUser?.uid !== post.ownerId) {
+        if (user?.uid !== post.ownerId) {
             alert("You are not authorized to delete this post.");
             return;
         }
@@ -64,7 +59,7 @@ const FullPostView = ({ post, comments }) => {
                                     </div>
                                     <span>{post.ownerName}</span>
                                 </div>
-                                {currentUser?.uid === post.ownerId && (
+                                {user?.uid === post.ownerId && (
                                     <button className="delete-post" onClick={handleDeletion}>
                                         Delete Post
                                     </button>

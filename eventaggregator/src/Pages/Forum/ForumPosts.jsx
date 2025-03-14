@@ -20,6 +20,7 @@ export const fetchForumPosts = async () => {
             title: doc.data().title || '',
             body: doc.data().body || '',
             ownerName: doc.data().ownerName || '',
+            ownerId: doc.data().ownerId || '',
             timestamp: doc.data().timestamp ? Math.floor((Date.now() - doc.data().timestamp.toDate()) / 60000) : 0,  // calculates in terms of minutes
             upvoteCount: doc.data().upvoteCount || 0,
             downvoteCount: doc.data().downvoteCount || 0,
