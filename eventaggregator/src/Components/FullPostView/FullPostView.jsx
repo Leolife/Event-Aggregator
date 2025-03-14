@@ -1,11 +1,21 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './FullPostView.css';
 import { forumPosts } from '../../Pages/Forum/ForumPosts';
 import { useParams } from 'react-router-dom';
+import { auth } from '../../firebase';
+import UserData from '../../utils/UserData';
+import ForumData from '../../utils/ForumData';
+
 
 const FullPostView = ({ post, comments }) => {
     const [showDropdown, setShowDropdown] = useState(false);
     const [replyText, setReplyText] = useState('');
+    const [isUser, setIsUser] = useState(false);
+
+    const handleDeletion = (e) => {
+        e.preventDefault();
+
+    };
 
     const handleReplySubmit = (e) => {
         e.preventDefault();
@@ -16,6 +26,16 @@ const FullPostView = ({ post, comments }) => {
     const toggleDropdown = () => {
         setShowDropdown(!showDropdown);
     };
+
+    useEffect(() => {
+        const user = auth.currentUser;
+        const post = new ForumData(postId);
+        if (user) {
+            if (user.id == post.getOwnerId()) {
+                setIsUser(true);
+            }
+        }
+    }, []);
 
     const { postId } = useParams();
 
@@ -36,6 +56,9 @@ const FullPostView = ({ post, comments }) => {
                                     </div>
                                     <span>{post.ownerName}</span>
                                 </div>
+                                <button className="delete-post" onClick={handleDeletion}>
+                                    Delete Post
+                                </button>
                             </div>
                             <button
                                 className={`dropdown-button ${showDropdown ? 'active' : ''}`}

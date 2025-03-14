@@ -330,3 +330,12 @@
     color: #666;
     font-size: 0.9rem;
 }
+
+.delete-post {
+    background-color: red;
+    color: white;
+}
+
+.delete-post:hover {
+    background-color: darkred;
+}

@@ -94,6 +94,17 @@ class ForumData {
         await this.setPostData({ ownerName: newOwnerName });
     }
 
+    // Getter: Fetch post owner id
+    async getOwnerId() {
+        const postData = await this.getPostData();
+        return postData.ownerId || "Unknown";
+    }
+
+    // Setter: Update post owner id
+    async setOwnerId(newOwnerId) {
+        await this.setPostData({ ownerId: newOwnerId });
+    }
+
     // Getter: Fetch event name associated with the post
     async getEventName() {
         const postData = await this.getPostData();
