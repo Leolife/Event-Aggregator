@@ -1,11 +1,40 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './FullPostView.css';
 import { forumPosts } from '../../Pages/Forum/ForumPosts';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import { auth } from '../../firebase';
+import UserData from '../../utils/UserData';
+import ForumData from '../../utils/ForumData';
+
+
 
 const FullPostView = ({ post, comments }) => {
     const [showDropdown, setShowDropdown] = useState(false);
     const [replyText, setReplyText] = useState('');
+    const [isUser, setIsUser] = useState(false);
+
+    const navigate = useNavigate();
+
+    const handleDeletion = async (e) => {
+        e.preventDefault();
+        if (!isUser) {
+            alert("You are not authorized to delete this post.");
+            return;
+        }
+    
+        const confirmDelete = window.confirm("Are you sure you want to delete this post?");
+        if (!confirmDelete) return;
+    
+        try {
+            const post = new ForumData(postId);
+            await post.deletePost(); 
+            alert("Post deleted successfully.");
+            navigate(`/Forum`);
+        } catch (error) {
+            console.error("Error deleting post:", error);
+            alert("Failed to delete the post.");
+        }
+    };
 
     const handleReplySubmit = (e) => {
         e.preventDefault();
@@ -16,6 +45,21 @@ const FullPostView = ({ post, comments }) => {
     const toggleDropdown = () => {
         setShowDropdown(!showDropdown);
     };
+
+    useEffect(() => {
+        const isSameUser = async () =>{
+            const user = auth.currentUser;
+            const post = new ForumData(postId)
+            if (user) {
+                const thisUserId = await user.uid;
+                const thisOwnerId = await post.getOwnerId()
+                if ( thisUserId == thisOwnerId ) {
+                    setIsUser(true);
+                }
+            }
+        };
+        isSameUser();
+    }, []);
 
     const { postId } = useParams();
 
@@ -36,6 +80,9 @@ const FullPostView = ({ post, comments }) => {
                                     </div>
                                     <span>{post.ownerName}</span>
                                 </div>
+                                <button className="delete-post" onClick={handleDeletion}>
+                                    Delete Post
+                                </button>
                             </div>
                             <button
                                 className={`dropdown-button ${showDropdown ? 'active' : ''}`}
