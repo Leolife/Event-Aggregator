@@ -1,18 +1,73 @@
 import React, { useEffect, useState } from 'react';
 import './FullPostView.css';
-import { forumPosts } from '../../Pages/Forum/ForumPosts';
-import { useNavigate, useParams } from 'react-router-dom';
-import { auth } from '../../firebase';
+import { auth, firestore } from '../../firebase';
+import { collection, addDoc, deleteDoc, doc, onSnapshot, query, orderBy, Timestamp } from 'firebase/firestore';
+import { useNavigate } from 'react-router-dom';
 import UserData from '../../utils/UserData';
-import ForumData from '../../utils/ForumData';
 
-const Replies = ({ comments }) => {
+const Replies = ({ postId }) => {
     const [replyText, setReplyText] = useState('');
+    const [replies, setReplies] = useState([]);
 
-    const handleReplySubmit = (e) => {
+    // Current user from Firebase Auth
+    const user = auth.currentUser;
+    const userData = user ? new UserData(user.uid) : null;
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (!postId) return;
+
+        const repliesRef = collection(firestore, 'forum', postId, 'replies');
+        const q = query(repliesRef, orderBy('timestamp', 'desc'));
+
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            setReplies(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+        });
+
+        return () => unsubscribe();
+    }, [postId]);
+
+    const handleReplySubmit = async (e) => {
         e.preventDefault();
-        alert('Reply submitted: ' + replyText);
-        setReplyText('');
+        if (!replyText.trim()) return;
+
+        if (!user) {
+            alert('You must be logged in to comment.');
+            return;
+        }
+
+        const userName = await userData.getName();
+
+        try {
+            const replyData = {
+                ownerName: userName || 'Anonymous',
+                ownerId: user.uid,
+                commentBody: replyText.trim(),
+                timestamp: Timestamp.now(),
+            };
+
+            await addDoc(collection(firestore, 'forum', postId, 'replies'), replyData);
+            setReplyText('');
+        } catch (error) {
+            console.error('Error adding reply:', error);
+        }
+    };
+
+    const handleDeletion = async (replyId, ownerId) => {
+        if (!user || user.uid !== ownerId) {
+            alert("You are not authorized to delete this post.");
+            return;
+        }
+
+        const confirmDelete = window.confirm("Are you sure you want to delete this reply?");
+        if (!confirmDelete) return;
+
+        try {
+            await deleteDoc(doc(firestore, 'forum', postId, 'replies', replyId));
+        } catch (error) {
+            console.error("Error deleting post:", error);
+            alert("Failed to delete the post.");
+        }
     };
 
     return (
@@ -30,16 +85,23 @@ const Replies = ({ comments }) => {
                 </button>
             </div>
 
-            {comments?.map((comment, index) => (
-                <div key={index} className="comment-box">
+            {replies.map((reply) => (
+                <div key={reply.id} className="comment-box">
                     <div className="author-info">
                         <div className="author-avatar">
-                            {comment.ownerName?.[0]?.toUpperCase() || 'U'}
+                            {reply.ownerName?.[0]?.toUpperCase() || 'U'}
                         </div>
-                        <span>{comment.ownerName}</span>
-                        <span className="post-time">{comment.timestamp}</span>
+                        <span>{reply.ownerName}</span>
+                        <span className="post-time">{new Date(reply.timestamp?.toDate()).toLocaleString()}</span>
+                        {user?.uid === reply.ownerId && (
+                            <button className="delete-post"
+                                onClick={() => handleDeletion(reply.id, reply.ownerId)}
+                            >
+                                Delete Reply
+                            </button>
+                        )}
                     </div>
-                    <p className="post-body">{comment.commentBody}</p>
+                    <p className="post-body">{reply.commentBody}</p>
                 </div>
             ))}
         </div>

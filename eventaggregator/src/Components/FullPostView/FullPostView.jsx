@@ -11,9 +11,7 @@ import Replies from './Replies';
 
 const FullPostView = ({ post, comments }) => {
     const [showDropdown, setShowDropdown] = useState(false);
-    const [replyText, setReplyText] = useState('');
     const [isPostUser, setIsPostUser] = useState(false);
-
     const navigate = useNavigate();
 
     const handleDeletion = async (e) => {
@@ -37,19 +35,13 @@ const FullPostView = ({ post, comments }) => {
         }
     };
 
-    const handleReplySubmit = (e) => {
-        e.preventDefault();
-        setReplyText('You actually thought the reply button would work properly, LOL!');
-        window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ')
-    };
-
     const toggleDropdown = () => {
         setShowDropdown(!showDropdown);
     };
 
     useEffect(() => {
+        const user = auth.currentUser;
         const isSamePostUser = async () =>{
-            const user = auth.currentUser;
             const post = new ForumData(postId)
             if (user) {
                 const thisUserId = await user.uid;
@@ -123,7 +115,7 @@ const FullPostView = ({ post, comments }) => {
                         </div>
                     </div>
 
-                    <Replies comments={comments} />
+                    <Replies postId={postId} />
                 </div>
 
                 {showDropdown && (
