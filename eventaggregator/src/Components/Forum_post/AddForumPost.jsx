@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ReactComponent as Logo } from '../../assets/calendar-icon.svg';
 import { auth, firestore } from '../../firebase'; // Adjust for your firebase.js location
 import { collection, addDoc, doc, setDoc, Timestamp, updateDoc } from 'firebase/firestore';
@@ -8,6 +9,7 @@ export const AddForumPost = ({ isOpen, onClose }) => {
     const [title, setTitle] = useState('');
     const [body, setBody] = useState('');
     const [eventName, setEventName] = useState('');
+    const navigate = useNavigate();
 
     // Current user from Firebase Auth
     const user = auth.currentUser;
@@ -59,6 +61,9 @@ export const AddForumPost = ({ isOpen, onClose }) => {
             setBody('');
             setEventName('');
             onClose();
+            
+            navigate(`/Forum/post/${newDocRef.id}`)
+
         } catch (error) {
             console.error("Error adding document:", error);
         }
