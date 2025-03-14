@@ -1,4 +1,4 @@
-import { doc, getDoc, updateDoc, collection, query, where, getDocs } from "firebase/firestore";
+import { doc, getDoc, updateDoc, collection, query, where, getDocs, deleteDoc } from "firebase/firestore";
 import { firestore } from "../firebase";
 
 class ForumData {
@@ -8,6 +8,35 @@ class ForumData {
         }
         this.postId = postId;
         this.postRef = doc(firestore, "forum", this.postId); // Direct reference using Post ID as document ID
+    }
+
+    // Delete post from Firestore
+    async deletePost() {
+        try {
+            const postSnap = await getDoc(this.postRef);
+
+            if (postSnap.exists()) {
+                await deleteDoc(this.postRef);
+                console.log("Post deleted successfully.");
+                return;
+            }
+
+            // If direct reference fails, search by postId field
+            const forumRef = collection(firestore, "forum");
+            const q = query(forumRef, where("postId", "==", this.postId));
+            const querySnapshot = await getDocs(q);
+
+            if (!querySnapshot.empty) {
+                const postDocRef = querySnapshot.docs[0].ref;
+                await deleteDoc(postDocRef);
+                console.log("Post deleted successfully (via query).");
+            } else {
+                throw new Error("Post not found in Firestore.");
+            }
+        } catch (error) {
+            console.error("Error deleting post:", error);
+            throw error;
+        }
     }
 
     // Getter: Fetch post data from Firestore
