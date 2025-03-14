@@ -3,31 +3,33 @@ import './FullPostView.css';
 import { forumPosts } from '../../Pages/Forum/ForumPosts';
 import { useNavigate, useParams } from 'react-router-dom';
 import { auth } from '../../firebase';
-import UserData from '../../utils/UserData';
 import ForumData from '../../utils/ForumData';
-
+import Replies from './Replies';
+import { onAuthStateChanged } from 'firebase/auth';
+import UserData from '../../utils/UserData';
 
 
 const FullPostView = ({ post, comments }) => {
     const [showDropdown, setShowDropdown] = useState(false);
-    const [replyText, setReplyText] = useState('');
-    const [isUser, setIsUser] = useState(false);
 
+    const user = auth.currentUser;
+    const userData = user ? new UserData(user.uid) : null;
     const navigate = useNavigate();
+    const { postId } = useParams();
 
     const handleDeletion = async (e) => {
         e.preventDefault();
-        if (!isUser) {
+        if (user?.uid !== post.ownerId) {
             alert("You are not authorized to delete this post.");
             return;
         }
-    
+
         const confirmDelete = window.confirm("Are you sure you want to delete this post?");
         if (!confirmDelete) return;
-    
+
         try {
-            const post = new ForumData(postId);
-            await post.deletePost(); 
+            const postInstance = new ForumData(postId);
+            await postInstance.deletePost();
             alert("Post deleted successfully.");
             navigate(`/Forum`);
         } catch (error) {
@@ -36,32 +38,9 @@ const FullPostView = ({ post, comments }) => {
         }
     };
 
-    const handleReplySubmit = (e) => {
-        e.preventDefault();
-        setReplyText('You actually thought the reply button would work properly, LOL!');
-        window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ')
-    };
-
     const toggleDropdown = () => {
         setShowDropdown(!showDropdown);
     };
-
-    useEffect(() => {
-        const isSameUser = async () =>{
-            const user = auth.currentUser;
-            const post = new ForumData(postId)
-            if (user) {
-                const thisUserId = await user.uid;
-                const thisOwnerId = await post.getOwnerId()
-                if ( thisUserId == thisOwnerId ) {
-                    setIsUser(true);
-                }
-            }
-        };
-        isSameUser();
-    }, []);
-
-    const { postId } = useParams();
 
     // Find the specific post from your posts array
     const forumPost = forumPosts.find(post => post.postId === parseInt(postId));
@@ -80,13 +59,16 @@ const FullPostView = ({ post, comments }) => {
                                     </div>
                                     <span>{post.ownerName}</span>
                                 </div>
-                                <button className="delete-post" onClick={handleDeletion}>
-                                    Delete Post
-                                </button>
+                                {user?.uid === post.ownerId && (
+                                    <button className="delete-post" onClick={handleDeletion}>
+                                        Delete Post
+                                    </button>
+                                )}
                             </div>
                             <button
                                 className={`dropdown-button ${showDropdown ? 'active' : ''}`}
-                                onClick={toggleDropdown}>
+                                onClick={toggleDropdown}
+                            >
                                 <span className="dropdown-icon">◄</span>
                                 View Event Info
                             </button>
@@ -118,33 +100,7 @@ const FullPostView = ({ post, comments }) => {
                         </div>
                     </div>
 
-                    <div className="comments-section">
-                        <div className="reply-container">
-                            <textarea
-                                className="reply-input"
-                                placeholder="Comment..."
-                                value={replyText}
-                                onChange={(e) => setReplyText(e.target.value)}
-                                rows={4}
-                            />
-                            <button className="reply-button" onClick={handleReplySubmit}>
-                                Reply
-                            </button>
-                        </div>
-
-                        {comments?.map((comment, index) => (
-                            <div key={index} className="comment-box">
-                                <div className="author-info">
-                                    <div className="author-avatar">
-                                        {comment.ownerName?.[0]?.toUpperCase() || 'U'}
-                                    </div>
-                                    <span>{comment.ownerName}</span>
-                                    <span className="post-time">{comment.timestamp}</span>
-                                </div>
-                                <p className="post-body">{comment.commentBody}</p>
-                            </div>
-                        ))}
-                    </div>
+                    <Replies postId={postId} />
                 </div>
 
                 {showDropdown && (
@@ -156,7 +112,7 @@ const FullPostView = ({ post, comments }) => {
                                 className="event-logos"
                             />
                             <div className="event-details">
-                                <h3 className="event-name"> {forumPost.eventName} </h3>
+                                <h3 className="event-name">{forumPost?.eventName}</h3>
                                 <div className="event-info">
                                     <span>📅</span>
                                     <span>Sat, October 19th @ 2:00 PM (PDT)</span>
@@ -167,15 +123,9 @@ const FullPostView = ({ post, comments }) => {
                                 </div>
                             </div>
                             <div className="event-actions">
-                                <button className="event-button primary-button">
-                                    Add to Calendar
-                                </button>
-                                <button className="event-button secondary-button">
-                                    Export (Google Calendar)
-                                </button>
-                                <button className="download-button">
-                                    ⬇️
-                                </button>
+                                <button className="event-button primary-button">Add to Calendar</button>
+                                <button className="event-button secondary-button">Export (Google Calendar)</button>
+                                <button className="download-button">⬇️</button>
                             </div>
                         </div>
                     </div>
