@@ -3,30 +3,38 @@ import './FullPostView.css';
 import { forumPosts } from '../../Pages/Forum/ForumPosts';
 import { useNavigate, useParams } from 'react-router-dom';
 import { auth } from '../../firebase';
-import UserData from '../../utils/UserData';
 import ForumData from '../../utils/ForumData';
 import Replies from './Replies';
-
-
+import { onAuthStateChanged } from 'firebase/auth';
 
 const FullPostView = ({ post, comments }) => {
     const [showDropdown, setShowDropdown] = useState(false);
-    const [isPostUser, setIsPostUser] = useState(false);
+    const [currentUser, setCurrentUser] = useState(null);
     const navigate = useNavigate();
+    const { postId } = useParams();
+
+    useEffect(() => {
+        // Listen for authentication state changes
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            setCurrentUser(user);
+        });
+
+        return () => unsubscribe(); // Cleanup the listener on unmount
+    }, []);
 
     const handleDeletion = async (e) => {
         e.preventDefault();
-        if (!isPostUser) {
+        if (currentUser?.uid !== post.ownerId) {
             alert("You are not authorized to delete this post.");
             return;
         }
-    
+
         const confirmDelete = window.confirm("Are you sure you want to delete this post?");
         if (!confirmDelete) return;
-    
+
         try {
-            const post = new ForumData(postId);
-            await post.deletePost(); 
+            const postInstance = new ForumData(postId);
+            await postInstance.deletePost();
             alert("Post deleted successfully.");
             navigate(`/Forum`);
         } catch (error) {
@@ -38,23 +46,6 @@ const FullPostView = ({ post, comments }) => {
     const toggleDropdown = () => {
         setShowDropdown(!showDropdown);
     };
-
-    useEffect(() => {
-        const user = auth.currentUser;
-        const isSamePostUser = async () =>{
-            const post = new ForumData(postId)
-            if (user) {
-                const thisUserId = await user.uid;
-                const thisOwnerId = await post.getOwnerId()
-                if ( thisUserId == thisOwnerId ) {
-                    setIsPostUser(true);
-                }
-            }
-        };
-        isSamePostUser();
-    }, []);
-
-    const { postId } = useParams();
 
     // Find the specific post from your posts array
     const forumPost = forumPosts.find(post => post.postId === parseInt(postId));
@@ -73,17 +64,16 @@ const FullPostView = ({ post, comments }) => {
                                     </div>
                                     <span>{post.ownerName}</span>
                                 </div>
-                                {isPostUser && (
-                                            <button className="delete-post" 
-                                                onClick={handleDeletion}
-                                            >
-                                                Delete Post
-                                            </button>
+                                {currentUser?.uid === post.ownerId && (
+                                    <button className="delete-post" onClick={handleDeletion}>
+                                        Delete Post
+                                    </button>
                                 )}
                             </div>
                             <button
                                 className={`dropdown-button ${showDropdown ? 'active' : ''}`}
-                                onClick={toggleDropdown}>
+                                onClick={toggleDropdown}
+                            >
                                 <span className="dropdown-icon">◄</span>
                                 View Event Info
                             </button>
@@ -127,7 +117,7 @@ const FullPostView = ({ post, comments }) => {
                                 className="event-logos"
                             />
                             <div className="event-details">
-                                <h3 className="event-name"> {forumPost.eventName} </h3>
+                                <h3 className="event-name">{forumPost?.eventName}</h3>
                                 <div className="event-info">
                                     <span>📅</span>
                                     <span>Sat, October 19th @ 2:00 PM (PDT)</span>
@@ -138,15 +128,9 @@ const FullPostView = ({ post, comments }) => {
                                 </div>
                             </div>
                             <div className="event-actions">
-                                <button className="event-button primary-button">
-                                    Add to Calendar
-                                </button>
-                                <button className="event-button secondary-button">
-                                    Export (Google Calendar)
-                                </button>
-                                <button className="download-button">
-                                    ⬇️
-                                </button>
+                                <button className="event-button primary-button">Add to Calendar</button>
+                                <button className="event-button secondary-button">Export (Google Calendar)</button>
+                                <button className="download-button">⬇️</button>
                             </div>
                         </div>
                     </div>
