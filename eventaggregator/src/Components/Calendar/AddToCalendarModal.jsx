@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { collection, query, where, getDocs, updateDoc, doc, arrayUnion } from 'firebase/firestore';
 import { firestore } from '../../firebase';
 import './AddToCalendarModal.css';
 
@@ -33,6 +33,8 @@ const AddToCalendarModal = ({ isOpen, onClose, event, user }) => {
     const [calendars, setCalendars] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedCalendar, setSelectedCalendar] = useState(null);
+    const [saving, setSaving] = useState(false);
+    const [error, setError] = useState('');
 
     // Fetch user's calendars when the modal opens
     useEffect(() => {
@@ -62,6 +64,7 @@ const AddToCalendarModal = ({ isOpen, onClose, event, user }) => {
                 }
             } catch (error) {
                 console.error('Error fetching user calendars:', error);
+                setError('Failed to load calendars. Please try again.');
             } finally {
                 setLoading(false);
             }
@@ -74,10 +77,103 @@ const AddToCalendarModal = ({ isOpen, onClose, event, user }) => {
         setSelectedCalendar(calendarId);
     };
 
+    // Function to add the event to a calendar
+    const addEventToCalendar = async () => {
+        if (!event || !selectedCalendar || !user) {
+            setError('Missing required information. Please try again.');
+            return;
+        }
+
+        try {
+            setSaving(true);
+            setError('');
+            
+            console.log('Adding event to calendar:', selectedCalendar);
+            console.log('Event data:', event);
+            
+            // Find the selected calendar document
+            const selectedCalendarObj = calendars.find(cal => cal.id === selectedCalendar);
+            if (!selectedCalendarObj) {
+                throw new Error('Selected calendar not found');
+            }
+
+            // Safely get properties with null/undefined checks
+            const safeLocation = () => {
+                // Convert any non-string values to strings and then check if they're empty
+                const address = typeof event.address1 === 'string' ? event.address1 : String(event.address1 || '');
+                const city = typeof event.city === 'string' ? event.city : String(event.city || '');
+                const state = typeof event.state === 'string' ? event.state : String(event.state || '');
+                const zip = typeof event.zipcode === 'string' ? event.zipcode : String(event.zipcode || '');
+                
+                const parts = [address, city, state, zip].filter(part => part && part.trim && part.trim() !== '');
+                return parts.join(', ');
+            };
+            
+            // Create event data
+            const eventData = {
+                eventId: `event-${Date.now()}`,
+                title: event.title || 'Unnamed Event',
+                description: event.description || '',
+                location: safeLocation(),
+                date: event.date || new Date().toISOString(),
+                price: event.price != null ? event.price : 0,
+                eventType: event["event type"] || '',
+                tags: event.tags || '',
+                createdAt: new Date().toISOString(),
+            };
+            
+            console.log('Formatted event data:', eventData);
+            
+            // Update the calendar document to include the new event
+            const calendarsCollection = collection(firestore, 'calendars');
+            const q = query(
+                calendarsCollection, 
+                where("id", "==", selectedCalendar)
+            );
+            
+            const querySnapshot = await getDocs(q);
+            
+            if (!querySnapshot.empty) {
+                const calendarDoc = querySnapshot.docs[0];
+                const calendarData = calendarDoc.data();
+                
+                // Check if events array exists, if not create one
+                if (!calendarData.eventsData) {
+                    await updateDoc(doc(firestore, 'calendars', calendarDoc.id), {
+                        eventsData: [eventData]
+                    });
+                } else {
+                    // Add event to existing events array
+                    await updateDoc(doc(firestore, 'calendars', calendarDoc.id), {
+                        eventsData: arrayUnion(eventData)
+                    });
+                }
+                
+                // Increment the events count and upcoming count
+                await updateDoc(doc(firestore, 'calendars', calendarDoc.id), {
+                    events: (calendarData.events || 0) + 1,
+                    upcoming: (calendarData.upcoming || 0) + 1
+                });
+                
+                console.log('Calendar updated with new event');
+            } else {
+                throw new Error('Calendar document not found');
+            }
+            
+            // Show success message
+            alert('Event added to calendar successfully!');
+            onClose(); // Close the modal after completion
+            
+        } catch (error) {
+            console.error('Error adding event to calendar:', error);
+            setError('Failed to add event to calendar. Please try again.');
+        } finally {
+            setSaving(false);
+        }
+    };
+
     const handleConfirm = () => {
-        // Just close the modal as requested
-        // The actual confirmation functionality will be implemented later
-        onClose();
+        addEventToCalendar();
     };
 
     // Get first letter of calendar name
@@ -124,6 +220,12 @@ const AddToCalendarModal = ({ isOpen, onClose, event, user }) => {
                     </div>
                 )}
                 
+                {error && (
+                    <div className="error-message" style={{color: 'red', textAlign: 'center', margin: '10px 0'}}>
+                        {error}
+                    </div>
+                )}
+                
                 <div className="modal-actions">
                     <button className="cancel-btn" onClick={onClose}>
                         Cancel
@@ -131,9 +233,9 @@ const AddToCalendarModal = ({ isOpen, onClose, event, user }) => {
                     <button 
                         className="confirm-btn" 
                         onClick={handleConfirm}
-                        disabled={!selectedCalendar || loading}
+                        disabled={!selectedCalendar || loading || saving}
                     >
-                        Confirm
+                        {saving ? 'Adding...' : 'Confirm'}
                     </button>
                 </div>
             </div>

@@ -391,7 +391,6 @@ export const Calendar = ({ sidebar, user }) => {
                                                 <h2 className="tile-name"> {calendar.name} </h2>
                                                 <label className="tile-info"> 
                                                     {calendar.events} Events • {calendar.upcoming} Upcoming
-                                                    {isFavoritesCalendar(calendar)}
                                                 </label>
                                             </div>
                                         </div>
@@ -410,8 +409,11 @@ export const Calendar = ({ sidebar, user }) => {
                     <div className="calendar-section">   {/* This is where the calendar to be displayed is chosen */}
                         <CalendarLayout 
                             calendarTitle={selectedCalendar ? selectedCalendar.name : "Calendar"}
+                            calendarId={selectedCalendar ? selectedCalendar.id : null}
                             onChangeMonth={(newDate) => console.log('Month changed:', newDate)} 
                             onDelete={handleDeleteClick}
+                            isDefaultCalendar={selectedCalendar && isFavoritesCalendar(selectedCalendar)}
+                            user={user}
                         />
                     </div>
                 </div>

@@ -1,10 +1,70 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Calendar_layout.css';
+import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
+import { firestore } from '../../firebase';
 
-const Calendar_layout = ({ calendarTitle, onChangeMonth, onDelete, isDefaultCalendar }) => {
+const Calendar_layout = ({ calendarTitle, calendarId, onChangeMonth, onDelete, isDefaultCalendar, user }) => {
     const [currentDate, setCurrentDate] = useState(new Date());
     const [selectedDate, setSelectedDate] = useState(null);
     const [viewMode, setViewMode] = useState('month'); // 'month' or 'upcoming'
+    const [upcomingEvents, setUpcomingEvents] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
+
+    // Fetch upcoming events when calendar changes or view mode changes to 'upcoming'
+    useEffect(() => {
+        const fetchUpcomingEvents = async () => {
+            if (!calendarId || !user || viewMode !== 'upcoming') return;
+            
+            try {
+                setLoading(true);
+                setError('');
+                console.log('Fetching events for calendar:', calendarId, 'user:', user.uid);
+                
+                // Find the calendar document
+                const calendarsCollection = collection(firestore, 'calendars');
+                const q = query(
+                    calendarsCollection,
+                    where("id", "==", calendarId),
+                    where("uid", "==", user.uid)
+                );
+                
+                const querySnapshot = await getDocs(q);
+                
+                if (querySnapshot.empty) {
+                    setError('Calendar not found');
+                    setUpcomingEvents([]);
+                    return;
+                }
+                
+                // Get the calendar document
+                const calendarDoc = querySnapshot.docs[0];
+                const calendarData = calendarDoc.data();
+                
+                // Check if the calendar has events
+                const eventsData = calendarData.eventsData || [];
+                console.log('Events data from calendar:', eventsData);
+                
+                // Format events for display
+                const formattedEvents = eventsData.map(event => ({
+                    id: event.eventId,
+                    ...event,
+                    formattedDate: formatDateTime(event.date)
+                }));
+                
+                console.log('Formatted events:', formattedEvents);
+                setUpcomingEvents(formattedEvents);
+            } catch (error) {
+                console.error('Error fetching upcoming events:', error);
+                setError('Failed to load events. Please try again.');
+                setUpcomingEvents([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+        
+        fetchUpcomingEvents();
+    }, [calendarId, user, viewMode]);
 
     const handleExport = (e) => {
         e.preventDefault();
@@ -60,6 +120,38 @@ const Calendar_layout = ({ calendarTitle, onChangeMonth, onDelete, isDefaultCale
     const formatMonthYear = (date) => {
         return date.toLocaleString('default', { month: 'long', year: 'numeric' });
     };
+
+    // Function to format date and time for display
+    function formatDateTime(dateString, timeZone = "America/Los_Angeles") {
+        if (!dateString) return "No date specified";
+        
+        try {
+            // Handle "Z" suffix if it's already present (ISO string)
+            const dateToFormat = dateString.endsWith('Z') ? dateString : dateString + 'Z';
+            const date = new Date(dateToFormat);
+            
+            if (isNaN(date.getTime())) {
+                console.error("Invalid date:", dateString);
+                return "Invalid date";
+            }
+            
+            const options = { 
+                weekday: "long", 
+                year: "numeric", 
+                month: "long", 
+                day: "numeric",
+                hour: "numeric", 
+                minute: "2-digit", 
+                hour12: true,
+                timeZoneName: "short"
+            };
+            
+            return date.toLocaleString("en-US", options);
+        } catch (error) {
+            console.error("Error formatting date:", error, "Original:", dateString);
+            return "Date error";
+        }
+    }
 
     // Function to handle date selection
     const handleDateClick = (day) => {
@@ -187,13 +279,47 @@ const Calendar_layout = ({ calendarTitle, onChangeMonth, onDelete, isDefaultCale
         return calendar;
     };
 
-    // Render the upcoming view (placeholder for now)
+    // Render the upcoming view with actual events from Firestore
     const renderUpcomingView = () => {
         return (
             <div className="upcoming-view">
                 <div className="upcoming-events">
-                    {/* List of upcoming events will be rendered here*/}
-                    <div className="no-events">No upcoming events to display</div>
+                    {loading ? (
+                        <div className="loading-events">Loading events...</div>
+                    ) : error ? (
+                        <div className="error-message" style={{color: 'red', textAlign: 'center'}}>
+                            {error}
+                        </div>
+                    ) : upcomingEvents.length === 0 ? (
+                        <div className="no-events">No upcoming events to display</div>
+                    ) : (
+                        <div className="event-list">
+                            {upcomingEvents.map(event => (
+                                <div key={event.id} className="upcoming-event-card">
+                                    <h3 className="event-title">{event.title}</h3>
+                                    <div className="event-details">
+                                        <p className="event-time">
+                                            <span className="event-icon">📅</span> {event.formattedDate}
+                                        </p>
+                                        <p className="event-location">
+                                            <span className="event-icon">📍</span> {event.location}
+                                        </p>
+                                        {event.price > 0 && (
+                                            <p className="event-price">
+                                                <span className="event-icon">💰</span> ${event.price}
+                                            </p>
+                                        )}
+                                        {event.price === 0 && (
+                                            <p className="event-price">
+                                                <span className="event-icon">💰</span> Free
+                                            </p>
+                                        )}
+                                    </div>
+                                    <p className="event-description">{event.description}</p>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </div>
         );
@@ -204,7 +330,6 @@ const Calendar_layout = ({ calendarTitle, onChangeMonth, onDelete, isDefaultCale
             <div className="calendar-navigation">
                 <div className="calendar-title">
                     {calendarTitle || 'Calendar'} 
-                    {calendarTitle === "Favorites"}
                 </div>
                 
                 <div className="calendar-controls">
