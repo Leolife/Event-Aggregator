@@ -10,6 +10,8 @@ import thumbnail3 from '../../assets/event3.jpg'
 import thumbnail4 from '../../assets/event4.jpg'
 import thumbnail5 from '../../assets/event5.jpg'
 import Header from '../../Components/Header/Header'
+import AddToCalendarModal from '../../Components/Calendar/AddToCalendarModal';
+import { auth } from '../../firebase';
 
 // Takes the category name from the url and reformats it to be placed in the header
 function formatCategoryName(categoryName) {
@@ -19,12 +21,15 @@ function formatCategoryName(categoryName) {
         .join(' ');
 }
 
-export const EventCategory = ({ sidebar }) => {
+export const EventCategory = ({ sidebar, user }) => {
     const { categoryName } = useParams();
     const [events, setEvents] = useState([{}])
     const [selectedTags, setSelectedTags] = useState([]);
     // Stores the Sort By option the user has selected
     const [selectedSort, setSelectedSort] = useState(0);
+    // State for the Add to Calendar modal
+    const [isAddToCalendarModalOpen, setIsAddToCalendarModalOpen] = useState(false);
+    const [selectedEvent, setSelectedEvent] = useState(null);
 
     // Dropdown options for sorting
     const options = [
@@ -58,6 +63,25 @@ export const EventCategory = ({ sidebar }) => {
         setSelectedSort(sort_data)
     }
 
+    // Handler for opening the Add to Calendar modal
+    const handleAddToCalendarClick = (event) => {
+        // Check if user is logged in
+        const currentUser = user || auth.currentUser;
+        if (!currentUser) {
+            // User is not logged in, show alert
+            alert("Please log in to add events to calendars.");
+            return;
+        }
+        
+        setSelectedEvent(event);
+        setIsAddToCalendarModalOpen(true);
+    };
+
+    // Handler for closing the Add to Calendar modal
+    const handleCloseModal = () => {
+        setIsAddToCalendarModalOpen(false);
+        setSelectedEvent(null);
+    };
 
     // Fetches 10 random events from the API
     useEffect(() => {
@@ -85,12 +109,11 @@ export const EventCategory = ({ sidebar }) => {
             <div className="events">
                 <Header title={formatCategoryName(categoryName)} sidebar={sidebar} sendData={sendData} options={options} />
                 <div className={`container ${sidebar ? "" : 'large-container'}`}>
-                    {console.log(selectedSort)}
                     <div className="feed">
                         {events && events.length > 0 ? (
                             events
                             .sort((a, b) => selectedSort === 1 ? new Date(a.date) - new Date(b.date) : selectedSort === 0 ? a.title.localeCompare(b.title) : 0) // If option 0, sort events alphebatically. If option 1, sort events by upcoming.
-                            .filter(x => selectedTags.length === 0 || selectedTags.some(tag => x.tags.includes(tag.category))) // Filters the events by category tags the user has selected. If no tags are selected then displays all.
+                            .filter(x => selectedTags.length === 0 || selectedTags.some(tag => x.tags && x.tags.includes(tag.category))) // Filters the events by category tags the user has selected. If no tags are selected then displays all.
                             .map((event, index) => (
                                 <div key={index} className="event-card">
                                     <div className='img-sizer'>
@@ -138,7 +161,12 @@ export const EventCategory = ({ sidebar }) => {
                                             <label className="price"> Price: {event.price === 0 ? "Free" : `$${event.price}`} </label>
                                             <div className="add-options">
                                                 <button className="heart-btn"> <HeartIcon className="heart-icon" /> </button>
-                                                <button className="add-btn"> Add to Calendar </button>
+                                                <button 
+                                                    className="add-btn" 
+                                                    onClick={() => handleAddToCalendarClick(event)}
+                                                > 
+                                                    Add to Calendar 
+                                                </button>
                                                 <button className="export-btn"> Export (Google Calendar) </button>
                                                 <button className="save-btn"> <SaveIcon className="save-icon" /> </button>
                                             </div>
@@ -154,6 +182,14 @@ export const EventCategory = ({ sidebar }) => {
                     </div>
                 </div>
             </div>
+
+            {/* Add to Calendar Modal */}
+            <AddToCalendarModal
+                isOpen={isAddToCalendarModalOpen}
+                onClose={handleCloseModal}
+                event={selectedEvent}
+                user={user || auth.currentUser}
+            />
         </>
     )
 }
