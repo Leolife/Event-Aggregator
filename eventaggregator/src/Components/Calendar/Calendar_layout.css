@@ -194,6 +194,10 @@
   overflow: hidden;
 }
 
+.calendar-day:hover {
+  background-color: rgba(62, 208, 228, 0.1);
+}
+
 .calendar-day:last-child {
   border-right: none;
 }
@@ -227,6 +231,12 @@
   color: white;
 }
 
+.calendar-day.today .day-number {
+  background-color: #3ed0e4;
+  color:white;
+  font-weight: bold;
+}
+
 /* Event dot/marker and Event styling */
 .calendar-day .events-container {
   margin-top: 30px;
@@ -235,12 +245,6 @@
   gap: 2px;
   overflow: hidden;
   max-height: calc(100% - 30px);
-}
-
-/* Current day highlight */
-.calendar-day.current-date .day-number {
-  background-color: #ffd700;
-  color: #000;
 }
 
 /* Event styling for future rendering */
@@ -255,19 +259,9 @@
   text-overflow: ellipsis;
 }
 
-.event-red {
-  background-color: #ff4d4d;
-  color: white;
-}
-
 .event-blue {
-  background-color: #4d79ff;
+  background-color: #3ed0e4;
   color: white;
-}
-
-.event-green {
-  background-color: #4dff4d;
-  color: black;
 }
 
 /* Upcoming View */
@@ -275,12 +269,6 @@
   padding: 16px;
   height: 100%;
   overflow-y: auto;
-}
-
-.upcoming-events {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
 }
 
 .no-events {
@@ -298,26 +286,7 @@
 
 /* Today highlight */
 .calendar-day.today {
-  background-color: rgba(255, 215, 0, 0.1);
-}
-
-/* Circle highlight for specific dates like the "15" in the screenshot */
-.calendar-day.highlight .day-number {
-  background-color: #ffd700;
-  color: #000;
-}
-
-/* For the highlighted date events */
-.day-with-events::after {
-  content: '';
-  position: absolute;
-  bottom: 5px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background-color: #0081ff;
+  background-color: rgba(62, 208, 228, 0.1);
 }
 
 /* Upcoming event card styles */
@@ -325,7 +294,6 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  width: 100%;
 }
 
 .upcoming-event-card {
