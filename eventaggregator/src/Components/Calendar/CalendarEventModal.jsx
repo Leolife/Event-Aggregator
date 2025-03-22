@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './CalendarEventModal.css';
 import { doc, updateDoc, arrayRemove, collection, query, where, getDocs, getDoc } from 'firebase/firestore';
 import { firestore } from '../../firebase';
 
 const CalendarEventModal = ({ isOpen, onClose, event, calendarId, onEventDelete, user }) => {
+    const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+    
     if (!isOpen || !event) return null;
     
     // Function to handle event deletion
@@ -129,9 +131,23 @@ const CalendarEventModal = ({ isOpen, onClose, event, calendarId, onEventDelete,
                 </div>
                 
                 <div className="event-modal-actions">
-                    <button className="delete-btn" onClick={handleDeleteEvent}>
-                        Delete
-                    </button>
+                    {!showDeleteConfirmation ? (
+                        <button className="delete-btn" onClick={() => setShowDeleteConfirmation(true)}>
+                            Delete
+                        </button>
+                    ) : (
+                        <div className="delete-confirmation">
+                            <p>Are you sure you want to delete this event?</p>
+                            <div className="confirmation-buttons">
+                                <button className="cancel-delete-btn" onClick={() => setShowDeleteConfirmation(false)}>
+                                    Cancel
+                                </button>
+                                <button className="confirm-delete-btn" onClick={handleDeleteEvent}>
+                                    Confirm
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
