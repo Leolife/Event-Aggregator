@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './Calendar_layout.css';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { firestore } from '../../firebase';
+import CalendarEventModal from './CalendarEventModal';
 
 const Calendar_layout = ({ calendarTitle, calendarId, onChangeMonth, onDelete, isDefaultCalendar, user }) => {
     const [currentDate, setCurrentDate] = useState(new Date());
@@ -11,6 +12,9 @@ const Calendar_layout = ({ calendarTitle, calendarId, onChangeMonth, onDelete, i
     const [calendarEvents, setCalendarEvents] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    // New state for event modal
+    const [selectedEvent, setSelectedEvent] = useState(null);
+    const [isEventModalOpen, setIsEventModalOpen] = useState(false);
 
     // Fetch calendar events whenever calendar, currentDate or viewMode changes
     useEffect(() => {
@@ -90,6 +94,28 @@ const Calendar_layout = ({ calendarTitle, calendarId, onChangeMonth, onDelete, i
         // Call the parent component's delete handler
         if (onDelete) {
             onDelete();
+        }
+    };
+
+    // Function to handle event click and open the modal
+    const handleEventClick = (event, e) => {
+        e.stopPropagation(); // Prevent day cell click from triggering
+        setSelectedEvent(event);
+        setIsEventModalOpen(true);
+    };
+
+    // Function to handle event deletion (callback from modal)
+    const handleEventDelete = (deletedEventId) => {
+        // Update the calendar events list
+        setCalendarEvents(prev => 
+            prev.filter(event => event.id !== deletedEventId)
+        );
+        
+        // Also update upcoming events if in that view
+        if (viewMode === 'upcoming') {
+            setUpcomingEvents(prev => 
+                prev.filter(event => event.id !== deletedEventId)
+            );
         }
     };
 
@@ -299,7 +325,11 @@ const Calendar_layout = ({ calendarTitle, calendarId, onChangeMonth, onDelete, i
                     <div className="day-number">{day.day}</div>
                     <div className="events-container">
                         {dayEvents.map((event, index) => (
-                            <div key={index} className="event event-blue">
+                            <div 
+                                key={index} 
+                                className="event event-blue"
+                                onClick={(e) => handleEventClick(event, e)}
+                            >
                                 {event.title}
                             </div>
                         ))}
@@ -342,7 +372,14 @@ const Calendar_layout = ({ calendarTitle, calendarId, onChangeMonth, onDelete, i
                     ) : (
                         <div className="event-list">
                             {upcomingEvents.map(event => (
-                                <div key={event.id} className="upcoming-event-card">
+                                <div 
+                                    key={event.id} 
+                                    className="upcoming-event-card"
+                                    onClick={() => {
+                                        setSelectedEvent(event);
+                                        setIsEventModalOpen(true);
+                                    }}
+                                >
                                     <h3 className="event-title">{event.title}</h3>
                                     <div className="event-details">
                                         <p className="event-time">
@@ -421,6 +458,16 @@ const Calendar_layout = ({ calendarTitle, calendarId, onChangeMonth, onDelete, i
             <div className="calendar-container">
                 {viewMode === 'month' ? renderCalendarDays() : renderUpcomingView()}
             </div>
+            
+            {/* Event Modal */}
+            <CalendarEventModal
+                isOpen={isEventModalOpen}
+                onClose={() => setIsEventModalOpen(false)}
+                event={selectedEvent}
+                calendarId={calendarId}
+                onEventDelete={handleEventDelete}
+                user={user}
+            />
         </div>
     );
 };

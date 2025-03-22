@@ -233,7 +233,7 @@
 
 .calendar-day.today .day-number {
   background-color: #3ed0e4;
-  color:white;
+  color: white;
   font-weight: bold;
 }
 
@@ -257,6 +257,13 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  cursor: pointer; /* Add cursor pointer to show it's clickable */
+  transition: background-color 0.2s ease; /* Smooth transition for hover */
+}
+
+.event:hover {
+  opacity: 0.85; /* Add hover effect */
+  transform: translateY(-1px); /* Slight lift effect */
 }
 
 .event-blue {
@@ -302,6 +309,7 @@
   padding: 16px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer; /* Add cursor pointer to show it's clickable */
 }
 
 .upcoming-event-card:hover {
