@@ -3,7 +3,7 @@ import './CalendarEventModal.css';
 import { doc, updateDoc, arrayRemove, collection, query, where, getDocs, getDoc } from 'firebase/firestore';
 import { firestore } from '../../firebase';
 
-const CalendarEventModal = ({ isOpen, onClose, event, calendarId, onEventDelete, user }) => {
+const CalendarEventModal = ({ isOpen, onClose, event, calendarId, onEventDelete, user, onNotification }) => {
     const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
     
     if (!isOpen || !event) return null;
@@ -11,7 +11,8 @@ const CalendarEventModal = ({ isOpen, onClose, event, calendarId, onEventDelete,
     // Function to handle event deletion
     const handleDeleteEvent = async () => {
         if (!calendarId || !event || !user) {
-            alert("Unable to delete event. Missing required information.");
+            // Use the passed notification handler instead of local state
+            onNotification({ show: true, message: "Unable to delete event. Missing required information.", isError: true });
             return;
         }
         
@@ -27,7 +28,11 @@ const CalendarEventModal = ({ isOpen, onClose, event, calendarId, onEventDelete,
             const querySnapshot = await getDocs(q);
             
             if (querySnapshot.empty) {
-                alert("Calendar not found.");
+                onNotification({ 
+                    show: true, 
+                    message: "Calendar not found.", 
+                    isError: true 
+                });
                 return;
             }
             
@@ -40,7 +45,11 @@ const CalendarEventModal = ({ isOpen, onClose, event, calendarId, onEventDelete,
             const currentData = calendarData.data();
             
             if (!currentData.eventsData) {
-                alert("No events found in this calendar.");
+                onNotification({ 
+                    show: true, 
+                    message: "No events found in this calendar.", 
+                    isError: true 
+                });
                 return;
             }
             
@@ -48,7 +57,11 @@ const CalendarEventModal = ({ isOpen, onClose, event, calendarId, onEventDelete,
             const eventToRemove = currentData.eventsData.find(e => e.eventId === event.id);
             
             if (!eventToRemove) {
-                alert("Event not found in calendar.");
+                onNotification({ 
+                    show: true, 
+                    message: "Event not found in calendar.", 
+                    isError: true 
+                });
                 return;
             }
             
@@ -62,19 +75,28 @@ const CalendarEventModal = ({ isOpen, onClose, event, calendarId, onEventDelete,
                 events: Math.max((currentData.events || 1) - 1, 0),
                 upcoming: Math.max((currentData.upcoming || 1) - 1, 0)
             });
+
+            // Close the modal immediately
+            onClose();
+
+            // In the case of a successful deletion, show notification through parent
+            onNotification({ show: true, message: "Event deleted successfully!", isError: false });
             
-            alert("Event deleted successfully!");
-            
+            // Hide delete confirmation if deletion is successful
+            setShowDeleteConfirmation(false);
+
             // Notify parent component to refresh events
             if (onEventDelete) {
                 onEventDelete(event.id);
             }
             
-            onClose(); // Close the modal
-            
         } catch (error) {
             console.error("Error deleting event:", error);
-            alert("Failed to delete event. Please try again.");
+            onNotification({ 
+                show: true, 
+                message: "Failed to delete event. Please try again.", 
+                isError: true 
+            });
         }
     };
     

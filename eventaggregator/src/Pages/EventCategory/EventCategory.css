@@ -79,6 +79,23 @@
     align-items: center;
 }
 
+.export-btn {
+    color: white !important;
+}
+
+.export-btn:hover {
+    transform: translateY(-1px); /* Slight lift effect */
+}
+
+.save-btn:hover {
+    transform: translateY(-1px); /* Slight lift effect */
+    background-color: #6b34c9 !important;
+}
+
+.add-btn:hover {
+    transform: translateY(-1px); /* Slight lift effect */
+}
+
 .add-options {
     position: absolute;
     right: 0;
@@ -105,4 +122,48 @@
 .event-card .category-box {
     display: flex;
     gap: 15px;
+}
+
+/* Unified notification toast style */
+.notification-toast {
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 24px;
+    border-radius: 8px;
+    border: 2px solid;
+    border-color: #32abbb !important;
+    font-weight: bold;
+    z-index: 1200;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    animation: fadeInOut 3s ease-in-out;
+    text-align: center;
+    background-color: #3ed0e4;
+    color: white;
+}
+
+.notification-toast.success {
+    background-color: #3ed0e4;
+    border-color: black;
+}
+
+.notification-toast.error {
+    background-color: #3ed0e4;
+}
+
+@keyframes fadeInOut {
+    0% { opacity: 0; }
+    15% { opacity: 1; }
+    85% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+/* Add a visual effect for the heart button when clicked */
+.heart-btn:active .heart-icon path {
+    transform: translateY(1px); /* Slight lift effect */
+}
+
+.heart-btn:hover {
+    transform: translateY(-1px); /* Slight lift effect */
 }

@@ -172,3 +172,38 @@
 .no-calendars-message p {
     margin: 8px 0;
 }
+
+/* Notification toast styles */
+.event-notification {
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 24px;
+    border-radius: 8px;
+    border: 2px solid;
+    border-color: #32abbb !important;
+    font-weight: bold;
+    z-index: 1200;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    animation: fadeInOut 3s ease-in-out;
+    text-align: center;
+}
+
+.event-notification.success {
+    background-color: #3ed0e4;
+    border-color: black;
+    color: white;
+}
+
+.event-notification.error {
+    background-color: #3ed0e4;
+    color: white;
+}
+
+@keyframes fadeInOut {
+    0% { opacity: 0; }
+    15% { opacity: 1; }
+    85% { opacity: 1; }
+    100% { opacity: 0; }
+}
