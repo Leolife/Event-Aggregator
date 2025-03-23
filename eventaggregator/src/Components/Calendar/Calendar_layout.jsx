@@ -12,9 +12,22 @@ const Calendar_layout = ({ calendarTitle, calendarId, onChangeMonth, onDelete, i
     const [calendarEvents, setCalendarEvents] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
-    // New state for event modal
+    
+    // State for event modal
     const [selectedEvent, setSelectedEvent] = useState(null);
     const [isEventModalOpen, setIsEventModalOpen] = useState(false);
+    
+    // State for notifications - moved from modal to parent component
+    const [notification, setNotification] = useState({ show: false, message: '', isError: false });
+
+    // Handle notifications from child components
+    const handleNotification = (notificationData) => {
+        setNotification(notificationData);
+        // Set a timeout to hide the notification after 3 seconds
+        setTimeout(() => {
+            setNotification(prev => ({ ...prev, show: false }));
+        }, 3000);
+    };
 
     // Fetch calendar events whenever calendar, currentDate or viewMode changes
     useEffect(() => {
@@ -411,6 +424,12 @@ const Calendar_layout = ({ calendarTitle, calendarId, onChangeMonth, onDelete, i
 
     return (
         <div className="calendar-layout">
+            {notification.show && (
+                <div className={`event-notification ${notification.isError ? 'error' : 'success'}`}>
+                    {notification.message}
+                </div>
+            )}
+            
             <div className="calendar-navigation">
                 <div className="calendar-title">
                     {calendarTitle || 'Calendar'} 
@@ -459,7 +478,7 @@ const Calendar_layout = ({ calendarTitle, calendarId, onChangeMonth, onDelete, i
                 {viewMode === 'month' ? renderCalendarDays() : renderUpcomingView()}
             </div>
             
-            {/* Event Modal */}
+            {/* Calendar Event Modal */}
             <CalendarEventModal
                 isOpen={isEventModalOpen}
                 onClose={() => setIsEventModalOpen(false)}
@@ -467,6 +486,7 @@ const Calendar_layout = ({ calendarTitle, calendarId, onChangeMonth, onDelete, i
                 calendarId={calendarId}
                 onEventDelete={handleEventDelete}
                 user={user}
+                onNotification={handleNotification} // Pass the notification handler
             />
         </div>
     );
