@@ -29,7 +29,7 @@ const getColorForCalendar = (calendarName) => {
     return colors[Math.abs(hash) % colors.length];
 };
 
-const AddToCalendarModal = ({ isOpen, onClose, event, user }) => {
+const AddToCalendarModal = ({ isOpen, onClose, event, user, onSuccess, onError }) => {
     const [calendars, setCalendars] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedCalendar, setSelectedCalendar] = useState(null);
@@ -65,13 +65,14 @@ const AddToCalendarModal = ({ isOpen, onClose, event, user }) => {
             } catch (error) {
                 console.error('Error fetching user calendars:', error);
                 setError('Failed to load calendars. Please try again.');
+                if (onError) onError('Failed to load calendars. Please try again.');
             } finally {
                 setLoading(false);
             }
         };
 
         fetchUserCalendars();
-    }, [user, isOpen]);
+    }, [user, isOpen, onError]);
 
     const handleCalendarSelect = (calendarId) => {
         setSelectedCalendar(calendarId);
@@ -81,6 +82,7 @@ const AddToCalendarModal = ({ isOpen, onClose, event, user }) => {
     const addEventToCalendar = async () => {
         if (!event || !selectedCalendar || !user) {
             setError('Missing required information. Please try again.');
+            if (onError) onError('Missing required information. Please try again.');
             return;
         }
 
@@ -160,13 +162,22 @@ const AddToCalendarModal = ({ isOpen, onClose, event, user }) => {
                 throw new Error('Calendar document not found');
             }
             
-            // Show success message
-            alert('Event added to calendar successfully!');
-            onClose(); // Close the modal after completion
+            // Call the success callback with the calendar name
+            if (onSuccess) {
+                onSuccess(selectedCalendarObj.name);
+            }
+            
+            // Close the modal
+            onClose();
             
         } catch (error) {
             console.error('Error adding event to calendar:', error);
             setError('Failed to add event to calendar. Please try again.');
+            
+            // Call the error callback
+            if (onError) {
+                onError('Failed to add event to calendar. Please try again.');
+            }
         } finally {
             setSaving(false);
         }

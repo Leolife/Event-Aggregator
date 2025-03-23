@@ -124,8 +124,8 @@
     gap: 15px;
 }
 
-/* New styles for heart button feedback */
-.heart-feedback {
+/* Unified notification toast style */
+.notification-toast {
     position: fixed;
     top: 80px;
     left: 50%;
@@ -135,21 +135,21 @@
     border: 2px solid;
     border-color: #32abbb !important;
     font-weight: bold;
-    z-index: 100;
+    z-index: 1200;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     animation: fadeInOut 3s ease-in-out;
     text-align: center;
+    background-color: #3ed0e4;
+    color: white;
 }
 
-.heart-feedback.success {
+.notification-toast.success {
     background-color: #3ed0e4;
     border-color: black;
-    color: white;
 }
 
-.heart-feedback.error {
+.notification-toast.error {
     background-color: #3ed0e4;
-    color: white;
 }
 
 @keyframes fadeInOut {

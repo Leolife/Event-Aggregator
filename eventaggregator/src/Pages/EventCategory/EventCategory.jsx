@@ -31,10 +31,34 @@ export const EventCategory = ({ sidebar, user }) => {
     // State for the Add to Calendar modal
     const [isAddToCalendarModalOpen, setIsAddToCalendarModalOpen] = useState(false);
     const [selectedEvent, setSelectedEvent] = useState(null);
-    // State for heart button action feedback
-    const [heartActionFeedback, setHeartActionFeedback] = useState({ show: false, message: '', isError: false });
+    
+    // Combined notification state for both heart actions and calendar additions
+    const [notification, setNotification] = useState({ 
+        show: false, 
+        message: '', 
+        isError: false 
+    });
+    
     // State to track favorited events
     const [favoritedEvents, setFavoritedEvents] = useState([]);
+
+    // Function to show notification
+    const showNotification = (message, isError = false) => {
+        setNotification({ 
+            show: true, 
+            message, 
+            isError 
+        });
+        
+        // Auto-hide notification after 3 seconds
+        setTimeout(() => {
+            setNotification({ 
+                show: false, 
+                message: '', 
+                isError: false 
+            });
+        }, 3000);
+    };
 
     // Dropdown options for sorting
     const options = [
@@ -73,13 +97,27 @@ export const EventCategory = ({ sidebar, user }) => {
         // Check if user is logged in
         const currentUser = user || auth.currentUser;
         if (!currentUser) {
-            // User is not logged in, show alert
-            alert("Please log in to add events to calendars.");
+            // Use notification instead of alert
+            showNotification("Please log in to add events to calendars.", true);
             return;
         }
         
         setSelectedEvent(event);
         setIsAddToCalendarModalOpen(true);
+    };
+
+    // Handler for successful calendar add (callback from modal)
+    const handleCalendarAddSuccess = (calendarName) => {
+        const message = calendarName 
+            ? `Event added to "${calendarName}" calendar successfully!` 
+            : "Event added to calendar successfully!";
+            
+        showNotification(message, false);
+    };
+
+    // Handler for calendar add error (callback from modal) 
+    const handleCalendarAddError = (errorMessage) => {
+        showNotification(errorMessage || "Failed to add event to calendar.", true);
     };
 
     // Handler for closing the Add to Calendar modal
@@ -93,8 +131,8 @@ export const EventCategory = ({ sidebar, user }) => {
         // Check if user is logged in
         const currentUser = user || auth.currentUser;
         if (!currentUser) {
-            // User is not logged in, show alert
-            alert("Please log in to add events to favorites.");
+            // User is not logged in, show notification
+            showNotification("Please log in to add events to favorites.", true);
             return;
         }
 
@@ -111,12 +149,7 @@ export const EventCategory = ({ sidebar, user }) => {
             const querySnapshot = await getDocs(q);
 
             if (querySnapshot.empty) {
-                setHeartActionFeedback({ 
-                    show: true, 
-                    message: "Favorites calendar not found. Please visit the Calendar page to set it up.", 
-                    isError: true 
-                });
-                setTimeout(() => setHeartActionFeedback({ show: false, message: '', isError: false }), 3000);
+                showNotification("Favorites calendar not found. Please visit the Calendar page to set it up.", true);
                 return;
             }
 
@@ -155,12 +188,7 @@ export const EventCategory = ({ sidebar, user }) => {
             const eventSignature = `${event.title}-${event.date}`;
             
             if (favoritedEvents.includes(eventSignature)) {
-                setHeartActionFeedback({ 
-                    show: true, 
-                    message: "This event is already in your favorites!", 
-                    isError: false 
-                });
-                setTimeout(() => setHeartActionFeedback({ show: false, message: '', isError: false }), 3000);
+                showNotification("This event is already in your favorites!");
                 return;
             }
 
@@ -186,21 +214,11 @@ export const EventCategory = ({ sidebar, user }) => {
             setFavoritedEvents([...favoritedEvents, eventSignature]);
 
             // Show success message
-            setHeartActionFeedback({ 
-                show: true, 
-                message: "Event added to favorites!", 
-                isError: false 
-            });
-            setTimeout(() => setHeartActionFeedback({ show: false, message: '', isError: false }), 3000);
+            showNotification("Event added to favorites!");
 
         } catch (error) {
             console.error('Error adding event to favorites:', error);
-            setHeartActionFeedback({ 
-                show: true, 
-                message: "Error adding to favorites. Please try again.", 
-                isError: true 
-            });
-            setTimeout(() => setHeartActionFeedback({ show: false, message: '', isError: false }), 3000);
+            showNotification("Error adding to favorites. Please try again.", true);
         }
     };
 
@@ -230,9 +248,10 @@ export const EventCategory = ({ sidebar, user }) => {
             <div className="events">
                 <Header title={formatCategoryName(categoryName)} sidebar={sidebar} sendData={sendData} options={options} />
                 <div className={`container ${sidebar ? "" : 'large-container'}`}>
-                    {heartActionFeedback.show && (
-                        <div className={`heart-feedback ${heartActionFeedback.isError ? 'error' : 'success'}`}>
-                            {heartActionFeedback.message}
+                    {/* Notification toast - moved from inside modal to parent component */}
+                    {notification.show && (
+                        <div className={`notification-toast ${notification.isError ? 'error' : 'success'}`}>
+                            {notification.message}
                         </div>
                     )}
                     <div className="feed">
@@ -314,14 +333,16 @@ export const EventCategory = ({ sidebar, user }) => {
                 </div>
             </div>
 
-            {/* Add to Calendar Modal */}
+            {/* Add to Calendar Modal with new callback props */}
             <AddToCalendarModal
                 isOpen={isAddToCalendarModalOpen}
                 onClose={handleCloseModal}
                 event={selectedEvent}
                 user={user || auth.currentUser}
+                onSuccess={handleCalendarAddSuccess}
+                onError={handleCalendarAddError}
             />
         </>
-    )
+    );
 }
 export default EventCategory
