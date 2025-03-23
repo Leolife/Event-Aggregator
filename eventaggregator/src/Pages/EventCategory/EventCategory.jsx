@@ -11,7 +11,8 @@ import thumbnail4 from '../../assets/event4.jpg'
 import thumbnail5 from '../../assets/event5.jpg'
 import Header from '../../Components/Header/Header'
 import AddToCalendarModal from '../../Components/Calendar/AddToCalendarModal';
-import { auth } from '../../firebase';
+import { auth, firestore } from '../../firebase';
+import { collection, query, where, getDocs, updateDoc, doc, arrayUnion } from 'firebase/firestore';
 
 // Takes the category name from the url and reformats it to be placed in the header
 function formatCategoryName(categoryName) {
@@ -30,6 +31,10 @@ export const EventCategory = ({ sidebar, user }) => {
     // State for the Add to Calendar modal
     const [isAddToCalendarModalOpen, setIsAddToCalendarModalOpen] = useState(false);
     const [selectedEvent, setSelectedEvent] = useState(null);
+    // State for heart button action feedback
+    const [heartActionFeedback, setHeartActionFeedback] = useState({ show: false, message: '', isError: false });
+    // State to track favorited events
+    const [favoritedEvents, setFavoritedEvents] = useState([]);
 
     // Dropdown options for sorting
     const options = [
@@ -83,6 +88,122 @@ export const EventCategory = ({ sidebar, user }) => {
         setSelectedEvent(null);
     };
 
+    // Function to add event to the Favorites calendar when heart button is clicked
+    const handleHeartClick = async (event) => {
+        // Check if user is logged in
+        const currentUser = user || auth.currentUser;
+        if (!currentUser) {
+            // User is not logged in, show alert
+            alert("Please log in to add events to favorites.");
+            return;
+        }
+
+        try {
+            // Find the Favorites calendar
+            const calendarsCollection = collection(firestore, 'calendars');
+            const q = query(
+                calendarsCollection,
+                where("uid", "==", currentUser.uid),
+                where("name", "==", "Favorites"),
+                where("isDefault", "==", true)
+            );
+
+            const querySnapshot = await getDocs(q);
+
+            if (querySnapshot.empty) {
+                setHeartActionFeedback({ 
+                    show: true, 
+                    message: "Favorites calendar not found. Please visit the Calendar page to set it up.", 
+                    isError: true 
+                });
+                setTimeout(() => setHeartActionFeedback({ show: false, message: '', isError: false }), 3000);
+                return;
+            }
+
+            // Get the Favorites calendar document
+            const calendarDoc = querySnapshot.docs[0];
+            const calendarDocRef = doc(firestore, 'calendars', calendarDoc.id);
+            const calendarData = calendarDoc.data();
+
+            // Create event data
+            const safeLocation = () => {
+                // Convert any non-string values to strings and then check if they're empty
+                const address = typeof event.address1 === 'string' ? event.address1 : String(event.address1 || '');
+                const city = typeof event.city === 'string' ? event.city : String(event.city || '');
+                const state = typeof event.state === 'string' ? event.state : String(event.state || '');
+                const zip = typeof event.zipcode === 'string' ? event.zipcode : String(event.zipcode || '');
+                
+                const parts = [address, city, state, zip].filter(part => part && part.trim && part.trim() !== '');
+                return parts.join(', ');
+            };
+
+            const eventId = `event-${Date.now()}`;
+            const eventData = {
+                eventId: eventId,
+                title: event.title || 'Unnamed Event',
+                description: event.description || '',
+                location: safeLocation(),
+                date: event.date || new Date().toISOString(),
+                price: event.price != null ? event.price : 0,
+                eventType: event["event type"] || '',
+                tags: event.tags || '',
+                createdAt: new Date().toISOString(),
+            };
+
+            // Check if the event is already in favorites by creating a simple signature
+            // This is a basic check that might need to be enhanced in a production environment
+            const eventSignature = `${event.title}-${event.date}`;
+            
+            if (favoritedEvents.includes(eventSignature)) {
+                setHeartActionFeedback({ 
+                    show: true, 
+                    message: "This event is already in your favorites!", 
+                    isError: false 
+                });
+                setTimeout(() => setHeartActionFeedback({ show: false, message: '', isError: false }), 3000);
+                return;
+            }
+
+            // Update calendar document to include the new event
+            if (!calendarData.eventsData) {
+                await updateDoc(calendarDocRef, {
+                    eventsData: [eventData]
+                });
+            } else {
+                // Add event to existing events array
+                await updateDoc(calendarDocRef, {
+                    eventsData: arrayUnion(eventData)
+                });
+            }
+
+            // Increment the events count and upcoming count
+            await updateDoc(calendarDocRef, {
+                events: (calendarData.events || 0) + 1,
+                upcoming: (calendarData.upcoming || 0) + 1
+            });
+
+            // Update the favorited events state
+            setFavoritedEvents([...favoritedEvents, eventSignature]);
+
+            // Show success message
+            setHeartActionFeedback({ 
+                show: true, 
+                message: "Event added to favorites!", 
+                isError: false 
+            });
+            setTimeout(() => setHeartActionFeedback({ show: false, message: '', isError: false }), 3000);
+
+        } catch (error) {
+            console.error('Error adding event to favorites:', error);
+            setHeartActionFeedback({ 
+                show: true, 
+                message: "Error adding to favorites. Please try again.", 
+                isError: true 
+            });
+            setTimeout(() => setHeartActionFeedback({ show: false, message: '', isError: false }), 3000);
+        }
+    };
+
     // Fetches 10 random events from the API
     useEffect(() => {
         async function fetchEvents() {
@@ -109,6 +230,11 @@ export const EventCategory = ({ sidebar, user }) => {
             <div className="events">
                 <Header title={formatCategoryName(categoryName)} sidebar={sidebar} sendData={sendData} options={options} />
                 <div className={`container ${sidebar ? "" : 'large-container'}`}>
+                    {heartActionFeedback.show && (
+                        <div className={`heart-feedback ${heartActionFeedback.isError ? 'error' : 'success'}`}>
+                            {heartActionFeedback.message}
+                        </div>
+                    )}
                     <div className="feed">
                         {events && events.length > 0 ? (
                             events
@@ -160,7 +286,12 @@ export const EventCategory = ({ sidebar, user }) => {
                                             {/* If the price is 0, display it as free */}
                                             <label className="price"> Price: {event.price === 0 ? "Free" : `$${event.price}`} </label>
                                             <div className="add-options">
-                                                <button className="heart-btn"> <HeartIcon className="heart-icon" /> </button>
+                                                <button 
+                                                    className="heart-btn"
+                                                    onClick={() => handleHeartClick(event)}
+                                                > 
+                                                    <HeartIcon className="heart-icon" /> 
+                                                </button>
                                                 <button 
                                                     className="add-btn" 
                                                     onClick={() => handleAddToCalendarClick(event)}
