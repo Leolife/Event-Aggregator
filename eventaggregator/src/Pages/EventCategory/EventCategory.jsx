@@ -233,7 +233,9 @@ export const EventCategory = ({ sidebar, user }) => {
                 },
                 body: JSON.stringify(event)
             });
-            setEvents(await response.json())
+            setEvents(await response.json().catch(
+                e => {console.log("Caught random json error: ", e)}
+            ))
         }
         fetchEvents();
     }, [])
