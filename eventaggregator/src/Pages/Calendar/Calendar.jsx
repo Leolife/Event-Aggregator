@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef, act } from 'react'
 import './Calendar.css'
 import Sidebar from '../../Components/Sidebar/Sidebar'
 import { ReactComponent as SlidersIcon } from '../../assets/sliders.svg';
@@ -21,6 +21,8 @@ import image9 from '../../assets/thumbnail9.jpg'
 import image10 from '../../assets/thumbnail10.png'
 import image11 from '../../assets/thumbnail11.jpg'
 import image12 from '../../assets/thumbnail12.png'
+import ContextMenu from '../../Components/ContextMenu/ContextMenu';
+import DropArea from '../../Components/DropArea/DropArea';
 
 export const Calendar = ({ sidebar, user }) => {
     const [showModal, setShowModal] = useState(false);
@@ -30,7 +32,18 @@ export const Calendar = ({ sidebar, user }) => {
     const [calendars, setCalendars] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedCalendar, setSelectedCalendar] = useState(null);
+    const [activeTile, setActiveTile] = useState(null);
+    const [tempSelectedCalendar, setTempSelectedCalendar] = useState(null);
+    const [deleteCalendar, setDeleteCalendar] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
+    const contextMenuRef = useRef(null)
+    const [contextMenu, setContextMenu] = useState({
+        position: {
+            x: 0,
+            y: 0
+        },
+        toggled: false
+    })
 
     // Function to map image number from database to actual image
     const getImageByNumber = (imageNumber) => {
@@ -57,24 +70,83 @@ export const Calendar = ({ sidebar, user }) => {
         return calendar.name === "Favorites" && calendar.isDefault === true;
     };
 
+    // Displays context menu when calendar tile is right clicked
+    function handleOnContextMenu(e, rightClickTile) {
+        e.preventDefault();
+        if (rightClickTile.name != "Favorites") {
+            setTempSelectedCalendar(rightClickTile)
+            const contextMenuAttr = contextMenuRef.current.getBoundingClientRect()
+
+            const isLeft = e.clientX < window?.innerWidth / 2
+            let x
+            let y = e.clientY
+
+            if (isLeft) {
+                x = e.clientX
+            } else {
+                x = e.clientX - contextMenuAttr.width
+            }
+
+            setContextMenu({
+                position: {
+                    x,
+                    y
+                },
+                toggled: true
+            })
+        }
+    }
+
+    // Hides context menu when the user clicks elsewhere on the screen
+    function resetContextMenu() {
+        if (!showDeleteModal) {
+            setTempSelectedCalendar(null)
+        }
+        setContextMenu({
+            position: {
+                x: 0,
+                y: 0
+            },
+            toggled: false
+        })
+    }
+
+    useEffect(() => {
+        function handler(e) {
+            if (contextMenuRef.current) {
+                if (!contextMenuRef.current.contains(e.target)) {
+                    resetContextMenu()
+                }
+            }
+        }
+
+        document.addEventListener('click', handler)
+
+        return () => {
+            document.removeEventListener('click', handler)
+        }
+
+    })
+
+
     // Fetch calendars from Firestore when component mounts
     useEffect(() => {
         // Move the function definition inside the effect
         const createFavoritesCalendar = async () => {
             if (!user) return;
-    
+
             try {
                 // Check if a Favorites calendar already exists for this user
                 const calendarsCollection = collection(firestore, 'calendars');
                 const q = query(
-                    calendarsCollection, 
+                    calendarsCollection,
                     where("uid", "==", user.uid),
                     where("name", "==", "Favorites"),
                     where("isDefault", "==", true)
                 );
-                
+
                 const querySnapshot = await getDocs(q);
-                
+
                 // If Favorites calendar doesn't exist, create it
                 if (querySnapshot.empty) {
                     const favoritesCalendar = {
@@ -84,41 +156,43 @@ export const Calendar = ({ sidebar, user }) => {
                         events: 0,
                         upcoming: 0,
                         uid: user.uid,
-                        isDefault: true // Mark as default/system calendar
+                        isDefault: true, // Mark as default/system calendar
+                        position: 0,
+                        pinned: true,
                     };
-                    
+
                     // Save to Firestore
                     await addDoc(collection(firestore, 'calendars'), favoritesCalendar);
-                    
+
                     console.log('Favorites calendar created');
                     return true;
                 }
-                
+
                 return false;
             } catch (error) {
                 console.error('Error creating Favorites calendar:', error);
                 return false;
             }
         };
-    
+
         const fetchCalendars = async () => {
             try {
                 setLoading(true);
-                
+
                 // Make sure we have a user
                 if (!user) {
                     setCalendars([]);
                     setLoading(false);
                     return;
                 }
-                
+
                 // Ensure Favorites calendar exists
                 await createFavoritesCalendar();
-                
+
                 // Fetch all calendars for the user
                 const calendarsCollection = collection(firestore, 'calendars');
                 const calendarsSnapshot = await getDocs(calendarsCollection);
-                
+
                 const fetchedCalendars = calendarsSnapshot.docs
                     .map(doc => {
                         const data = doc.data();
@@ -131,21 +205,18 @@ export const Calendar = ({ sidebar, user }) => {
                             events: data.events || 0,
                             upcoming: data.upcoming || 0,
                             uid: data.uid || '',
-                            isDefault: data.isDefault || false // Include the isDefault flag
+                            isDefault: data.isDefault || false, // Include the isDefault flag
+                            position: data.position || 0,
+                            pinned: data.pinned || false,
                         };
                     })
                     // Filter to only include calendars that belong to the current user
                     .filter(calendar => calendar.uid === user.uid);
-                
+
                 // Sort calendars to put Favorites first
-                const sortedCalendars = fetchedCalendars.sort((a, b) => {
-                    if (a.isDefault && a.name === "Favorites") return -1;
-                    if (b.isDefault && b.name === "Favorites") return 1;
-                    return 0;
-                });
-                
+                const sortedCalendars  = [...fetchedCalendars].sort((a, b) => a.position - b.position);
                 setCalendars(sortedCalendars);
-                
+
                 // Set the first calendar (Favorites) as the selected one if available
                 if (sortedCalendars.length > 0) {
                     setSelectedCalendar(sortedCalendars[0]);
@@ -156,7 +227,7 @@ export const Calendar = ({ sidebar, user }) => {
                 setLoading(false);
             }
         };
-    
+
         fetchCalendars();
     }, [user]);
 
@@ -208,23 +279,23 @@ export const Calendar = ({ sidebar, user }) => {
         try {
             // Find the calendar document in Firestore
             const calendarsRef = collection(firestore, 'calendars');
-            const q = query(calendarsRef, 
+            const q = query(calendarsRef,
                 where("id", "==", calendarId),
                 where("uid", "==", user.uid)
             );
-            
+
             const querySnapshot = await getDocs(q);
-            
+
             if (!querySnapshot.empty) {
                 // Check if this is the Favorites calendar
                 const calendarDoc = querySnapshot.docs[0];
                 const calendarData = calendarDoc.data();
-                
+
                 if (calendarData.name === "Favorites" && calendarData.isDefault === true) {
                     console.error('Cannot delete the Favorites calendar');
                     return false;
                 }
-                
+
                 // Delete the document
                 await deleteDoc(doc(firestore, 'calendars', calendarDoc.id));
                 console.log('Calendar deleted from Firestore');
@@ -233,7 +304,7 @@ export const Calendar = ({ sidebar, user }) => {
                 // Try using the stored Firestore ID directly
                 const calendarDocRef = doc(firestore, 'calendars', selectedCalendar.firestoreId);
                 const calendarDoc = await getDoc(calendarDocRef);
-                
+
                 if (calendarDoc.exists()) {
                     const calendarData = calendarDoc.data();
                     if (calendarData.name === "Favorites" && calendarData.isDefault === true) {
@@ -241,7 +312,7 @@ export const Calendar = ({ sidebar, user }) => {
                         return false;
                     }
                 }
-                
+
                 await deleteDoc(calendarDocRef);
                 console.log('Calendar deleted from Firestore using firestoreId');
                 return true;
@@ -258,7 +329,7 @@ export const Calendar = ({ sidebar, user }) => {
     const handleCreateCalendar = () => {
         if (newCalendarName.trim() && user) {
             const imageNumber = handleImageForDatabase();
-            
+            const pos = calendars.length;
             const newCalendar = {
                 id: `calendar-${Date.now()}`,
                 name: newCalendarName,
@@ -266,25 +337,27 @@ export const Calendar = ({ sidebar, user }) => {
                 events: 0,
                 upcoming: 0,
                 uid: user.uid,
-                isDefault: false // Regular user-created calendar
+                isDefault: false, // Regular user-created calendar
+                position: pos,
+                pinned: false,
             };
-            
+
             // Save to Firestore
             saveCalendarToFirestore(newCalendar);
-            
+
             // Create the new calendar with image object instead of number
             const newCalendarWithImage = {
                 ...newCalendar,
                 image: getImageByNumber(imageNumber),
                 imageNumber: imageNumber
             };
-            
+
             // Add to local state
             setCalendars([...calendars, newCalendarWithImage]);
-            
+
             // Set the newly created calendar as the selected one
             setSelectedCalendar(newCalendarWithImage);
-            
+
             setNewCalendarName('');
             setSelectedImage(null);
             setShowModal(false);
@@ -300,11 +373,15 @@ export const Calendar = ({ sidebar, user }) => {
     const handleDeleteClick = () => {
         if (selectedCalendar) {
             // Check if this is the Favorites calendar
-            if (isFavoritesCalendar(selectedCalendar)) {
+            if (isFavoritesCalendar(selectedCalendar) && !tempSelectedCalendar) {
                 alert("The Favorites calendar cannot be deleted.");
                 return;
             }
-            
+            setDeleteCalendar(selectedCalendar)
+            if (tempSelectedCalendar) {
+                setDeleteCalendar(tempSelectedCalendar)
+                resetContextMenu()
+            }
             setShowDeleteModal(true);
         }
     };
@@ -312,19 +389,18 @@ export const Calendar = ({ sidebar, user }) => {
     const handleConfirmDelete = async () => {
         if (selectedCalendar) {
             // Double-check that we're not trying to delete Favorites calendar
-            if (isFavoritesCalendar(selectedCalendar)) {
+            if (isFavoritesCalendar(deleteCalendar)) {
                 alert("The Favorites calendar cannot be deleted.");
                 setShowDeleteModal(false);
                 return;
             }
-            
-            const success = await deleteCalendarFromFirestore(selectedCalendar.id);
-            
+            const success = await deleteCalendarFromFirestore(deleteCalendar.id);
+
             if (success) {
                 // Update the local state
-                const updatedCalendars = calendars.filter(cal => cal.id !== selectedCalendar.id);
+                const updatedCalendars = calendars.filter(cal => cal.id !== deleteCalendar.id);
                 setCalendars(updatedCalendars);
-                
+
                 // Set a new selected calendar or null if none left
                 if (updatedCalendars.length > 0) {
                     setSelectedCalendar(updatedCalendars[0]);
@@ -332,8 +408,9 @@ export const Calendar = ({ sidebar, user }) => {
                     setSelectedCalendar(null);
                 }
             }
-            
             setShowDeleteModal(false);
+            setDeleteCalendar(null);
+            setTempSelectedCalendar(null);
         }
     };
 
@@ -347,9 +424,19 @@ export const Calendar = ({ sidebar, user }) => {
     };
 
     // Function to filter calendars based on search term
-    const filteredCalendars = calendars.filter(calendar => 
+    const filteredCalendars = calendars.filter(calendar =>
         calendar.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
+
+    const onDrop = (position) => {
+        console.log(`${activeTile} placed at position ${position}`)
+        const tile = calendars[activeTile]
+        const updatedCalendars = calendars.filter((calendar, index) => index !== activeTile)
+        updatedCalendars.splice(position ,0, {
+            ...tile
+        })
+        setCalendars(updatedCalendars)
+    }
 
     return (
         <>
@@ -362,43 +449,91 @@ export const Calendar = ({ sidebar, user }) => {
                                 <h1> My Calendars </h1>
                                 <div className="search-box flex-div">
                                     <SearchIcon className="search-icon" />
-                                    <input 
-                                        type="text" 
-                                        placeholder='Search Calendars' 
+                                    <input
+                                        type="text"
+                                        placeholder='Search Calendars'
                                         value={searchTerm}
                                         onChange={(e) => setSearchTerm(e.target.value)}
                                     />
                                     <SlidersIcon className="sliders-icon" />
                                 </div>
                             </div>
-                            <div className="mycalendars">
+                            <div className="mycalendars">   {/* My Calendars Section */}
                                 {loading ? (
                                     <div>Loading calendars...</div>
                                 ) : filteredCalendars.length === 0 ? (
                                     <div>No calendars found. Create one to get started!</div>
                                 ) : (
-                                    filteredCalendars.map(calendar => (
-                                        <div 
-                                            key={calendar.id} 
-                                            className={`calendar-tile ${selectedCalendar && selectedCalendar.id === calendar.id ? 'selected-calendar' : ''}`}
-                                            onClick={() => handleCalendarSelect(calendar)}
-                                        >
-                                            <div className="img-sizer">
-                                                <img src={calendar.image} alt="" />
-                                            </div>
+                                    filteredCalendars.map((calendar, index) => (
+                                        // Calendar Tile
+                                        <>
+                                            <div
+                                                key={calendar.id}
+                                                className={`calendar-tile ${selectedCalendar && selectedCalendar.id === calendar.id ? 'selected-calendar' : ''}`}
+                                                onClick={() => handleCalendarSelect(calendar)}
+                                                onContextMenu={(e) => handleOnContextMenu(e, calendar)}
+                                                draggable="true"
+                                                onDragStart={() => setActiveTile(index)}
+                                                onDragEnd={() => setActiveTile(null)}
+                                            >
+                                                <div className="img-sizer">
+                                                    <img src={calendar.image} alt="" />
+                                                </div>
 
-                                            <div className="tile-container">
-                                                <h2 className="tile-name"> {calendar.name} </h2>
-                                                <label className="tile-info"> 
-                                                    {calendar.events} Events • {calendar.upcoming} Upcoming
-                                                </label>
+                                                <div className="tile-container">
+                                                    <h2 className="tile-name"> {calendar.name} </h2>
+                                                    <label className="tile-info">
+                                                        {calendar.events} Events • {calendar.upcoming} Upcoming
+                                                    </label>
+                                                </div>
                                             </div>
-                                        </div>
+                                            <DropArea onDrop={() => onDrop(index)} />
+                                        </>
                                     ))
                                 )}
-                                
-                                <div 
-                                    className="new-calendar-button" 
+                                <ContextMenu
+                                    contextMenuRef={contextMenuRef}
+                                    isToggled={contextMenu.toggled}
+                                    positionX={contextMenu.position.x}
+                                    positionY={contextMenu.position.y}
+                                    buttons={[
+                                        {
+                                            text: "Edit details",
+                                            icon: "✏️",
+                                            onClick: () => alert("Hey"),
+                                            isSpacer: false
+                                        },
+                                        {
+                                            text: "Delete",
+                                            icon: "🗑️",
+                                            onClick: handleDeleteClick,
+                                        },
+                                        {
+                                            isSpacer: true
+                                        },
+                                        {
+                                            text: "Create Calendar",
+                                            icon: "➕",
+                                            onClick: () => alert("Hey"),
+                                        },
+                                        {
+                                            text: "Pin calendar",
+                                            icon: "📌",
+                                            onClick: () => alert("Hey"),
+                                        },
+                                        {
+                                            isSpacer: true
+                                        },
+                                        {
+                                            text: "Share",
+                                            icon: "➦",
+                                            onClick: () => alert("Hey"),
+                                        },
+                                    ]}
+                                />
+
+                                <div
+                                    className="new-calendar-button"
                                     onClick={() => setShowModal(true)}
                                 >
                                     New Calendar
@@ -407,10 +542,10 @@ export const Calendar = ({ sidebar, user }) => {
                         </div>
                     </div>
                     <div className="calendar-section">   {/* This is where the calendar to be displayed is chosen */}
-                        <CalendarLayout 
+                        <CalendarLayout
                             calendarTitle={selectedCalendar ? selectedCalendar.name : "Calendar"}
                             calendarId={selectedCalendar ? selectedCalendar.id : null}
-                            onChangeMonth={(newDate) => console.log('Month changed:', newDate)} 
+                            onChangeMonth={(newDate) => console.log('Month changed:', newDate)}
                             onDelete={handleDeleteClick}
                             isDefaultCalendar={selectedCalendar && isFavoritesCalendar(selectedCalendar)}
                             user={user}
@@ -424,23 +559,23 @@ export const Calendar = ({ sidebar, user }) => {
                 <div className="modal-overlay">
                     <div className="modal-content">
                         <h2>Create New Calendar</h2>
-                        
+
                         <div className="modal-input-group">
                             <label htmlFor="calendar-name">Calendar Name</label>
-                            <input 
-                                type="text" 
+                            <input
+                                type="text"
                                 id="calendar-name"
                                 value={newCalendarName}
                                 onChange={(e) => setNewCalendarName(e.target.value)}
                                 placeholder="Enter calendar name"
                             />
                         </div>
-                        
+
                         <div className="modal-image-selection">
                             <h3>Select an Image</h3>
                             <div className="image-grid">
                                 {calendarImages.map(image => (
-                                    <div 
+                                    <div
                                         key={image.id}
                                         className={`image-option ${selectedImage === image.src ? 'selected' : ''}`}
                                         onClick={() => setSelectedImage(image.src)}
@@ -450,15 +585,15 @@ export const Calendar = ({ sidebar, user }) => {
                                 ))}
                             </div>
                         </div>
-                        
+
                         <div className="modal-actions">
-                            <button 
+                            <button
                                 className="cancel-btn"
                                 onClick={handleCancel}
                             >
                                 Cancel
                             </button>
-                            <button 
+                            <button
                                 className="create-btn"
                                 onClick={handleCreateCalendar}
                                 disabled={!newCalendarName.trim() || !selectedImage || !user}
@@ -477,13 +612,13 @@ export const Calendar = ({ sidebar, user }) => {
                         <h2>Delete Calendar</h2>
                         <p>Are you sure you want to delete this calendar?</p>
                         <div className="modal-actions">
-                            <button 
+                            <button
                                 className="cancel-btn"
                                 onClick={handleCancelDelete}
                             >
                                 Cancel
                             </button>
-                            <button 
+                            <button
                                 className="delete-confirm-btn"
                                 onClick={handleConfirmDelete}
                             >
