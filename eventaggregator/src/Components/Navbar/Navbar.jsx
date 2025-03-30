@@ -78,7 +78,7 @@ const Navbar = ({ setSidebar }) => {
     navigate({
       pathname: "forum",
       search: createSearchParams(
-        Object.fromEntries(Object.entries({ q: query, type: typeParam, sort: sortParam}).filter(([_, v]) => v != null)) // If any of these parameters are empty, then don't include them
+        Object.fromEntries(Object.entries({ q: query, type: typeParam, sort: sortParam }).filter(([_, v]) => v != null)) // If any of these parameters are empty, then don't include them
       ).toString()
     })
   }
@@ -111,7 +111,7 @@ const Navbar = ({ setSidebar }) => {
         <div className='nav-left flex-div'>
           <MenuIcon className="menu-icon" onClick={() => setSidebar(prev => prev === false ? true : false)} />
           <Link to={'/'}><img className='logo' src={logo} alt="" /></Link>
-          <a className="nav-menu-title" >Events</a>
+          <a className="nav-menu-title"><Link to={'/'}> Events </Link></a>
           <a className="nav-menu-title"><Link to={'/forum'} style={{ color: 'inherit' }}> Forum </Link></a>
           <a className="nav-menu-title" onClick={handleProfileClick} >Profile</a>
         </div>
