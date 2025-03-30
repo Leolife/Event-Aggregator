@@ -25,8 +25,6 @@ const Header = ({ title, sidebar, sendData, options }) => {
             categories => {
                 setCategories(categories)
             }
-        ).catch(
-            e => {console.log("Caught random json error: ", e)}
         )
     }, [])
 
