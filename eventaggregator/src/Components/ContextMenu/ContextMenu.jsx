@@ -18,8 +18,6 @@ const ContextMenu = ({
             ref={contextMenuRef}
         >
             {buttons.map((button, index) => {
-                const { isSpacer = false, onClick, icon = "", text = ""} = button
-
                 function handleClick(e) {
                     e.stopPropagation();
                     button.onClick(e, rightClickItem)
