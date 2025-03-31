@@ -6,7 +6,7 @@
 }
 
 .mycalendars-section {
-  width: 250px; /* Fixed width for the sidebar */
+  width: 350px; /* Fixed width for the sidebar */
   background-color: #dadada;
   height: 800px;
   border-radius: 12px;
@@ -14,6 +14,19 @@
   flex-shrink: 0; /* Prevent this section from shrinking */
 }
 
+.mycalendars-overlay {
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
+  width: 350px; /* Fixed width for the sidebar */
+  background-color: black;
+  opacity: 0;
+  height: 800px;
+  border-radius: 12px;
+  margin-right: 15px;
+  flex-shrink: 0; /* Prevent this section from shrinking */
+  transition: all 0.1s ease;
+}
 .calendar-section {
   flex: 1; /* Take up all remaining space */
   min-width: 0; /* Important for flex items to shrink below min-content */
