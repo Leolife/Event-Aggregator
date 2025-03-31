@@ -5,12 +5,6 @@
     margin-top: 12px;
 }
 
-.mycalendars-section {
-    width: 25%;
-    background-color: #dadada;
-    height: 800px;
-    border-radius: 12px;
-}
 
 .mycalendars-header {
     padding: 5%;
@@ -49,6 +43,8 @@
 }
 
 .calendar-tile {
+    position: relative;
+    z-index: 0;
     background-color: #dadada;
     border-radius: 5px;
     cursor: pointer;
@@ -83,6 +79,22 @@
     overflow: hidden;
     margin-right: 15px;
 }
+
+/* Pin Icon */
+.tile-info-section svg{
+    width: 15px;
+    height: 15px;
+    display: none;
+    color: var(--secondary);
+}
+
+.tile-info-section {
+    margin-top: 5px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
 
 /* New Calendar Button */
 .new-calendar-button {
@@ -231,7 +243,9 @@
 }
 
 .image-option.selected {
-    border-color: #3ed0e4;
+    border-color: var(--primary);
+    border-width: thick;
+    box-shadow: 0 0 10px rgb(0, 0, 0);
 }
 
 /* more modal styling */
@@ -285,6 +299,7 @@
 
 .tile-info {
     font-size: 14px;
+    font-weight: bold;
     color: #666;
 }
 
@@ -306,3 +321,4 @@
     overflow-y: auto;
     padding: 0 15px;
 }
+

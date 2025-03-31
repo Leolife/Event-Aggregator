@@ -72,7 +72,7 @@ const Navbar = ({ setSidebar }) => {
       e.toLowerCase().startsWith(searchText.toLowerCase())
     )
     setFilteredEvents(sortedEvents);
-  }, [searchText])
+  }, [searchText, events])
 
   function forumNav(query) {
     navigate({
@@ -111,15 +111,15 @@ const Navbar = ({ setSidebar }) => {
         <div className='nav-left flex-div'>
           <MenuIcon className="menu-icon" onClick={() => setSidebar(prev => prev === false ? true : false)} />
           <Link to={'/'}><img className='logo' src={logo} alt="" /></Link>
-          <a className="nav-menu-title" >Events</a>
-          <a className="nav-menu-title"><Link to={'/forum'} style={{ color: 'inherit' }}> Forum </Link></a>
-          <a className="nav-menu-title" onClick={handleProfileClick} >Profile</a>
+          <a href={() => false} className="nav-menu-title" >Events</a>
+          <a href={() => false} className="nav-menu-title"><Link to={'/forum'} style={{ color: 'inherit' }}> Forum </Link></a>
+          <a href={() => false} className="nav-menu-title" onClick={handleProfileClick} >Profile</a>
         </div>
         <div className="nav-middle flex-div">
           <div className="dropdown-search" ref={queryRef}>
             <div className="search-box flex-div">
               <SearchIcon className="search-icon" />
-              <input autocomplete="off" id="search" type="text" placeholder='Search'
+              <input autoComplete="off" id="search" type="text" placeholder='Search'
                 onInput={e => setSearchText(e.target.value) & setActive(e.target.value.length > 0)}  // If the user has typed into the search, display the dropdown
                 value={searchText}
                 onMouseDown={() => setActive(searchText.length > 0)}
@@ -135,7 +135,7 @@ const Navbar = ({ setSidebar }) => {
                 <ul>
                   <li className="dropdown-item">
                     {/* Search in events */}
-                    <a className="dropdown-anchor" onClick={() => setActive(false)}>
+                    <a href={() => false} className="dropdown-anchor" onClick={() => setActive(false)}>
                       <span className="dropdown-icons"> <EventIcon className="event-icon" /> </span>
                       <span className="list-option-text"> {searchText} </span>
                       <span className="list-option-suffix"> in Events </span>
@@ -146,7 +146,7 @@ const Navbar = ({ setSidebar }) => {
                     forumNav(searchText)
                     & setActive(false)} >
                     {/* Search in forums */}
-                    <a className="dropdown-anchor">
+                    <a href={() => false} className="dropdown-anchor">
                       <span className="dropdown-icons"> <ForumIcon className="forum-icon" /> </span>
                       <span className="list-option-text"> {searchText} </span>
                       <span className="list-option-suffix"> in Forums </span>
@@ -157,7 +157,7 @@ const Navbar = ({ setSidebar }) => {
                       setSearchText(event)
                       & forumNav(event)
                       & setActive(false)} >
-                      <a className="dropdown-anchor">
+                      <a href={() => false} className="dropdown-anchor">
                         <span className="dropdown-icons"> <ForumIcon className="forum-icon" /> </span>
                         <span className="list-option-event-name"> {event} </span>
                         <span className="list-option-suffix"> in Forums </span>

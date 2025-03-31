@@ -1,12 +1,13 @@
-import React, { useState, useEffect, useRef, act } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import './Calendar.css'
 import Sidebar from '../../Components/Sidebar/Sidebar'
 import { ReactComponent as SlidersIcon } from '../../assets/sliders.svg';
 import { ReactComponent as SearchIcon } from '../../assets/search-icon.svg';
+import { ReactComponent as PinIcon } from '../../assets/pushpin-icon.svg';
 import image0 from '../../assets/liked.jpg'
 import CalendarLayout from '../../Components/Calendar/Calendar_layout';
 import { firestore } from '../../firebase';
-import { collection, getDocs, addDoc, doc, deleteDoc, query, where, getDoc } from 'firebase/firestore';
+import { collection, getDocs, addDoc, updateDoc, doc, deleteDoc, query, where, getDoc, onSnapshot } from 'firebase/firestore';
 
 // Import sample images for new calendars
 import image1 from '../../assets/thumbnail1.png'
@@ -27,6 +28,7 @@ import DropArea from '../../Components/DropArea/DropArea';
 export const Calendar = ({ sidebar, user }) => {
     const [showModal, setShowModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [newPosition, setNewPosition] = useState(null);
     const [newCalendarName, setNewCalendarName] = useState('');
     const [selectedImage, setSelectedImage] = useState(null);
     const [calendars, setCalendars] = useState([]);
@@ -73,7 +75,7 @@ export const Calendar = ({ sidebar, user }) => {
     // Displays context menu when calendar tile is right clicked
     function handleOnContextMenu(e, rightClickTile) {
         e.preventDefault();
-        if (rightClickTile.name != "Favorites") {
+        if (rightClickTile.name !== "Favorites") {
             setTempSelectedCalendar(rightClickTile)
             const contextMenuAttr = contextMenuRef.current.getBoundingClientRect()
 
@@ -98,8 +100,8 @@ export const Calendar = ({ sidebar, user }) => {
     }
 
     // Hides context menu when the user clicks elsewhere on the screen
-    function resetContextMenu() {
-        if (!showDeleteModal) {
+    const resetContextMenu = () => {
+        if (!showDeleteModal && !showModal) {
             setTempSelectedCalendar(null)
         }
         setContextMenu({
@@ -214,7 +216,7 @@ export const Calendar = ({ sidebar, user }) => {
                     .filter(calendar => calendar.uid === user.uid);
 
                 // Sort calendars to put Favorites first
-                const sortedCalendars  = [...fetchedCalendars].sort((a, b) => a.position - b.position);
+                const sortedCalendars = [...fetchedCalendars].sort((a, b) => a.position - b.position);
                 setCalendars(sortedCalendars);
 
                 // Set the first calendar (Favorites) as the selected one if available
@@ -230,6 +232,22 @@ export const Calendar = ({ sidebar, user }) => {
 
         fetchCalendars();
     }, [user]);
+
+    // Update calendars locally whenever a change is made
+    useEffect(() => {
+        const calendarsCollection = collection(firestore, 'calendars');
+        const unsubscribe = onSnapshot(calendarsCollection, (snapshot) => {
+            const newData = snapshot.docs.map(doc => ({ firestoreId: doc.id, ...doc.data() })).filter(calendar => calendar.uid === user.uid)
+            newData.forEach(calendarData => {
+                calendarData.imageNumber = calendarData.image
+                calendarData.image = getImageByNumber(calendarData.imageNumber)
+            })
+            setCalendars(newData.sort((a, b) => a.position - b.position))
+        });
+
+        return () => unsubscribe();
+    }, [user]);
+
 
     // Sample images for the modal
     const calendarImages = [
@@ -267,7 +285,28 @@ export const Calendar = ({ sidebar, user }) => {
     const saveCalendarToFirestore = async (calendarData) => {
         try {
             const calendarsRef = collection(firestore, 'calendars');
-            await addDoc(calendarsRef, calendarData);
+            const docRef = await addDoc(calendarsRef, calendarData);
+            // Create the new calendar with image object instead of number and attach firestoreId
+            const imageNumber = calendarData.image
+            const newCalendar = {
+                ...calendarData,
+                image: getImageByNumber(imageNumber),
+                imageNumber: imageNumber,
+                firestoreId: docRef.id
+            };
+
+            // Add to local state
+            setCalendars([...calendars, newCalendar]);
+
+            // Set the newly created calendar as the selected one
+            setSelectedCalendar(newCalendar);
+            if (newPosition) {
+                updateTilePosition(newCalendar, newPosition)
+                setNewPosition(null);
+            }
+            setNewCalendarName('');
+            setSelectedImage(null);
+            setShowModal(false);
             console.log('Calendar saved to Firestore');
         } catch (error) {
             console.error('Error saving calendar:', error);
@@ -344,29 +383,14 @@ export const Calendar = ({ sidebar, user }) => {
 
             // Save to Firestore
             saveCalendarToFirestore(newCalendar);
-
-            // Create the new calendar with image object instead of number
-            const newCalendarWithImage = {
-                ...newCalendar,
-                image: getImageByNumber(imageNumber),
-                imageNumber: imageNumber
-            };
-
-            // Add to local state
-            setCalendars([...calendars, newCalendarWithImage]);
-
-            // Set the newly created calendar as the selected one
-            setSelectedCalendar(newCalendarWithImage);
-
-            setNewCalendarName('');
-            setSelectedImage(null);
-            setShowModal(false);
+            
         }
     };
 
     const handleCancel = () => {
         setNewCalendarName('');
         setSelectedImage(null);
+        setNewPosition(null);
         setShowModal(false);
     };
 
@@ -428,14 +452,76 @@ export const Calendar = ({ sidebar, user }) => {
         calendar.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    const onDrop = (position) => {
-        console.log(`${activeTile} placed at position ${position}`)
-        const tile = calendars[activeTile]
-        const updatedCalendars = calendars.filter((calendar, index) => index !== activeTile)
-        updatedCalendars.splice(position ,0, {
+    const updateCalendar = async (calendar, field, newValue) => {
+        try {
+            const calendarDocRef = doc(firestore, 'calendars', calendar.firestoreId)
+            await updateDoc(calendarDocRef, {
+                [field]: newValue,
+            });
+        } catch (error) {
+            console.error('Error updating Calendar:', error);
+        }
+    }
+
+
+    // Handles positioning the calendar tile when the user drags and drops it into a new spot
+    const updateTilePosition = (tile, position) => {
+        const updatedCalendars = calendars.filter((_, index) => index !== tile.position) // Removes the dragged calendar tile from the calendars list
+        updatedCalendars.splice(position, 0, { // Inserts it into its respective position while adjusting the positions of the other calendar tiles as well
             ...tile
         })
-        setCalendars(updatedCalendars)
+        updatedCalendars.map((calendar, index) => (
+            updateCalendar(calendar, "position", index)
+        ))
+    }
+
+    const onDrop = (position) => {
+        updateTilePosition(calendars[activeTile], position)
+        setActiveTile(null)
+    }
+
+
+    const handleEditDetails = () => {
+        if (tempSelectedCalendar) {
+            setNewCalendarName(tempSelectedCalendar.name)
+            setSelectedImage(getImageByNumber(tempSelectedCalendar.imageNumber))
+            setShowModal(true)
+            setContextMenu({
+                position: {
+                    x: 0,
+                    y: 0
+                },
+                toggled: false
+            })
+        }
+    }
+
+    const handleSaveEdits = () => {
+        updateCalendar(tempSelectedCalendar, "name", newCalendarName)
+        if (selectedImage) {
+            const imageNumber = handleImageForDatabase();
+            updateCalendar(tempSelectedCalendar, "image", imageNumber)
+        }
+        setNewCalendarName('');
+        setSelectedImage(null);
+        setShowModal(false)
+    }
+
+    const handlePin = () => {
+        if (!tempSelectedCalendar.pinned) {
+            const pinnedCalendars = calendars.filter((calendar) => calendar.pinned === true)
+            const farthestPinned = Math.max(...pinnedCalendars.map(calendar => calendar.position)) + 1
+            updateTilePosition(tempSelectedCalendar, farthestPinned)
+        }
+        updateCalendar(tempSelectedCalendar, "pinned", !tempSelectedCalendar.pinned)
+        resetContextMenu()
+    }
+
+    const handleCreateCalendarAtPos = () => {
+        if (tempSelectedCalendar) {
+            setNewPosition(tempSelectedCalendar.position + 1)
+            setShowModal(true)
+        }
     }
 
     return (
@@ -443,6 +529,7 @@ export const Calendar = ({ sidebar, user }) => {
             <Sidebar sidebar={sidebar} />
             <div className={`container ${sidebar ? "" : 'large-container'}`}>
                 <div className="calendar">
+                    <div className="mycalendars-overlay" style={{ opacity: activeTile ? 0.5 : 0 }} ></div>
                     <div className="mycalendars-section">
                         <div className="mycalendars-container">
                             <div className="mycalendars-header">
@@ -464,7 +551,7 @@ export const Calendar = ({ sidebar, user }) => {
                                 ) : filteredCalendars.length === 0 ? (
                                     <div>No calendars found. Create one to get started!</div>
                                 ) : (
-                                    filteredCalendars.map((calendar, index) => (
+                                    calendars.map((calendar, index) => (
                                         // Calendar Tile
                                         <>
                                             <div
@@ -472,22 +559,27 @@ export const Calendar = ({ sidebar, user }) => {
                                                 className={`calendar-tile ${selectedCalendar && selectedCalendar.id === calendar.id ? 'selected-calendar' : ''}`}
                                                 onClick={() => handleCalendarSelect(calendar)}
                                                 onContextMenu={(e) => handleOnContextMenu(e, calendar)}
-                                                draggable="true"
-                                                onDragStart={() => setActiveTile(index)}
+                                                draggable={calendar.name !== "Favorites" ? true : false}
+                                                onDragStart={() => setActiveTile(calendar.position)}
                                                 onDragEnd={() => setActiveTile(null)}
+                                                style={{ zIndex: activeTile === calendar.position ? 2 : 0 }}
                                             >
                                                 <div className="img-sizer">
-                                                    <img src={calendar.image} alt="" />
+                                                    <img src={calendar.image} draggable="false" alt="" />
                                                 </div>
 
                                                 <div className="tile-container">
                                                     <h2 className="tile-name"> {calendar.name} </h2>
-                                                    <label className="tile-info">
-                                                        {calendar.events} Events • {calendar.upcoming} Upcoming
-                                                    </label>
+                                                    <span className='tile-info-section'>
+                                                        {/* Display Pin Icon if the calendar is pinned */}
+                                                        <PinIcon style={{ display: calendar.pinned ? "inline" : "none" }} />
+                                                        <label className="tile-info">
+                                                            {calendar.events} Events • {calendar.upcoming} Upcoming
+                                                        </label>
+                                                    </span>
                                                 </div>
                                             </div>
-                                            <DropArea onDrop={() => onDrop(index)} />
+                                            <DropArea activeTile={calendars[activeTile]} index={index} onDrop={(pos) => onDrop(pos)} />
                                         </>
                                     ))
                                 )}
@@ -500,7 +592,7 @@ export const Calendar = ({ sidebar, user }) => {
                                         {
                                             text: "Edit details",
                                             icon: "✏️",
-                                            onClick: () => alert("Hey"),
+                                            onClick: handleEditDetails,
                                             isSpacer: false
                                         },
                                         {
@@ -514,20 +606,20 @@ export const Calendar = ({ sidebar, user }) => {
                                         {
                                             text: "Create Calendar",
                                             icon: "➕",
-                                            onClick: () => alert("Hey"),
+                                            onClick: handleCreateCalendarAtPos,
                                         },
                                         {
-                                            text: "Pin calendar",
+                                            text: tempSelectedCalendar?.pinned ? "Unpin Calendar" : "Pin Calendar",
                                             icon: "📌",
-                                            onClick: () => alert("Hey"),
+                                            onClick: handlePin,
                                         },
                                         {
                                             isSpacer: true
                                         },
                                         {
-                                            text: "Share",
+                                            text: "Export",
                                             icon: "➦",
-                                            onClick: () => alert("Hey"),
+                                            onClick: () => window.open('https://open.spotify.com/playlist/1H163taKSeBERTtCu3R7bp'),
                                         },
                                     ]}
                                 />
@@ -558,7 +650,7 @@ export const Calendar = ({ sidebar, user }) => {
             {showModal && (
                 <div className="modal-overlay">
                     <div className="modal-content">
-                        <h2>Create New Calendar</h2>
+                        <h2>{tempSelectedCalendar && !newPosition ? "Edit Calendar" : "Create New Calendar"}</h2>
 
                         <div className="modal-input-group">
                             <label htmlFor="calendar-name">Calendar Name</label>
@@ -595,10 +687,10 @@ export const Calendar = ({ sidebar, user }) => {
                             </button>
                             <button
                                 className="create-btn"
-                                onClick={handleCreateCalendar}
+                                onClick={tempSelectedCalendar && !newPosition ? handleSaveEdits : handleCreateCalendar}
                                 disabled={!newCalendarName.trim() || !selectedImage || !user}
                             >
-                                Create
+                                {tempSelectedCalendar && !newPosition ? "Save" : "Create"}
                             </button>
                         </div>
                     </div>
