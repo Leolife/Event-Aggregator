@@ -99,7 +99,7 @@ export const Calendar = ({ sidebar, user }) => {
         }
     }
 
-    // Hides context menu when the user clicks elsewhere on the screen
+    // Hides the context menu and sets the tempSelectedCalendar to null
     const resetContextMenu = () => {
         if (!showDeleteModal && !showModal) {
             setTempSelectedCalendar(null)
@@ -113,6 +113,7 @@ export const Calendar = ({ sidebar, user }) => {
         })
     }
 
+    // Hides context menu when the user clicks elsewhere on the screen
     useEffect(() => {
         function handler(e) {
             if (contextMenuRef.current) {
@@ -121,7 +122,6 @@ export const Calendar = ({ sidebar, user }) => {
                 }
             }
         }
-
         document.addEventListener('click', handler)
 
         return () => {
@@ -209,6 +209,7 @@ export const Calendar = ({ sidebar, user }) => {
                             uid: data.uid || '',
                             isDefault: data.isDefault || false, // Include the isDefault flag
                             position: data.position || 0,
+                            timestamp: data.timestamp ? Math.floor((Date.now() - data.timestamp.toDate()) / 60000) : 0,
                             pinned: data.pinned || false,
                         };
                     })
@@ -238,6 +239,7 @@ export const Calendar = ({ sidebar, user }) => {
         const calendarsCollection = collection(firestore, 'calendars');
         const unsubscribe = onSnapshot(calendarsCollection, (snapshot) => {
             const newData = snapshot.docs.map(doc => ({ firestoreId: doc.id, ...doc.data() })).filter(calendar => calendar.uid === user.uid)
+            // Set the images properly
             newData.forEach(calendarData => {
                 calendarData.imageNumber = calendarData.image
                 calendarData.image = getImageByNumber(calendarData.imageNumber)
@@ -378,6 +380,7 @@ export const Calendar = ({ sidebar, user }) => {
                 uid: user.uid,
                 isDefault: false, // Regular user-created calendar
                 position: pos,
+                timestamp: new Date(),
                 pinned: false,
             };
 
@@ -403,6 +406,7 @@ export const Calendar = ({ sidebar, user }) => {
             }
             setDeleteCalendar(selectedCalendar)
             if (tempSelectedCalendar) {
+                // Handles deleting the calendar tile if it was right clicked on
                 setDeleteCalendar(tempSelectedCalendar)
                 resetContextMenu()
             }
@@ -452,6 +456,7 @@ export const Calendar = ({ sidebar, user }) => {
         calendar.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    // Function to update the calendar in the database 
     const updateCalendar = async (calendar, field, newValue) => {
         try {
             const calendarDocRef = doc(firestore, 'calendars', calendar.firestoreId)
@@ -481,11 +486,13 @@ export const Calendar = ({ sidebar, user }) => {
     }
 
 
+    // Function to handle displaying the edits form
     const handleEditDetails = () => {
         if (tempSelectedCalendar) {
             setNewCalendarName(tempSelectedCalendar.name)
             setSelectedImage(getImageByNumber(tempSelectedCalendar.imageNumber))
             setShowModal(true)
+            // Hide the context menu without setting tempSelectedCalendar to null
             setContextMenu({
                 position: {
                     x: 0,
@@ -496,6 +503,7 @@ export const Calendar = ({ sidebar, user }) => {
         }
     }
 
+    // Function to handle saving edits made to the calendar tile
     const handleSaveEdits = () => {
         updateCalendar(tempSelectedCalendar, "name", newCalendarName)
         if (selectedImage) {
@@ -507,8 +515,10 @@ export const Calendar = ({ sidebar, user }) => {
         setShowModal(false)
     }
 
+    // Function to handle pinning a calendar tile
     const handlePin = () => {
         if (!tempSelectedCalendar.pinned) {
+            // If the tile is to be pinned, place it after the farthest pinned tile
             const pinnedCalendars = calendars.filter((calendar) => calendar.pinned === true)
             const farthestPinned = Math.max(...pinnedCalendars.map(calendar => calendar.position)) + 1
             updateTilePosition(tempSelectedCalendar, farthestPinned)
@@ -517,10 +527,19 @@ export const Calendar = ({ sidebar, user }) => {
         resetContextMenu()
     }
 
+    // Function to handle creating calendar at the selected position
     const handleCreateCalendarAtPos = () => {
         if (tempSelectedCalendar) {
             setNewPosition(tempSelectedCalendar.position + 1)
             setShowModal(true)
+            // Hide the context menu without setting tempSelectedCalendar to null
+            setContextMenu({
+                position: {
+                    x: 0,
+                    y: 0
+                },
+                toggled: false
+            })
         }
     }
 
@@ -687,7 +706,7 @@ export const Calendar = ({ sidebar, user }) => {
                             </button>
                             <button
                                 className="create-btn"
-                                onClick={tempSelectedCalendar && !newPosition ? handleSaveEdits : handleCreateCalendar}
+                                onClick={tempSelectedCalendar && !newPosition ? handleSaveEdits : handleCreateCalendar} // Determines whether this button saves edits or creates a new calendar
                                 disabled={!newCalendarName.trim() || !selectedImage || !user}
                             >
                                 {tempSelectedCalendar && !newPosition ? "Save" : "Create"}
