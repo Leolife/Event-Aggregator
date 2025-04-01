@@ -2,22 +2,26 @@
 GREEN='\033[0;32m'
 RED='\033[0;31m'
 NC='\033[0m' # No Color
-# export FLASK_APP=RestAPI.py
-# flask run
+###################################################
+#             Dir in Event-Aggregator             #
+###################################################
+mypath=$(pwd)
+echo Working Dir: $mypath
+#read -p "Please make sure that the working directory is in Event Aggregator. Continue? (Y/N): " confirm && [[ $confirm == [yY] || $confirm == [yY][eE][sS] ]] || exit 1
 
-mypath=pwd
-python -c "import os; assert(os.getcwd().endswith('Event-Aggregator')) == True"
-echo $mypath
-
+###################################################
+#                Virtual Env exists               #
+###################################################
 if test -d .venv;
 then
     echo -e "${GREEN}Virtual Env Exists${NC}"
+    source .venv/bin/activate
 else
-    echo -e "${RED}SCRIPT NOT IN WORKING DIR${NC}"
+    echo -e "${RED}There is no virtual environment currently set up${NC}"
+    echo "Please set up a virtual environemtn and title it .venv"
 fi 
 
-# echo $mypath
-# cd Server
-# export FLASK_APP=db_API.py
-# flask run
-# cd ..
+###################################################
+#               Run Setup.py in venv              #
+###################################################
+python3 setup.py $mypath

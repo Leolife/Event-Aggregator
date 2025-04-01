@@ -1,11 +1,12 @@
-# # [hex (#00ff00), BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE]
-# for i in tqdm(range(50), colour="MAGENTA"):
-#     sleep(0.1)
-
-exit(code = 1)
-
-import os
+"""
+Setups the entire data pipline environemnt
+"""
 import subprocess
+import threading
+import random
+import time
+import sys
+import os
 
 def run_cmd(cmd: list[str]) -> str:
     return subprocess.run(cmd, stdout=subprocess.PIPE).stdout.decode('utf-8')
@@ -23,12 +24,15 @@ if __name__ == '__main__':
     #########################################################
     with open('requiremnts.txt', mode = 'r') as f:
         required_lib = [lib.strip() for lib in f.readlines()]
+
+    print(f'{"Libraries":<22}{"State":<15}')
+    print(f'{"-"*20:<15} {"-"*10:<15}')
     
     for l in required_lib:
         if l in libs:
-            print(f'{l:<15}{IGreen}Installed{White}')
+            print(f'{l:<22}{IGreen}Installed{White}')
         else:
-            print(f'{l:<15}{IRed}Missing')
+            print(f'{l:<22}{IRed}Missing')
     
     #########################################################
     #               Importing  Libraries                    #
@@ -38,7 +42,33 @@ if __name__ == '__main__':
     from tqdm        import tqdm
     
     #########################################################
+    #         Obtain all the working dir                    #
+    #########################################################
+    assert(len(sys.argv)) == 2
+    _, default_path = sys.argv
+    # -- Obtain the path for each 
+    prod_env = os.path.join(default_path,'Production_Environment')
+    server_dir = os.path.join(prod_env,'Server')
+
+    server_list = [os.path.join(server_dir,'db_API.py')]
+    #########################################################
+    #         Add Environment to working path               #
+    #########################################################
+
+    #########################################################
     #                   Running Scripts                     #
     #########################################################
-    # os.system(command='pwd')
-
+    colors = ["BLACK", "RED", "GREEN", "YELLOW", "BLUE", "MAGENTA", "CYAN", "WHITE"]
+    jobs = []
+    for idx in tqdm(range(len(server_list)),colour=random.choice(colors)): #hex (#00ff00),
+        jobs.append(threading.Thread(target=os.system, 
+                                  args = (f'export FLASK_APP={server_list[idx]};flask run -h localhost -p 300{idx}',) ))
+    time.sleep(1)
+    for thread in jobs:
+        thread.start()
+    
+    for thread in jobs:
+        thread.join()
+    #########################################################
+    #                   Running Scripts                     #
+    #########################################################
