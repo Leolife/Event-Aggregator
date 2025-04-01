@@ -37,6 +37,24 @@ class UserData {
         }
     }
 
+    async getUserCalendarData() {
+        try {
+            const calendarsCollection = collection(firestore, 'calendars');
+            const calendarsSnapshot = await getDocs(calendarsCollection);
+            const fetchedCalendars = calendarsSnapshot.docs
+                .map(doc => {
+                    const data = doc.data();
+                    return { ...data };
+                })
+                // Filter to only the favorites calendar
+                .filter(calendar => calendar.uid === this.uid);
+            return fetchedCalendars
+        } catch (error) {
+            console.error("Error fetching user data:", error);
+            throw error;
+        }
+    }
+
     // Setter: Update specific fields in the user's Firestore document
     async setUserData(updatedData) {
         try {
@@ -152,6 +170,18 @@ class UserData {
     // Setter: Update the user's bio
     async setBio(newBio) {
         await this.setUserData({ bio: newBio });
+    }
+
+    // Getter: Fetch the user's calendars
+    async getCalendars() {
+        const calendarData = await this.getUserCalendarData();
+        return calendarData || [];
+    }
+
+    // Getter: Fetch the user's Favorites calendars
+    async getFavorites() {
+        const calendarData = (await this.getUserCalendarData()).filter(calendar => calendar.name === "Favorites")[0];
+        return calendarData || [];
     }
 
 }

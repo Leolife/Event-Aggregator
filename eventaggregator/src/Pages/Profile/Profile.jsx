@@ -3,7 +3,7 @@ import './Profile.css';
 import Sidebar from '../../Components/Sidebar/Sidebar';
 import headerimage from '../../assets/profile-header-image.png';
 import profileimage from '../../assets/profile-picture.png';
-import { auth } from '../../firebase'; 
+import { auth } from '../../firebase';
 import { Link } from "react-router-dom";
 import UserData from '../../utils/UserData';
 import Overlays from '../../Components/Overlays';
@@ -32,8 +32,11 @@ export const Profile = ({ sidebar }) => {
     const [profileBanner, setProfileBanner] = useState("");
     const [tempProfileBanner, setTempProfileBanner] = useState("");
 
-    const [bio, setBio] =  useState("");
-    
+    const [profileFavorites, setProfileFavorites] = useState([]);
+    const [profileCalendars, setProfileCalendars] = useState([]);
+
+    const [bio, setBio] = useState("");
+
     // modal control for editing mode
     const [modalType, setModalType] = useState('');
     const [isOpen, setIsOpen] = useState(false);
@@ -52,10 +55,15 @@ export const Profile = ({ sidebar }) => {
                 const picture = await userData.getProfilePicture();
                 const banner = await userData.getProfileBanner();
                 const userBio = await userData.getBio();
+                const userFavorites = await userData.getFavorites();
+                const userCalendars = await userData.getCalendars();
+
                 setProfileName(userName);
                 setProfilePicture(picture);
                 setProfileBanner(banner);
-                setBio(userBio)
+                setProfileFavorites(userFavorites);
+                setProfileCalendars(userCalendars);
+                setBio(userBio);
 
                 setTempProfileBanner(banner); // Initialize temp banner
                 setTempProfilePicture(picture); // Initialize temp pictire
@@ -133,7 +141,7 @@ export const Profile = ({ sidebar }) => {
     function renderTab(tab) {
         switch (tab) {
             case TABS.ABOUT:
-                return <About editMode={editMode} bio={bio} setBio={setBio} />;
+                return <About editMode={editMode} bio={bio} setBio={setBio} favorites ={profileFavorites} />;
             case TABS.USERCALENDAR:
                 return <UserCalendar />;
             case TABS.USERPOSTS:
@@ -158,32 +166,32 @@ export const Profile = ({ sidebar }) => {
                         <div className="profile-container">
                             <div className="profile-header">
                                 <div className="profile-banner">
-                                    <div className="profile-banner-sizer">                                  
-                                        <img 
-                                            className="profile-banner-image" 
-                                            src={editMode ? tempProfileBanner : profileBanner} 
-                                            alt="Profile Banner" 
+                                    <div className="profile-banner-sizer">
+                                        <img
+                                            className="profile-banner-image"
+                                            src={editMode ? tempProfileBanner : profileBanner}
+                                            alt="Profile Banner"
                                         />
                                         {editMode && (
-                                            <button 
+                                            <button
                                                 className="edit-profile-banner-button"
-                                                onClick={() => {openModal('submit-prof-ban')}}
+                                                onClick={() => { openModal('submit-prof-ban') }}
                                             >
                                                 Edit
                                             </button>
                                         )}
                                     </div>
                                     <div className="profile-picture-container">
-                                    <img 
-                                        className="profile-picture" 
-                                        src={editMode ? tempProfilePicture : profilePicture} 
-                                        alt="Profile Picture" 
-                                    />
+                                        <img
+                                            className="profile-picture"
+                                            src={editMode ? tempProfilePicture : profilePicture}
+                                            alt="Profile Picture"
+                                        />
                                         {editMode && (
-                                            <button 
-                                                className="edit-profile-picture-button" 
-                                                onClick={() => {openModal('submit-prof-pic')}
-                                            }>
+                                            <button
+                                                className="edit-profile-picture-button"
+                                                onClick={() => { openModal('submit-prof-pic') }
+                                                }>
                                                 Edit
                                             </button>
                                         )}
@@ -250,12 +258,12 @@ export const Profile = ({ sidebar }) => {
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div className="profile-tabs">
                             {Object.entries(TABS).map(([tabKey, tabName]) => (
-                                <button 
-                                    key={tabName} 
-                                    className={`tab-link ${activeTab === tabName ? 'active' : ''}`} 
+                                <button
+                                    key={tabName}
+                                    className={`tab-link ${activeTab === tabName ? 'active' : ''}`}
                                     onClick={() => setActiveTab(tabName)}
                                 >
                                     {tabName}
@@ -274,11 +282,11 @@ export const Profile = ({ sidebar }) => {
                 </div>
             </div>
 
-            <Overlays 
-                modalType={modalType} 
-                isOpen={isOpen} 
-                onClose={() => setIsOpen(false)} 
-                onSubmitBanner={handleBannerSubmit} 
+            <Overlays
+                modalType={modalType}
+                isOpen={isOpen}
+                onClose={() => setIsOpen(false)}
+                onSubmitBanner={handleBannerSubmit}
                 onSubmitPicture={handlePictureSubmit}
             />
 

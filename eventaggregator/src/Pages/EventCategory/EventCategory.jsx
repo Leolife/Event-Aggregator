@@ -31,31 +31,31 @@ export const EventCategory = ({ sidebar, user }) => {
     // State for the Add to Calendar modal
     const [isAddToCalendarModalOpen, setIsAddToCalendarModalOpen] = useState(false);
     const [selectedEvent, setSelectedEvent] = useState(null);
-    
+
     // Combined notification state for both heart actions and calendar additions
-    const [notification, setNotification] = useState({ 
-        show: false, 
-        message: '', 
-        isError: false 
+    const [notification, setNotification] = useState({
+        show: false,
+        message: '',
+        isError: false
     });
-    
+
     // State to track favorited events
     const [favoritedEvents, setFavoritedEvents] = useState([]);
 
     // Function to show notification
     const showNotification = (message, isError = false) => {
-        setNotification({ 
-            show: true, 
-            message, 
-            isError 
+        setNotification({
+            show: true,
+            message,
+            isError
         });
-        
+
         // Auto-hide notification after 3 seconds
         setTimeout(() => {
-            setNotification({ 
-                show: false, 
-                message: '', 
-                isError: false 
+            setNotification({
+                show: false,
+                message: '',
+                isError: false
             });
         }, 3000);
     };
@@ -101,17 +101,17 @@ export const EventCategory = ({ sidebar, user }) => {
             showNotification("Please log in to add events to calendars.", true);
             return;
         }
-        
+
         setSelectedEvent(event);
         setIsAddToCalendarModalOpen(true);
     };
 
     // Handler for successful calendar add (callback from modal)
     const handleCalendarAddSuccess = (calendarName) => {
-        const message = calendarName 
-            ? `Event added to "${calendarName}" calendar successfully!` 
+        const message = calendarName
+            ? `Event added to "${calendarName}" calendar successfully!`
             : "Event added to calendar successfully!";
-            
+
         showNotification(message, false);
     };
 
@@ -165,7 +165,7 @@ export const EventCategory = ({ sidebar, user }) => {
                 const city = typeof event.city === 'string' ? event.city : String(event.city || '');
                 const state = typeof event.state === 'string' ? event.state : String(event.state || '');
                 const zip = typeof event.zipcode === 'string' ? event.zipcode : String(event.zipcode || '');
-                
+
                 const parts = [address, city, state, zip].filter(part => part && part.trim && part.trim() !== '');
                 return parts.join(', ');
             };
@@ -181,12 +181,13 @@ export const EventCategory = ({ sidebar, user }) => {
                 eventType: event["event type"] || '',
                 tags: event.tags || '',
                 createdAt: new Date().toISOString(),
+                image: event.image || "https://i.scdn.co/image/ab67616d0000b273dbc606d7a57e551c5b9d4ee3"
             };
 
             // Check if the event is already in favorites by creating a simple signature
             // This is a basic check that might need to be enhanced in a production environment
             const eventSignature = `${event.title}-${event.date}`;
-            
+
             if (favoritedEvents.includes(eventSignature)) {
                 showNotification("This event is already in your favorites!");
                 return;
@@ -225,7 +226,7 @@ export const EventCategory = ({ sidebar, user }) => {
     // Fetches 10 random events from the API
     useEffect(() => {
         async function fetchEvents() {
-            const event = { NUMBER: 10 };
+            const event = { NUMBER: 5 };
             const response = await fetch("/events/random", {
                 method: "POST",
                 headers: {
@@ -234,9 +235,14 @@ export const EventCategory = ({ sidebar, user }) => {
                 body: JSON.stringify(event)
             });
             setEvents(await response.json())
+            
         }
         fetchEvents();
     }, [])
+
+    useEffect(() => {
+        console.log(events)
+    }, [events])
 
     // Grabs selected tags from the header
     useEffect(() => {
@@ -257,73 +263,73 @@ export const EventCategory = ({ sidebar, user }) => {
                     <div className="feed">
                         {events && events.length > 0 ? (
                             events
-                            .sort((a, b) => selectedSort === 1 ? new Date(a.date) - new Date(b.date) : selectedSort === 0 ? a.title.localeCompare(b.title) : 0) // If option 0, sort events alphebatically. If option 1, sort events by upcoming.
-                            .filter(x => selectedTags.length === 0 || selectedTags.some(tag => x.tags && x.tags.includes(tag.category))) // Filters the events by category tags the user has selected. If no tags are selected then displays all.
-                            .map((event, index) => (
-                                <div key={index} className="event-card">
-                                    <div className='img-sizer'>
-                                        {/* Selects a random thumbnail, will be changed later */}
-                                        <img src={thumbnails[Math.floor(Math.random() * thumbnails.length)]} alt="" />
-                                    </div>
-                                    <div className="event-content">
-                                        <div className="event-details">
-                                            <div className="event-name">
-                                                <h2> {event.title} </h2>
-                                                <div className="category-box">
-                                                    <label className="event-type"> {event["event type"]} </label>
-                                                    <div className="tag-box">
-                                                        {/* Checks if the event has tags associated with it */}
-                                                        {event.tags &&
-                                                            // Converts the tag string into a JSON object
-                                                            JSON.parse(event.tags.replace(/'/g, '"')).map((tag, index) => (
-                                                                // Displays each tag
-                                                                <div key={index} className="tag">
-                                                                    <label className="tag-name">{tag}</label>
-                                                                </div>
-                                                            ))
-                                                        }
+                                .sort((a, b) => selectedSort === 1 ? new Date(a.date) - new Date(b.date) : selectedSort === 0 ? a.title.localeCompare(b.title) : 0) // If option 0, sort events alphebatically. If option 1, sort events by upcoming.
+                                .filter(x => selectedTags.length === 0 || selectedTags.some(tag => x.tags && x.tags.includes(tag.category))) // Filters the events by category tags the user has selected. If no tags are selected then displays all.
+                                .map((event, index) => (
+                                    <div key={index} className="event-card">
+                                        <div className='img-sizer'>
+                                            {/* Selects a random thumbnail, will be changed later */}
+                                            <img src={event["image"] ? event["image"]: thumbnails[Math.floor(Math.random() * thumbnails.length)]} alt="" />
+                                        </div>
+                                        <div className="event-content">
+                                            <div className="event-details">
+                                                <div className="event-name">
+                                                    <h2> {event.title} </h2>
+                                                    <div className="category-box">
+                                                        <label className="event-type"> {event["event type"]} </label>
+                                                        <div className="tag-box">
+                                                            {/* Checks if the event has tags associated with it */}
+                                                            {event.tags &&
+                                                                // Converts the tag string into a JSON object
+                                                                JSON.parse(event.tags.replace(/'/g, '"')).map((tag, index) => (
+                                                                    // Displays each tag
+                                                                    <div key={index} className="tag">
+                                                                        <label className="tag-name">{tag}</label>
+                                                                    </div>
+                                                                ))
+                                                            }
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <div className="description-box">
-                                                <span className="description"> {event.description}  </span>
-                                            </div>
-                                            {/* Container for the date and location */}
-                                            <div className="timestamp-container">
-                                                <div className="event-date">
-                                                    <span> 📅 </span>
-                                                    <label className="date-text"> {formatDateTime(event.date)} </label>
-                                                    <div className="event-location">
-                                                        <span>📍</span>
-                                                        <label className="location-text"> {event.address1}. {event.city}, {event.state} {event.zipcode} </label>
+                                                <div className="description-box">
+                                                    <span className="description"> {event.description}  </span>
+                                                </div>
+                                                {/* Container for the date and location */}
+                                                <div className="timestamp-container">
+                                                    <div className="event-date">
+                                                        <span> 📅 </span>
+                                                        <label className="date-text"> {formatDateTime(event.date)} </label>
+                                                        <div className="event-location">
+                                                            <span>📍</span>
+                                                            <label className="location-text"> {event.address1}. {event.city}, {event.state} {event.zipcode} </label>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
 
-                                        </div>
-                                        <div className="footer">
-                                            {/* If the price is 0, display it as free */}
-                                            <label className="price"> Price: {event.price === 0 ? "Free" : `$${event.price}`} </label>
-                                            <div className="add-options">
-                                                <button 
-                                                    className="heart-btn"
-                                                    onClick={() => handleHeartClick(event)}
-                                                > 
-                                                    <HeartIcon className="heart-icon" /> 
-                                                </button>
-                                                <button 
-                                                    className="add-btn" 
-                                                    onClick={() => handleAddToCalendarClick(event)}
-                                                > 
-                                                    Add to Calendar 
-                                                </button>
-                                                <button className="export-btn"> Export (Google Calendar) </button>
-                                                <button className="save-btn"> <SaveIcon className="save-icon" /> </button>
+                                            </div>
+                                            <div className="footer">
+                                                {/* If the price is 0, display it as free */}
+                                                <label className="price"> Price: {event.price === 0 ? "Free" : `$${event.price}`} </label>
+                                                <div className="add-options">
+                                                    <button
+                                                        className="heart-btn"
+                                                        onClick={() => handleHeartClick(event)}
+                                                    >
+                                                        <HeartIcon className="heart-icon" />
+                                                    </button>
+                                                    <button
+                                                        className="add-btn"
+                                                        onClick={() => handleAddToCalendarClick(event)}
+                                                    >
+                                                        Add to Calendar
+                                                    </button>
+                                                    <button className="export-btn"> Export (Google Calendar) </button>
+                                                    <button className="save-btn"> <SaveIcon className="save-icon" /> </button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            ))
+                                ))
                         ) : (
                             // Displays an error message if the events have not loaded in
                             <label> Error Loading Events </label>

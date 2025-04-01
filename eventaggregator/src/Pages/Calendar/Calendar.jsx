@@ -209,7 +209,7 @@ export const Calendar = ({ sidebar, user }) => {
                             uid: data.uid || '',
                             isDefault: data.isDefault || false, // Include the isDefault flag
                             position: data.position || 0,
-                            timestamp: data.timestamp ? Math.floor((Date.now() - data.timestamp.toDate()) / 60000) : 0,
+                            timestamp: data.timestamp || '',
                             pinned: data.pinned || false,
                         };
                     })
