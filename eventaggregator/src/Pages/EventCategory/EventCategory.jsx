@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useParams } from 'react-router-dom'
+import { data, useParams } from 'react-router-dom'
 import './EventCategory.css';
 import Sidebar from '../../Components/Sidebar/Sidebar'
 import { ReactComponent as HeartIcon } from '../../assets/heart-icon.svg';
@@ -226,7 +226,7 @@ export const EventCategory = ({ sidebar, user }) => {
     // Fetches 10 random events from the API
     useEffect(() => {
         async function fetchEvents() {
-            const event = { NUMBER: 5 };
+            const event = { NUMBER: 10 };
             const response = await fetch("/events/random", {
                 method: "POST",
                 headers: {
@@ -234,7 +234,12 @@ export const EventCategory = ({ sidebar, user }) => {
                 },
                 body: JSON.stringify(event)
             });
-            setEvents(await response.json())
+            const data = await response.json()
+            data.map(item => (
+                item["image"] = "https://images.igdb.com/igdb/image/upload/t_1080p/" + item["image"] + ".jpg"
+            ))
+            console.log(data[0]["image"])
+            setEvents(data)
             
         }
         fetchEvents();

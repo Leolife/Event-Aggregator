@@ -20,32 +20,11 @@ class user_metrics:
 user_db = user_metrics()
 ##########################################
 games_URL = "https://api.igdb.com/v4/games"
-covers_URL = "https://api.igdb.com/v4/covers"
 headers = {
     'Content-Type': 'application/json',
     'Client-ID': 'ekp4auk5xo1dmmqdaz0a22aud0gym9',
     'Authorization': 'Bearer 56shn9khhwand5f7cd9rsdrhykdpsb'
 }
-def get_game_image(game_name):
-    query = f'search "{game_name}"; fields id, name, cover; limit 1;'
-    cover_url = "https://i.scdn.co/image/ab67616d0000b273dbc606d7a57e551c5b9d4ee3"
-    response = requests.post(games_URL, headers=headers, data=query)
-    if response.status_code != 200 or not response.json():
-        return cover_url
-    
-    game = response.json()[0]
-    cover_id = game.get('cover')
-    if not cover_id:
-        return cover_url
-    cover_query = f'fields url; where id = {cover_id};'
-
-    cover_response = requests.post(covers_URL, headers=headers, data=cover_query)
-
-    if cover_response.status_code != 200 or not cover_response.json():
-        return cover_url
-
-    cover_url = "https:" + cover_response.json()[0]['url'].replace("t_thumb", "t_1080p")
-    return cover_url
 
 @app.get("/events/random_one")
 def get_random_event():
@@ -58,8 +37,6 @@ def get_random_events():
     if request.is_json:
         n = request.get_json()['NUMBER']
         fetchedEvents =  eval(events.data.sample(n = n).to_json(orient='records'))
-        for event in fetchedEvents:
-            event["image"] = get_game_image(event["title"])
         return fetchedEvents
     return {"error": "Request must be JSON"}, 415
 
