@@ -12,7 +12,8 @@ import thumbnail5 from '../../assets/event5.jpg'
 import Header from '../../Components/Header/Header'
 import AddToCalendarModal from '../../Components/Calendar/AddToCalendarModal';
 import { auth, firestore } from '../../firebase';
-import { collection, query, where, getDocs, updateDoc, doc, arrayUnion } from 'firebase/firestore';
+import { collection, query, where, getDocs, updateDoc, doc, arrayUnion, addDoc, arrayRemove } from 'firebase/firestore';
+var hash = require('object-hash');
 
 // Takes the category name from the url and reformats it to be placed in the header
 function formatCategoryName(categoryName) {
@@ -31,6 +32,7 @@ export const EventCategory = ({ sidebar, user }) => {
     // State for the Add to Calendar modal
     const [isAddToCalendarModalOpen, setIsAddToCalendarModalOpen] = useState(false);
     const [selectedEvent, setSelectedEvent] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     // Combined notification state for both heart actions and calendar additions
     const [notification, setNotification] = useState({
@@ -86,6 +88,63 @@ export const EventCategory = ({ sidebar, user }) => {
         return `${formattedDate} @ ${formattedTime}`;
     }
 
+    // Fetch calendars from Firestore when component mounts
+    useEffect(() => {
+        const getEvents = async () => {
+            try {
+                setLoading(true);
+
+                const eventsCollection = collection(firestore, 'events');
+                const eventsSnapshot = await getDocs(eventsCollection);
+
+                const calendarsCollection = collection(firestore, "calendars");
+                const currentUser = user || auth.currentUser;
+                const q = query(
+                    calendarsCollection,
+                    where("uid", "==", currentUser.uid),
+                    where("name", "==", "Favorites"),
+                    where("isDefault", "==", true)
+                );
+                const calendarSnapshot = await getDocs(q);
+
+                const userFavorites = calendarSnapshot.docs
+                    .flatMap(doc => {
+                        const data = doc.data();
+                        const eventsData = data.eventsData || [];
+                        return eventsData.map(event => event.eventId);
+                    })
+                console.log(userFavorites)
+                setFavoritedEvents(userFavorites)
+
+                const fetchedEvents = eventsSnapshot.docs
+                    .map(doc => {
+                        const data = doc.data();
+                        console.log(userFavorites.includes(data.id), data.title, data.id)
+                        return {
+                            eventId: data.id || '',
+                            title: data.title || 'Unnamed Event',
+                            description: data.description || '',
+                            location: safeLocation(data),
+                            date: data.date || new Date().toISOString(),
+                            price: data.price != null ? data.price : 0,
+                            eventType: data.eventType || '',
+                            tags: data.tags || '',
+                            image: data.image || "https://i.scdn.co/image/ab67616d0000b273dbc606d7a57e551c5b9d4ee3",
+                            favorited: userFavorites.includes(data.id) ? false : true
+                        };
+                    })
+                setEvents(fetchedEvents);
+
+            } catch (error) {
+                console.error('Error fetching events:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        getEvents();
+    }, []);
+
     // Retrieves tags and sort options from the header
     function sendData(tags_data, sort_data) {
         setSelectedTags(tags_data)
@@ -126,6 +185,17 @@ export const EventCategory = ({ sidebar, user }) => {
         setSelectedEvent(null);
     };
 
+    const safeLocation = (event) => {
+        // Convert any non-string values to strings and then check if they're empty
+        const address = typeof event.address1 === 'string' ? event.address1 : String(event.address1 || '');
+        const city = typeof event.city === 'string' ? event.city : String(event.city || '');
+        const state = typeof event.state === 'string' ? event.state : String(event.state || '');
+        const zip = typeof event.zipcode === 'string' ? event.zipcode : String(event.zipcode || '');
+
+        const parts = [address, city, state, zip].filter(part => part && part.trim && part.trim() !== '');
+        return parts.join(', ');
+    };
+
     // Function to add event to the Favorites calendar when heart button is clicked
     const handleHeartClick = async (event) => {
         // Check if user is logged in
@@ -135,6 +205,7 @@ export const EventCategory = ({ sidebar, user }) => {
             showNotification("Please log in to add events to favorites.", true);
             return;
         }
+
 
         try {
             // Find the Favorites calendar
@@ -159,39 +230,46 @@ export const EventCategory = ({ sidebar, user }) => {
             const calendarData = calendarDoc.data();
 
             // Create event data
-            const safeLocation = () => {
-                // Convert any non-string values to strings and then check if they're empty
-                const address = typeof event.address1 === 'string' ? event.address1 : String(event.address1 || '');
-                const city = typeof event.city === 'string' ? event.city : String(event.city || '');
-                const state = typeof event.state === 'string' ? event.state : String(event.state || '');
-                const zip = typeof event.zipcode === 'string' ? event.zipcode : String(event.zipcode || '');
-
-                const parts = [address, city, state, zip].filter(part => part && part.trim && part.trim() !== '');
-                return parts.join(', ');
-            };
-
-            const eventId = `event-${Date.now()}`;
+            const eventId = event.eventId;
             const eventData = {
                 eventId: eventId,
                 title: event.title || 'Unnamed Event',
                 description: event.description || '',
-                location: safeLocation(),
+                location: safeLocation(event),
                 date: event.date || new Date().toISOString(),
                 price: event.price != null ? event.price : 0,
                 eventType: event["event type"] || '',
                 tags: event.tags || '',
-                createdAt: new Date().toISOString(),
                 image: event.image || "https://i.scdn.co/image/ab67616d0000b273dbc606d7a57e551c5b9d4ee3"
             };
 
             // Check if the event is already in favorites by creating a simple signature
             // This is a basic check that might need to be enhanced in a production environment
-            const eventSignature = `${event.title}-${event.date}`;
+            const alreadyFavorited = querySnapshot.docs.filter(doc => {
+                const eventsData = doc.data().eventsData || [];
+                return eventsData.some(event => event.eventId === eventId);
+            }).length === 1
+            if (alreadyFavorited) {
+                const eventToRemove = calendarData.eventsData.find(e => e.eventId === eventId);
 
-            if (favoritedEvents.includes(eventSignature)) {
-                showNotification("This event is already in your favorites!");
+                if (!eventToRemove) {
+                    return
+                }
+
+                // Remove the event from the eventsData array
+                await updateDoc(calendarDocRef, {
+                    eventsData: arrayRemove(eventToRemove)
+                });
+                await updateDoc(calendarDocRef, {
+                    events: Math.max((calendarData.events || 1) - 1, 0),
+                    upcoming: Math.max((calendarData.upcoming || 1) - 1, 0)
+                });
+                setFavoritedEvents(prev => prev.filter(id => id !== eventId));
+                showNotification("Event removed from favorites");
                 return;
             }
+
+
 
             // Update calendar document to include the new event
             if (!calendarData.eventsData) {
@@ -212,7 +290,7 @@ export const EventCategory = ({ sidebar, user }) => {
             });
 
             // Update the favorited events state
-            setFavoritedEvents([...favoritedEvents, eventSignature]);
+            setFavoritedEvents([...favoritedEvents, eventId]);
 
             // Show success message
             showNotification("Event added to favorites!");
@@ -223,10 +301,13 @@ export const EventCategory = ({ sidebar, user }) => {
         }
     };
 
+    useEffect(() => {
+        console.log(favoritedEvents)
+    }, [favoritedEvents])
     // Fetches 10 random events from the API
     useEffect(() => {
         async function fetchEvents() {
-            const event = { NUMBER: 10 };
+            const event = { NUMBER: 3 };
             const response = await fetch("/events/random", {
                 method: "POST",
                 headers: {
@@ -235,20 +316,39 @@ export const EventCategory = ({ sidebar, user }) => {
                 body: JSON.stringify(event)
             });
             const data = await response.json()
-            data.map(item => (
+            data.map(item => {
                 item["image"] = "https://images.igdb.com/igdb/image/upload/t_1080p/" + item["image"] + ".jpg"
-            ))
-            console.log(data[0]["image"])
-            setEvents(data)
-            
+                const eventHash = hash(item)
+                handleStoreEvent(eventHash, item)
+
+            })
+            //setEvents(data)
+
         }
         fetchEvents();
     }, [])
 
-    useEffect(() => {
-        console.log(events)
-    }, [events])
-
+    const handleStoreEvent = async (eventHash, event) => {
+        const eventsCollection = collection(firestore, "events");
+        const q = query(eventsCollection, where("id", '==', eventHash));
+        const querySnapshot = await getDocs(q);
+        if (querySnapshot.empty) {
+            const newEvent = {
+                id: eventHash,
+                title: event.title || 'Unnamed Event',
+                description: event.description || '',
+                location: safeLocation(event),
+                date: event.date || new Date().toISOString(),
+                price: event.price != null ? event.price : 0,
+                eventType: event["event type"] || '',
+                tags: event.tags || '',
+                image: event.image || "https://i.scdn.co/image/ab67616d0000b273dbc606d7a57e551c5b9d4ee3"
+            };
+            //setEvents([...events, newEvent])
+            //console.log(newEvent)
+            //await addDoc(eventsCollection, newEvent);
+        }
+    }
     // Grabs selected tags from the header
     useEffect(() => {
     }, [selectedTags, selectedSort])
@@ -268,20 +368,20 @@ export const EventCategory = ({ sidebar, user }) => {
                     <div className="feed">
                         {events && events.length > 0 ? (
                             events
-                                .sort((a, b) => selectedSort === 1 ? new Date(a.date) - new Date(b.date) : selectedSort === 0 ? a.title.localeCompare(b.title) : 0) // If option 0, sort events alphebatically. If option 1, sort events by upcoming.
+                                .sort((a, b) => selectedSort === 1 ? new Date(a.date) - new Date(b.date) : 0) // If option 0, sort events alphebatically. If option 1, sort events by upcoming.
                                 .filter(x => selectedTags.length === 0 || selectedTags.some(tag => x.tags && x.tags.includes(tag.category))) // Filters the events by category tags the user has selected. If no tags are selected then displays all.
                                 .map((event, index) => (
                                     <div key={index} className="event-card">
                                         <div className='img-sizer'>
                                             {/* Selects a random thumbnail, will be changed later */}
-                                            <img src={event["image"] ? event["image"]: thumbnails[Math.floor(Math.random() * thumbnails.length)]} alt="" />
+                                            <img src={event["image"] ? event["image"] : thumbnails[Math.floor(Math.random() * thumbnails.length)]} alt="" />
                                         </div>
                                         <div className="event-content">
                                             <div className="event-details">
                                                 <div className="event-name">
                                                     <h2> {event.title} </h2>
                                                     <div className="category-box">
-                                                        <label className="event-type"> {event["event type"]} </label>
+                                                        <label className="event-type"> {event["eventType"]} </label>
                                                         <div className="tag-box">
                                                             {/* Checks if the event has tags associated with it */}
                                                             {event.tags &&
@@ -306,7 +406,7 @@ export const EventCategory = ({ sidebar, user }) => {
                                                         <label className="date-text"> {formatDateTime(event.date)} </label>
                                                         <div className="event-location">
                                                             <span>📍</span>
-                                                            <label className="location-text"> {event.address1}. {event.city}, {event.state} {event.zipcode} </label>
+                                                            <label className="location-text"> {event.location} </label>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -317,10 +417,12 @@ export const EventCategory = ({ sidebar, user }) => {
                                                 <label className="price"> Price: {event.price === 0 ? "Free" : `$${event.price}`} </label>
                                                 <div className="add-options">
                                                     <button
-                                                        className="heart-btn"
+                                                        className={favoritedEvents.includes(event.eventId) ? 'heartfilled-btn' : 'heart-btn'}
                                                         onClick={() => handleHeartClick(event)}
                                                     >
                                                         <HeartIcon className="heart-icon" />
+                                                        {favoritedEvents.includes(event.eventId) ? 'Unfavorite' : 'Favorite'}
+
                                                     </button>
                                                     <button
                                                         className="add-btn"
