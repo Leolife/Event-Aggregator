@@ -41,6 +41,15 @@ const Sidebar = ({ sidebar }) => {
     }
   };
 
+  const handleFriendsClick = () => {
+    const auth = getAuth();
+    if (auth.currentUser) {
+      navigate('/Friends');
+    } else {
+      openModal('login')
+    }
+  };
+
   return (
     <>
       <Overlays isOpen={isOpen} modalType={modalType} onClose={() => setIsOpen(false)} />
@@ -92,7 +101,7 @@ const Sidebar = ({ sidebar }) => {
           </div>
 
           <div className="side-link">
-            <FriendIcon className="friend-icon" /><p>Friends</p>
+            <FriendIcon className="friend-icon" /><p onClick={handleFriendsClick}>Friends</p>
           </div>
         </div>
         <hr />
