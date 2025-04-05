@@ -9,6 +9,7 @@ import { onAuthStateChanged } from 'firebase/auth';
 import UserData from '../../utils/UserData';
 import DownvoteButton from '../Votes/DownvoteButton';
 import UpvoteButton from '../Votes/UpvoteButton';
+import { formatDistanceToNow } from 'date-fns';
 
 
 const FullPostView = ({ post, comments }) => {
@@ -18,6 +19,11 @@ const FullPostView = ({ post, comments }) => {
     const userData = user ? new UserData(user.uid) : null;
     const navigate = useNavigate();
     const { postId } = useParams();
+
+    const timestampInMilliseconds = post.timestamp * 60 * 1000; // Convert minutes to milliseconds
+    const date = new Date(Date.now() - timestampInMilliseconds); // Subtract to get the past date
+    const timeAgo = formatDistanceToNow(date, { addSuffix: true });
+      
 
     const handleDeletion = async (e) => {
         e.preventDefault();
@@ -91,7 +97,7 @@ const FullPostView = ({ post, comments }) => {
                     </div>
 
                     <div className="post-footer">
-                        <span className="post-time">Posted: {post.timestamp} minutes ago</span>
+                        <span className="post-time">Posted: {timeAgo} </span>
                         <div className="votes-section">
                             <div className="vote-count upvotes">
                                 <UpvoteButton postId={postId}/>
