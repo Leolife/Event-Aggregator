@@ -1,6 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Forum_post.css';
+import UpvoteButton from '../Votes/UpvoteButton';
+import DownvoteButton from '../Votes/DownvoteButton';
 
 const Forum_post = ({ postId, eventName, title, body, ownerName, timestamp, upvoteCount, downvoteCount, replyCount, thumbnailID }) => {
   const navigate = useNavigate();
@@ -40,8 +42,8 @@ const Forum_post = ({ postId, eventName, title, body, ownerName, timestamp, upvo
 
           <div className="post-stats">
             <div className="votes">
-              <span className="upvoteCount">{upvoteCount}↑</span>
-              <span className="downvoteCount">{downvoteCount}↓</span>
+              <UpvoteButton postId={postId}/>
+              <DownvoteButton postId={postId}/>
             </div>
             <div className="replyCount">
               See {replyCount} Replies

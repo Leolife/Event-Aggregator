@@ -4,6 +4,8 @@ import { auth, firestore } from '../../firebase';
 import { collection, addDoc, deleteDoc, doc, onSnapshot, query, orderBy, Timestamp } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import UserData from '../../utils/UserData';
+import ReplyUpvoteButton from '../Votes/ReplyUpvoteButton';
+import ReplyDownvoteButton from '../Votes/ReplyDownvoteButton';
 
 const Replies = ({ postId }) => {
     const [replyText, setReplyText] = useState('');
@@ -44,6 +46,8 @@ const Replies = ({ postId }) => {
                 ownerId: user.uid,
                 commentBody: replyText.trim(),
                 timestamp: Timestamp.now(),
+                upvoteCount: 0,
+                downvoteCount: 0
             };
 
             await addDoc(collection(firestore, 'forum', postId, 'replies'), replyData);
@@ -102,6 +106,10 @@ const Replies = ({ postId }) => {
                         )}
                     </div>
                     <p className="post-body">{reply.commentBody}</p>
+                    <div className="votes-section">
+                        <ReplyUpvoteButton postId={postId} replyId={reply.id}/>
+                        <ReplyDownvoteButton postId={postId} replyId={reply.id}/>
+                    </div>
                 </div>
             ))}
         </div>

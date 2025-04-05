@@ -3,50 +3,51 @@ import { getFirestore, doc, getDoc, updateDoc, increment, setDoc } from "firebas
 import DownvoteArrow from "../../assets/downvotearrow.png";
 import "./VoteButton.css";
 
-const DownvoteButton = ({ postId }) => {
+const ReplyDownvoteButton = ({ postId, replyId }) => {
   const [downvotes, setDownvotes] = useState(null);
   const db = getFirestore();
 
   useEffect(() => {
     const fetchDownvotes = async () => {
       try {
-        const postRef = doc(db, "forum", postId); // adjust collection name
-        const postSnap = await getDoc(postRef);
+        // Reference the reply document in the "replies" subcollection under the forum post
+        const replyRef = doc(db, "forum", postId, "replies", replyId);
+        const replySnap = await getDoc(replyRef);
 
-        if (postSnap.exists()) {
-          const data = postSnap.data();
+        if (replySnap.exists()) {
+          const data = replySnap.data();
           setDownvotes(data.downvoteCount || 0);
         } else {
-          console.log("No such document!");
+          console.log("No such reply!");
         }
       } catch (error) {
-        console.error("Error getting document:", error);
+        console.error("Error getting reply document:", error);
       }
     };
 
-    if (postId) fetchDownvotes();
-  }, [db, postId]);
+    if (postId && replyId) fetchDownvotes();
+  }, [db, postId, replyId]);
 
   const handleDownVote = async () => {
     try {
-      const postRef = doc(db, "forum", postId);
-      const postSnap = await getDoc(postRef);
-  
-      if (postSnap.exists()) {
-        // If document exists, increment downvoteCount
-        await updateDoc(postRef, {
+      const replyRef = doc(db, "forum", postId, "replies", replyId);
+      const replySnap = await getDoc(replyRef);
+
+      if (replySnap.exists()) {
+        // If the reply document exists, increment downvoteCount
+        await updateDoc(replyRef, {
           downvoteCount: increment(1),
         });
       } else {
-        // If document doesn't exist, create it with downvoteCount = 1
-        await setDoc(postRef, { downvoteCount: 1 });
+        // If the reply document doesn't exist, create it with downvoteCount = 1
+        await setDoc(replyRef, { downvoteCount: 1 });
       }
-  
+
       // Update UI
       setDownvotes((prev) => (prev !== null ? prev + 1 : 1));
-      console.log("Downvoted post:", postId);
+      console.log("Downvoted reply:", replyId);
     } catch (error) {
-      console.error("Error updating downvote count:", error);
+      console.error("Error updating reply downvote count:", error);
     }
   };
 
@@ -62,4 +63,4 @@ const DownvoteButton = ({ postId }) => {
   );
 };
 
-export default DownvoteButton;
+export default ReplyDownvoteButton;
