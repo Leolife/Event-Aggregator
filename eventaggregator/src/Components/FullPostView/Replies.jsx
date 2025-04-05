@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import UserData from '../../utils/UserData';
 import ReplyUpvoteButton from '../Votes/ReplyUpvoteButton';
 import ReplyDownvoteButton from '../Votes/ReplyDownvoteButton';
+import { formatDistanceToNowStrict } from 'date-fns';
 
 const Replies = ({ postId }) => {
     const [replyText, setReplyText] = useState('');
@@ -89,29 +90,34 @@ const Replies = ({ postId }) => {
                 </button>
             </div>
 
-            {replies.map((reply) => (
-                <div key={reply.id} className="comment-box">
-                    <div className="author-info">
-                        <div className="author-avatar">
-                            {reply.ownerName?.[0]?.toUpperCase() || 'U'}
+            {replies.map((reply) => {
+                const timeAgo = formatDistanceToNowStrict(reply.timestamp.toDate(), { addSuffix: true });
+
+                return (
+                    <div key={reply.id} className="comment-box">
+                        <div className="author-info">
+                            <div className="author-avatar">
+                                {reply.ownerName?.[0]?.toUpperCase() || 'U'}
+                            </div>
+                            <span>{reply.ownerName}</span>
+                            <span className="post-time">{timeAgo}</span> {/* Display time ago */}
+                            
+                            {user?.uid === reply.ownerId && (
+                                <button className="delete-post"
+                                    onClick={() => handleDeletion(reply.id, reply.ownerId)}
+                                >
+                                    Delete Reply
+                                </button>
+                            )}
                         </div>
-                        <span>{reply.ownerName}</span>
-                        <span className="post-time">{new Date(reply.timestamp?.toDate()).toLocaleString()}</span>
-                        {user?.uid === reply.ownerId && (
-                            <button className="delete-post"
-                                onClick={() => handleDeletion(reply.id, reply.ownerId)}
-                            >
-                                Delete Reply
-                            </button>
-                        )}
+                        <p className="post-body">{reply.commentBody}</p>
+                        <div className="votes-section">
+                            <ReplyUpvoteButton postId={postId} replyId={reply.id} />
+                            <ReplyDownvoteButton postId={postId} replyId={reply.id} />
+                        </div>
                     </div>
-                    <p className="post-body">{reply.commentBody}</p>
-                    <div className="votes-section">
-                        <ReplyUpvoteButton postId={postId} replyId={reply.id}/>
-                        <ReplyDownvoteButton postId={postId} replyId={reply.id}/>
-                    </div>
-                </div>
-            ))}
+                );
+            })}
         </div>
     );
 };
