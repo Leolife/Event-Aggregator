@@ -7,6 +7,8 @@ import ForumData from '../../utils/ForumData';
 import Replies from './Replies';
 import { onAuthStateChanged } from 'firebase/auth';
 import UserData from '../../utils/UserData';
+import DownvoteButton from '../Votes/DownvoteButton';
+import UpvoteButton from '../Votes/UpvoteButton';
 
 
 const FullPostView = ({ post, comments }) => {
@@ -92,10 +94,10 @@ const FullPostView = ({ post, comments }) => {
                         <span className="post-time">Posted: {post.timestamp} minutes ago</span>
                         <div className="votes-section">
                             <div className="vote-count upvotes">
-                                {post.upvoteCount} <span className="vote-arrow">↑</span>
+                                <UpvoteButton postId={postId}/>
                             </div>
                             <div className="vote-count downvotes">
-                                {post.downvoteCount} <span className="vote-arrow">↓</span>
+                                <DownvoteButton postId={postId}/>
                             </div>
                         </div>
                     </div>
