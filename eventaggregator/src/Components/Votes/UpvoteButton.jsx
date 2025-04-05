@@ -15,7 +15,7 @@ const UpvoteButton = ({ postId }) => {
 
         if (postSnap.exists()) {
           const data = postSnap.data();
-          setUpvotes(data.UpvoteCount || 0);
+          setUpvotes(data.upvoteCount || 0);
         } else {
           console.log("No such document!");
         }
