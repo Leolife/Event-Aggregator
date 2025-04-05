@@ -1,7 +1,6 @@
 from flask import Flask, request, jsonify
 
 import pandas as pd
-import requests
 ########################################## Running the Flask App
 app = Flask(__name__)
 ########################################## Event Listings
