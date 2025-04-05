@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { data, useParams } from 'react-router-dom'
+import { data, useParams, useNavigate } from 'react-router-dom'
 import './EventCategory.css';
 import Sidebar from '../../Components/Sidebar/Sidebar'
 import { ReactComponent as HeartIcon } from '../../assets/heart-icon.svg';
@@ -24,6 +24,7 @@ function formatCategoryName(categoryName) {
 }
 
 export const EventCategory = ({ sidebar, user }) => {
+    const navigate = useNavigate()
     const { categoryName } = useParams();
     const [events, setEvents] = useState([{}])
     const [selectedTags, setSelectedTags] = useState([]);
@@ -121,6 +122,7 @@ export const EventCategory = ({ sidebar, user }) => {
                         const data = doc.data();
                         console.log(userFavorites.includes(data.id), data.title, data.id)
                         return {
+                            firestoreId: doc.id || '',
                             eventId: data.id || '',
                             title: data.title || 'Unnamed Event',
                             description: data.description || '',
@@ -371,17 +373,17 @@ export const EventCategory = ({ sidebar, user }) => {
                                 .sort((a, b) => selectedSort === 1 ? new Date(a.date) - new Date(b.date) : 0) // If option 0, sort events alphebatically. If option 1, sort events by upcoming.
                                 .filter(x => selectedTags.length === 0 || selectedTags.some(tag => x.tags && x.tags.includes(tag.category))) // Filters the events by category tags the user has selected. If no tags are selected then displays all.
                                 .map((event, index) => (
-                                    <div key={index} className="event-card">
+                                    <div key={index} className="event-card" onClick={() => navigate(`/event/${event.firestoreId}`)}>
                                         <div className='img-sizer'>
                                             {/* Selects a random thumbnail, will be changed later */}
-                                            <img src={event["image"] ? event["image"] : thumbnails[Math.floor(Math.random() * thumbnails.length)]} alt="" />
+                                            <img src={event.image} alt="" />
                                         </div>
                                         <div className="event-content">
                                             <div className="event-details">
                                                 <div className="event-name">
                                                     <h2> {event.title} </h2>
                                                     <div className="category-box">
-                                                        <label className="event-type"> {event["eventType"]} </label>
+                                                        <label className="event-type"> {event.eventType} </label>
                                                         <div className="tag-box">
                                                             {/* Checks if the event has tags associated with it */}
                                                             {event.tags &&
