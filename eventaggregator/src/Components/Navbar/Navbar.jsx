@@ -111,7 +111,7 @@ const Navbar = ({ setSidebar }) => {
         <div className='nav-left flex-div'>
           <MenuIcon className="menu-icon" onClick={() => setSidebar(prev => prev === false ? true : false)} />
           <Link to={'/'}><img className='logo' src={logo} alt="" /></Link>
-          <a href={() => false} className="nav-menu-title" >Events</a>
+          <a href={() => false} className="nav-menu-title"><Link to={'/'}>Events</Link></a>
           <a href={() => false} className="nav-menu-title"><Link to={'/forum'} style={{ color: 'inherit' }}> Forum </Link></a>
           <a href={() => false} className="nav-menu-title" onClick={handleProfileClick} >Profile</a>
         </div>
