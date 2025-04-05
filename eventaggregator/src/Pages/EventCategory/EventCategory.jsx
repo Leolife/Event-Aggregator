@@ -126,7 +126,7 @@ export const EventCategory = ({ sidebar, user }) => {
                             eventId: data.id || '',
                             title: data.title || 'Unnamed Event',
                             description: data.description || '',
-                            location: safeLocation(data),
+                            location: data.location || '',
                             date: data.date || new Date().toISOString(),
                             price: data.price != null ? data.price : 0,
                             eventType: data.eventType || '',

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom';
-
+import './EventPage.css'
 import Sidebar from '../../Components/Sidebar/Sidebar'
 import { auth, firestore } from '../../firebase';
 import { collection, query, where, getDocs } from 'firebase/firestore';
@@ -32,17 +32,6 @@ export const EventPage = ({ sidebar, user }) => {
 
         return `${formattedDate} @ ${formattedTime}`;
     }
-
-    const safeLocation = (event) => {
-        // Convert any non-string values to strings and then check if they're empty
-        const address = typeof event.address1 === 'string' ? event.address1 : String(event.address1 || '');
-        const city = typeof event.city === 'string' ? event.city : String(event.city || '');
-        const state = typeof event.state === 'string' ? event.state : String(event.state || '');
-        const zip = typeof event.zipcode === 'string' ? event.zipcode : String(event.zipcode || '');
-
-        const parts = [address, city, state, zip].filter(part => part && part.trim && part.trim() !== '');
-        return parts.join(', ');
-    };
 
     useEffect(() => {
         console.log(event)
@@ -87,7 +76,7 @@ export const EventPage = ({ sidebar, user }) => {
                             eventId: data.id || '',
                             title: data.title || 'Unnamed Event',
                             description: data.description || '',
-                            location: safeLocation(data),
+                            location: data.location || '',
                             date: data.date || new Date().toISOString(),
                             price: data.price != null ? data.price : 0,
                             eventType: data.eventType || '',
@@ -113,16 +102,69 @@ export const EventPage = ({ sidebar, user }) => {
             <div className={`container ${sidebar ? "" : 'large-container'}`}>
                 {event ? (
                     <div className='event-listing'>
-                        <div className='details-section'>
-                            <div className='event-details'>
+                        <div className='event-info'>
+                            <div className='img-section'>
+                                <div className='img-sizer'>
+                                    <img src={event.image} alt="" />
+                                </div>
                             </div>
-                        </div>
-                        <div className='img-section'>
-                            <div className='img-sizer'>
-                                <img src={event.image} alt="" />
+                            <div className='event-info-section'>
+                                <div className='event-header-section'>
+                                    <h2 className='event-time'> 📅 {formatDateTime(event.date)} </h2>
+                                    <h1 className='event-title'> {event.title} </h1>
+                                    <div className='event-type-section'>
+                                        <h2 className='event-type'> {event.eventType} </h2>
+                                        <h2 className="price"> • {event.price === 0 ? "Free" : `$${event.price}`} </h2>
+                                    </div>
+                                    <div className='event-buttons'>
+                                        <div className='event-tabs'>
+                                            <button className='event-tab-btn'> About </button>
+                                            <button className='event-tab-btn'> Discussions </button>
+                                        </div>
+                                        <div className="add-options">
+                                            <button
+                                                className={favoritedEvents.includes(event.eventId) ? 'heartfilled-btn' : 'heart-btn'}
+                                                //onClick={() => handleHeartClick(event)}
+                                            >
+                                                <HeartIcon className="heart-icon" />
+                                                {favoritedEvents.includes(event.eventId) ? 'Unfavorite' : 'Favorite'}
+
+                                            </button>
+                                            <button
+                                                className="add-btn"
+                                                //onClick={() => handleAddToCalendarClick(event)}
+                                            >
+                                                Add to Calendar
+                                            </button>
+                                            <button className="export-btn"> Export (Google Calendar) </button>
+                                            <button className="save-btn"> <SaveIcon className="save-icon" /> </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <hr />
+                                <div className='event-about'>
+                                    <div className='event-description-section'>
+                                        <h1 className='event-header'> Desciption </h1>
+                                        <p className='event-description'> {event.description} </p>
+                                    </div>
+                                    <div className='event-location-section'>
+                                        <h1 className='event-header'> Location </h1>
+                                        <p className='event-location'> 📍 {event.location} </p>
+                                    </div>
+
+                                    <div className='event-buttons-section'>
+
+                                    </div>
+                                    <div className='event-tags'>
+                                        <h1> Tags </h1>
+                                    </div>
+                                </div>
                             </div>
+
                         </div>
+
                     </div>
+
                 ) : (
                     // Displays an error message if the events have not loaded in
                     <label> Error Loading Events </label>
