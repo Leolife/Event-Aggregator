@@ -6,6 +6,7 @@
     align-items: center;
     border-radius: 20px;
     margin-top: 10px;
+    cursor: pointer;
 }
 
 .event-card .event-content {
@@ -157,6 +158,32 @@
     15% { opacity: 1; }
     85% { opacity: 1; }
     100% { opacity: 0; }
+}
+
+.heart-btn .heart-icon {
+    color: white;
+    width: 25px;
+    height: 25px;
+}
+
+.heart-btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background-color: var(--secondary);
+}
+
+.heartfilled-btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background-color: pink !important;
+}
+
+.heartfilled-btn .heart-icon {
+    color: #ec77ae;
+    width: 25px;
+    height: 25px;
 }
 
 /* Add a visual effect for the heart button when clicked */

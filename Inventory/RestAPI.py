@@ -1,7 +1,6 @@
 from flask import Flask, request, jsonify
 
 import pandas as pd
-
 ########################################## Running the Flask App
 app = Flask(__name__)
 ########################################## Event Listings
@@ -19,6 +18,12 @@ class user_metrics:
         self.data = {}
 user_db = user_metrics()
 ##########################################
+games_URL = "https://api.igdb.com/v4/games"
+headers = {
+    'Content-Type': 'application/json',
+    'Client-ID': 'ekp4auk5xo1dmmqdaz0a22aud0gym9',
+    'Authorization': 'Bearer 56shn9khhwand5f7cd9rsdrhykdpsb'
+}
 
 @app.get("/events/random_one")
 def get_random_event():
@@ -30,7 +35,8 @@ def get_random_events():
     """Returns the NUMBER of n events. Expects: {NUMBER: [int]}"""
     if request.is_json:
         n = request.get_json()['NUMBER']
-        return eval(events.data.sample(n = n).to_json(orient='records'))
+        fetchedEvents =  eval(events.data.sample(n = n).to_json(orient='records'))
+        return fetchedEvents
     return {"error": "Request must be JSON"}, 415
 
 @app.get("/dump_records")

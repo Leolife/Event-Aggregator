@@ -6,6 +6,7 @@ import IndividualPostView from './Pages/Forum/IndividualPostView/IndividualPostV
 import { Profile } from './Pages/Profile/Profile';
 import { Friends } from './Pages/Profile/Friends';
 import { Forum } from './Pages/Forum/Forum';
+import { EventPage } from './Pages/Events/EventPage';
 import { EventCategory } from './Pages/EventCategory/EventCategory';
 import { Calendar } from './Pages/Calendar/Calendar';
 import { auth } from './firebase';
@@ -47,6 +48,7 @@ function App() {
         <Route path='/friends' element={ <Friends sidebar={sidebar} user={user} />} />
         <Route path='settings' element={<Settings />}/>
         <Route path='/event/category/:categoryName' element={ <EventCategory sidebar={sidebar} user={user} />} />
+        <Route path="/event/:eventId" element={<EventPage sidebar={sidebar} user = {user} />} />
         <Route path='/debug' element={<TestUserData />}/>
       </Routes>
       
