@@ -130,7 +130,11 @@
     color: #667;
 }
 
-.forum-post {
+.linkable {
     cursor: pointer;
-  }
-  
+}
+
+.profile-link:hover {
+    cursor: pointer;
+    text-decoration: underline;
+}

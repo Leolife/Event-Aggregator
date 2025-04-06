@@ -5,7 +5,7 @@ import UpvoteButton from '../Votes/UpvoteButton';
 import DownvoteButton from '../Votes/DownvoteButton';
 import { formatDistanceToNow } from 'date-fns'; // Import the necessary function
 
-const Forum_post = ({ postId, eventName, title, body, ownerName, timestamp, upvoteCount, downvoteCount, replyCount, thumbnailID }) => {
+const Forum_post = ({ postId, eventName, title, body, ownerName, ownerId, timestamp, upvoteCount, downvoteCount, replyCount, thumbnailID }) => {
   const navigate = useNavigate();
   const timestampInMilliseconds = timestamp * 60 * 1000; // Convert minutes to milliseconds
   const date = new Date(Date.now() - timestampInMilliseconds); // Subtract to get the past date
@@ -14,8 +14,8 @@ const Forum_post = ({ postId, eventName, title, body, ownerName, timestamp, upvo
 
   return (
     //Route to individual post
-    <div className="forum-post" onClick={() => navigate(`/Forum/post/${postId}`)}>
-      <div className="post-thumbnail">
+    <div className="forum-post linkable" onClick={() => navigate(`/Forum/post/${postId}`)}>
+      <div className="post-thumbnail" >
         <img src={thumbnailID || "/api/placeholder/64/64"} alt="" />
       </div>
 
@@ -26,11 +26,22 @@ const Forum_post = ({ postId, eventName, title, body, ownerName, timestamp, upvo
         </div>
         <div className="post-info">
           <div className="post-meta">
-            <span>{timeAgo} • {ownerName}</span>
+            <span> 
+              {timeAgo} • <span 
+                className="profile-link" 
+                onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(`/profile/${ownerId}`)
+                  }
+                }
+              >
+                  {ownerName}
+              </span>
+            </span>
           </div>
 
           <div className="post-stats">
-            <div className="votes">
+            <div className="votes" onClick={(e) => e.stopPropagation()}>
               <UpvoteButton postId={postId}/>
               <DownvoteButton postId={postId}/>
             </div>
