@@ -4,46 +4,80 @@ import './EventPage.css'
 import Sidebar from '../../Components/Sidebar/Sidebar'
 import { auth, firestore } from '../../firebase';
 import { collection, query, where, getDocs } from 'firebase/firestore';
-import { ReactComponent as HeartIcon } from '../../assets/heart-icon.svg';
-import { ReactComponent as SaveIcon } from '../../assets/save-icon.svg';
-
+import { formatDateTime } from '../../utils/FormatData'
+import SaveEventButtons from '../../Components/Events/SaveEventButtons';
+import AddToCalendarModal from '../../Components/Calendar/AddToCalendarModal';
+import Alert from '../../Components/Notification/Alert';
 
 export const EventPage = ({ sidebar, user }) => {
     const { eventId } = useParams();
     const [event, setEvent] = useState([{}])
     const [loading, setLoading] = useState(true);
     const [favoritedEvents, setFavoritedEvents] = useState([]);
+    // State for the Add to Calendar modal
+    const [isAddToCalendarModalOpen, setIsAddToCalendarModalOpen] = useState(false);
+    const [selectedEvent, setSelectedEvent] = useState(null);
+    // Combined notification state for both heart actions and calendar additions
+    const [notification, setNotification] = useState({
+        show: false,
+        message: '',
+        isError: false
+    });
 
-    function formatDateTime(dateString, timeZone = "America/Los_Angeles") {
-        const date = new Date(dateString + "Z"); // Ensure UTC parsing
-        const optionsDate = { weekday: "short", month: "short", day: "numeric" };
-        const optionsTime = { hour: "numeric", minute: "2-digit", hour12: true, timeZoneName: "short" };
+    // Function to show notification
+    const showNotification = (message, isError = false) => {
+        setNotification({
+            show: true,
+            message,
+            isError
+        });
 
-        // Format date
-        let formattedDate = date.toLocaleDateString("en-US", optionsDate);
-        let day = date.getDate();
+        // Auto-hide notification after 3 seconds
+        setTimeout(() => {
+            setNotification({
+                show: false,
+                message: '',
+                isError: false
+            });
+        }, 3000);
+    };
 
-        // Add ordinal suffix
-        const ordinal = (d) => (d > 3 && d < 21) ? "th" : ["st", "nd", "rd"][(d % 10) - 1] || "th";
-        formattedDate += ordinal(day);
+    // Handler for successful calendar add (callback from modal)
+    const handleCalendarAddSuccess = (calendarName) => {
+        const message = calendarName
+            ? `Event added to "${calendarName}" calendar successfully!`
+            : "Event added to calendar successfully!";
 
-        // Format time
-        let formattedTime = date.toLocaleTimeString("en-US", optionsTime);
+        showNotification(message, false);
+    };
 
-        return `${formattedDate} @ ${formattedTime}`;
+    // Handler for closing the Add to Calendar modal
+    const handleCloseModal = () => {
+        setIsAddToCalendarModalOpen(false);
+        setSelectedEvent(null);
+    };
+
+    // Handler for calendar add error (callback from modal) 
+    const handleCalendarAddError = (errorMessage) => {
+        showNotification(errorMessage || "Failed to add event to calendar.", true);
+    };
+
+    // Sets favorited events passed from SaveEventButtons component
+    const onEventHeart = (newFavoritesList) => {
+        setFavoritedEvents(newFavoritesList)
     }
 
-    useEffect(() => {
-        console.log(event)
-    }, [event])
+    // Sets selected event passed from SaveEventButtons component
+    const onEventAdd = (newSelectedEvent, newModalOpen) => {
+        setSelectedEvent(newSelectedEvent)
+        setIsAddToCalendarModalOpen(newModalOpen)
+    }
+
     useEffect(() => {
         const getEvents = async () => {
             try {
                 setLoading(true);
-
                 const eventsCollection = collection(firestore, 'events');
-
-
                 const calendarsCollection = collection(firestore, "calendars");
                 const currentUser = user || auth.currentUser;
                 const q = query(
@@ -70,9 +104,8 @@ export const EventPage = ({ sidebar, user }) => {
                 const fetchedEvents = eventsSnapshot.docs
                     .flatMap(doc => {
                         const data = doc.data();
-                        console.log(userFavorites.includes(data.id), data.title, data.id)
                         return {
-                            firestoreId: doc.id || '',
+                            id: doc.id || '',
                             eventId: data.id || '',
                             title: data.title || 'Unnamed Event',
                             description: data.description || '',
@@ -95,11 +128,12 @@ export const EventPage = ({ sidebar, user }) => {
         };
 
         getEvents();
-    }, []);
+    }, [user, eventId]);
     return (
         <>
             <Sidebar sidebar={sidebar} />
             <div className={`container ${sidebar ? "" : 'large-container'}`}>
+                <Alert notification={notification}> </Alert>
                 {event ? (
                     <div className='event-listing'>
                         <div className='event-info'>
@@ -121,24 +155,10 @@ export const EventPage = ({ sidebar, user }) => {
                                             <button className='event-tab-btn'> About </button>
                                             <button className='event-tab-btn'> Discussions </button>
                                         </div>
-                                        <div className="add-options">
-                                            <button
-                                                className={favoritedEvents.includes(event.eventId) ? 'heartfilled-btn' : 'heart-btn'}
-                                                //onClick={() => handleHeartClick(event)}
-                                            >
-                                                <HeartIcon className="heart-icon" />
-                                                {favoritedEvents.includes(event.eventId) ? 'Unfavorite' : 'Favorite'}
-
-                                            </button>
-                                            <button
-                                                className="add-btn"
-                                                //onClick={() => handleAddToCalendarClick(event)}
-                                            >
-                                                Add to Calendar
-                                            </button>
-                                            <button className="export-btn"> Export (Google Calendar) </button>
-                                            <button className="save-btn"> <SaveIcon className="save-icon" /> </button>
-                                        </div>
+                                        <SaveEventButtons user={user} event={event} favoritedEvents={favoritedEvents}
+                                            onEventHeart={(newFavoritesList) => onEventHeart(newFavoritesList)}
+                                            onEventAdd={(newSelectedEvent, newModalOpen) => onEventAdd(newSelectedEvent, newModalOpen)}
+                                            showNotification={(message, isError) => showNotification(message, isError)} />
                                     </div>
                                 </div>
                                 <hr />
@@ -150,13 +170,6 @@ export const EventPage = ({ sidebar, user }) => {
                                     <div className='event-location-section'>
                                         <h1 className='event-header'> Location </h1>
                                         <p className='event-location'> 📍 {event.location} </p>
-                                    </div>
-
-                                    <div className='event-buttons-section'>
-
-                                    </div>
-                                    <div className='event-tags'>
-                                        <h1> Tags </h1>
                                     </div>
                                 </div>
                             </div>
@@ -170,6 +183,15 @@ export const EventPage = ({ sidebar, user }) => {
                     <label> Error Loading Events </label>
                 )}
             </div>
+            {/* Add to Calendar Modal with new callback props */}
+            <AddToCalendarModal
+                isOpen={isAddToCalendarModalOpen}
+                onClose={handleCloseModal}
+                event={selectedEvent}
+                user={user || auth.currentUser}
+                onSuccess={handleCalendarAddSuccess}
+                onError={handleCalendarAddError}
+            />
         </>
     )
 }

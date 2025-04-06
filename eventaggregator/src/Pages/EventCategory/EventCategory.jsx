@@ -1,27 +1,15 @@
 import React, { useState, useEffect } from 'react'
-import { data, useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import './EventCategory.css';
 import Sidebar from '../../Components/Sidebar/Sidebar'
-import { ReactComponent as HeartIcon } from '../../assets/heart-icon.svg';
-import { ReactComponent as SaveIcon } from '../../assets/save-icon.svg';
-import thumbnail1 from '../../assets/event1.jpg'
-import thumbnail2 from '../../assets/event2.jpg'
-import thumbnail3 from '../../assets/event3.jpg'
-import thumbnail4 from '../../assets/event4.jpg'
-import thumbnail5 from '../../assets/event5.jpg'
 import Header from '../../Components/Header/Header'
 import AddToCalendarModal from '../../Components/Calendar/AddToCalendarModal';
 import { auth, firestore } from '../../firebase';
-import { collection, query, where, getDocs, updateDoc, doc, arrayUnion, addDoc, arrayRemove } from 'firebase/firestore';
+import { collection, query, where, getDocs} from 'firebase/firestore';
+import { formatCategoryName, formatDateTime, formatLocation } from '../../utils/FormatData';
+import SaveEventButtons from '../../Components/Events/SaveEventButtons';
+import Alert from '../../Components/Notification/Alert';
 var hash = require('object-hash');
-
-// Takes the category name from the url and reformats it to be placed in the header
-function formatCategoryName(categoryName) {
-    return categoryName
-        .split('-')
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(' ');
-}
 
 export const EventCategory = ({ sidebar, user }) => {
     const navigate = useNavigate()
@@ -34,6 +22,9 @@ export const EventCategory = ({ sidebar, user }) => {
     const [isAddToCalendarModalOpen, setIsAddToCalendarModalOpen] = useState(false);
     const [selectedEvent, setSelectedEvent] = useState(null);
     const [loading, setLoading] = useState(true);
+    // State to track favorited events
+    const [favoritedEvents, setFavoritedEvents] = useState([]);
+
 
     // Combined notification state for both heart actions and calendar additions
     const [notification, setNotification] = useState({
@@ -42,8 +33,6 @@ export const EventCategory = ({ sidebar, user }) => {
         isError: false
     });
 
-    // State to track favorited events
-    const [favoritedEvents, setFavoritedEvents] = useState([]);
 
     // Function to show notification
     const showNotification = (message, isError = false) => {
@@ -68,45 +57,27 @@ export const EventCategory = ({ sidebar, user }) => {
         "All",
         "Upcoming"
     ]
-    const thumbnails = [thumbnail1, thumbnail2, thumbnail3, thumbnail4, thumbnail5];
 
-    function formatDateTime(dateString, timeZone = "America/Los_Angeles") {
-        const date = new Date(dateString + "Z"); // Ensure UTC parsing
-        const optionsDate = { weekday: "short", month: "short", day: "numeric" };
-        const optionsTime = { hour: "numeric", minute: "2-digit", hour12: true, timeZoneName: "short" };
-
-        // Format date
-        let formattedDate = date.toLocaleDateString("en-US", optionsDate);
-        let day = date.getDate();
-
-        // Add ordinal suffix
-        const ordinal = (d) => (d > 3 && d < 21) ? "th" : ["st", "nd", "rd"][(d % 10) - 1] || "th";
-        formattedDate += ordinal(day);
-
-        // Format time
-        let formattedTime = date.toLocaleTimeString("en-US", optionsTime);
-
-        return `${formattedDate} @ ${formattedTime}`;
-    }
-
-    // Fetch calendars from Firestore when component mounts
+    // Fetch events from Firestore when component mounts and set user favorite events
     useEffect(() => {
         const getEvents = async () => {
             try {
                 setLoading(true);
 
-                const eventsCollection = collection(firestore, 'events');
-                const eventsSnapshot = await getDocs(eventsCollection);
-
-                const calendarsCollection = collection(firestore, "calendars");
                 const currentUser = user || auth.currentUser;
-                const q = query(
+                const eventsCollection = collection(firestore, 'events');
+                const calendarsCollection = collection(firestore, "calendars");
+                const favoritesQuery = query(
                     calendarsCollection,
                     where("uid", "==", currentUser.uid),
                     where("name", "==", "Favorites"),
                     where("isDefault", "==", true)
                 );
-                const calendarSnapshot = await getDocs(q);
+
+                const [eventsSnapshot, calendarSnapshot] = await Promise.all([
+                    getDocs(eventsCollection),
+                    getDocs(favoritesQuery)
+                ])
 
                 const userFavorites = calendarSnapshot.docs
                     .flatMap(doc => {
@@ -114,15 +85,13 @@ export const EventCategory = ({ sidebar, user }) => {
                         const eventsData = data.eventsData || [];
                         return eventsData.map(event => event.eventId);
                     })
-                console.log(userFavorites)
                 setFavoritedEvents(userFavorites)
 
                 const fetchedEvents = eventsSnapshot.docs
                     .map(doc => {
                         const data = doc.data();
-                        console.log(userFavorites.includes(data.id), data.title, data.id)
                         return {
-                            firestoreId: doc.id || '',
+                            id: doc.id || '',
                             eventId: data.id || '',
                             title: data.title || 'Unnamed Event',
                             description: data.description || '',
@@ -132,7 +101,7 @@ export const EventCategory = ({ sidebar, user }) => {
                             eventType: data.eventType || '',
                             tags: data.tags || '',
                             image: data.image || "https://i.scdn.co/image/ab67616d0000b273dbc606d7a57e551c5b9d4ee3",
-                            favorited: userFavorites.includes(data.id) ? false : true
+                            favorited: userFavorites.includes(data.id),
                         };
                     })
                 setEvents(fetchedEvents);
@@ -145,27 +114,13 @@ export const EventCategory = ({ sidebar, user }) => {
         };
 
         getEvents();
-    }, []);
+    }, [user]);
 
     // Retrieves tags and sort options from the header
     function sendData(tags_data, sort_data) {
         setSelectedTags(tags_data)
         setSelectedSort(sort_data)
     }
-
-    // Handler for opening the Add to Calendar modal
-    const handleAddToCalendarClick = (event) => {
-        // Check if user is logged in
-        const currentUser = user || auth.currentUser;
-        if (!currentUser) {
-            // Use notification instead of alert
-            showNotification("Please log in to add events to calendars.", true);
-            return;
-        }
-
-        setSelectedEvent(event);
-        setIsAddToCalendarModalOpen(true);
-    };
 
     // Handler for successful calendar add (callback from modal)
     const handleCalendarAddSuccess = (calendarName) => {
@@ -187,125 +142,17 @@ export const EventCategory = ({ sidebar, user }) => {
         setSelectedEvent(null);
     };
 
-    const safeLocation = (event) => {
-        // Convert any non-string values to strings and then check if they're empty
-        const address = typeof event.address1 === 'string' ? event.address1 : String(event.address1 || '');
-        const city = typeof event.city === 'string' ? event.city : String(event.city || '');
-        const state = typeof event.state === 'string' ? event.state : String(event.state || '');
-        const zip = typeof event.zipcode === 'string' ? event.zipcode : String(event.zipcode || '');
+    // Sets favorited events passed from SaveEventButtons component
+    const onEventHeart = (newFavoritesList) => {
+        setFavoritedEvents(newFavoritesList)
+    }
 
-        const parts = [address, city, state, zip].filter(part => part && part.trim && part.trim() !== '');
-        return parts.join(', ');
-    };
+    // Sets selected event passed from SaveEventButtons component
+    const onEventAdd = (newSelectedEvent, newModalOpen) => {
+        setSelectedEvent(newSelectedEvent)
+        setIsAddToCalendarModalOpen(newModalOpen)
+    }
 
-    // Function to add event to the Favorites calendar when heart button is clicked
-    const handleHeartClick = async (event) => {
-        // Check if user is logged in
-        const currentUser = user || auth.currentUser;
-        if (!currentUser) {
-            // User is not logged in, show notification
-            showNotification("Please log in to add events to favorites.", true);
-            return;
-        }
-
-
-        try {
-            // Find the Favorites calendar
-            const calendarsCollection = collection(firestore, 'calendars');
-            const q = query(
-                calendarsCollection,
-                where("uid", "==", currentUser.uid),
-                where("name", "==", "Favorites"),
-                where("isDefault", "==", true)
-            );
-
-            const querySnapshot = await getDocs(q);
-
-            if (querySnapshot.empty) {
-                showNotification("Favorites calendar not found. Please visit the Calendar page to set it up.", true);
-                return;
-            }
-
-            // Get the Favorites calendar document
-            const calendarDoc = querySnapshot.docs[0];
-            const calendarDocRef = doc(firestore, 'calendars', calendarDoc.id);
-            const calendarData = calendarDoc.data();
-
-            // Create event data
-            const eventId = event.eventId;
-            const eventData = {
-                eventId: eventId,
-                title: event.title || 'Unnamed Event',
-                description: event.description || '',
-                location: safeLocation(event),
-                date: event.date || new Date().toISOString(),
-                price: event.price != null ? event.price : 0,
-                eventType: event["event type"] || '',
-                tags: event.tags || '',
-                image: event.image || "https://i.scdn.co/image/ab67616d0000b273dbc606d7a57e551c5b9d4ee3"
-            };
-
-            // Check if the event is already in favorites by creating a simple signature
-            // This is a basic check that might need to be enhanced in a production environment
-            const alreadyFavorited = querySnapshot.docs.filter(doc => {
-                const eventsData = doc.data().eventsData || [];
-                return eventsData.some(event => event.eventId === eventId);
-            }).length === 1
-            if (alreadyFavorited) {
-                const eventToRemove = calendarData.eventsData.find(e => e.eventId === eventId);
-
-                if (!eventToRemove) {
-                    return
-                }
-
-                // Remove the event from the eventsData array
-                await updateDoc(calendarDocRef, {
-                    eventsData: arrayRemove(eventToRemove)
-                });
-                await updateDoc(calendarDocRef, {
-                    events: Math.max((calendarData.events || 1) - 1, 0),
-                    upcoming: Math.max((calendarData.upcoming || 1) - 1, 0)
-                });
-                setFavoritedEvents(prev => prev.filter(id => id !== eventId));
-                showNotification("Event removed from favorites");
-                return;
-            }
-
-
-
-            // Update calendar document to include the new event
-            if (!calendarData.eventsData) {
-                await updateDoc(calendarDocRef, {
-                    eventsData: [eventData]
-                });
-            } else {
-                // Add event to existing events array
-                await updateDoc(calendarDocRef, {
-                    eventsData: arrayUnion(eventData)
-                });
-            }
-
-            // Increment the events count and upcoming count
-            await updateDoc(calendarDocRef, {
-                events: (calendarData.events || 0) + 1,
-                upcoming: (calendarData.upcoming || 0) + 1
-            });
-
-            // Update the favorited events state
-            setFavoritedEvents([...favoritedEvents, eventId]);
-
-            // Show success message
-            showNotification("Event added to favorites!");
-
-        } catch (error) {
-            console.error('Error adding event to favorites:', error);
-            showNotification("Error adding to favorites. Please try again.", true);
-        }
-    };
-
-    useEffect(() => {
-        console.log(favoritedEvents)
-    }, [favoritedEvents])
     // Fetches 10 random events from the API
     useEffect(() => {
         async function fetchEvents() {
@@ -318,11 +165,10 @@ export const EventCategory = ({ sidebar, user }) => {
                 body: JSON.stringify(event)
             });
             const data = await response.json()
-            data.map(item => {
-                item["image"] = "https://images.igdb.com/igdb/image/upload/t_1080p/" + item["image"] + ".jpg"
+            data.forEach(item => {
+                item["image"] = "https://images.igdb.com/igdb/image/upload/t_1080p/" + item["image"] + ".jpg" //Attaches URL to the image ID
                 const eventHash = hash(item)
                 handleStoreEvent(eventHash, item)
-
             })
             //setEvents(data)
 
@@ -339,17 +185,18 @@ export const EventCategory = ({ sidebar, user }) => {
                 id: eventHash,
                 title: event.title || 'Unnamed Event',
                 description: event.description || '',
-                location: safeLocation(event),
+                location: formatLocation(event),
                 date: event.date || new Date().toISOString(),
                 price: event.price != null ? event.price : 0,
                 eventType: event["event type"] || '',
                 tags: event.tags || '',
                 image: event.image || "https://i.scdn.co/image/ab67616d0000b273dbc606d7a57e551c5b9d4ee3"
             };
-            //setEvents([...events, newEvent])
-            //console.log(newEvent)
-            //await addDoc(eventsCollection, newEvent);
-        }
+            /*
+            setEvents([...events, newEvent])
+            await addDoc(eventsCollection, newEvent);
+            */
+            }
     }
     // Grabs selected tags from the header
     useEffect(() => {
@@ -361,21 +208,15 @@ export const EventCategory = ({ sidebar, user }) => {
             <div className="events">
                 <Header title={formatCategoryName(categoryName)} sidebar={sidebar} sendData={sendData} options={options} />
                 <div className={`container ${sidebar ? "" : 'large-container'}`}>
-                    {/* Notification toast - moved from inside modal to parent component */}
-                    {notification.show && (
-                        <div className={`notification-toast ${notification.isError ? 'error' : 'success'}`}>
-                            {notification.message}
-                        </div>
-                    )}
+                    <Alert notification = {notification}> </Alert>
                     <div className="feed">
                         {events && events.length > 0 ? (
                             events
                                 .sort((a, b) => selectedSort === 1 ? new Date(a.date) - new Date(b.date) : 0) // If option 0, sort events alphebatically. If option 1, sort events by upcoming.
                                 .filter(x => selectedTags.length === 0 || selectedTags.some(tag => x.tags && x.tags.includes(tag.category))) // Filters the events by category tags the user has selected. If no tags are selected then displays all.
                                 .map((event, index) => (
-                                    <div key={index} className="event-card" onClick={() => navigate(`/event/${event.firestoreId}`)}>
+                                    <div key={index} className="event-card" onClick={() => navigate(`/event/${event.id}`)}>
                                         <div className='img-sizer'>
-                                            {/* Selects a random thumbnail, will be changed later */}
                                             <img src={event.image} alt="" />
                                         </div>
                                         <div className="event-content">
@@ -417,24 +258,10 @@ export const EventCategory = ({ sidebar, user }) => {
                                             <div className="footer">
                                                 {/* If the price is 0, display it as free */}
                                                 <label className="price"> Price: {event.price === 0 ? "Free" : `$${event.price}`} </label>
-                                                <div className="add-options">
-                                                    <button
-                                                        className={favoritedEvents.includes(event.eventId) ? 'heartfilled-btn' : 'heart-btn'}
-                                                        onClick={() => handleHeartClick(event)}
-                                                    >
-                                                        <HeartIcon className="heart-icon" />
-                                                        {favoritedEvents.includes(event.eventId) ? 'Unfavorite' : 'Favorite'}
-
-                                                    </button>
-                                                    <button
-                                                        className="add-btn"
-                                                        onClick={() => handleAddToCalendarClick(event)}
-                                                    >
-                                                        Add to Calendar
-                                                    </button>
-                                                    <button className="export-btn"> Export (Google Calendar) </button>
-                                                    <button className="save-btn"> <SaveIcon className="save-icon" /> </button>
-                                                </div>
+                                                <SaveEventButtons user={user} event={event} favoritedEvents={favoritedEvents}
+                                                    onEventHeart={(newFavoritesList) => onEventHeart(newFavoritesList)}
+                                                    onEventAdd={(newSelectedEvent, newModalOpen) => onEventAdd(newSelectedEvent, newModalOpen)}
+                                                    showNotification={(message, isError) => showNotification(message, isError)} />
                                             </div>
                                         </div>
                                     </div>

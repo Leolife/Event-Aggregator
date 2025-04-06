@@ -97,7 +97,7 @@ const Navbar = ({ setSidebar }) => {
   let queryRef = useRef(null);
   useEffect(() => {
     let handler = (e) => {
-      if (!queryRef.current.contains(e.target)) {
+      if (queryRef.current && !queryRef.current.contains(e.target)) {
         setActive(false);
       }
     };
@@ -173,7 +173,7 @@ const Navbar = ({ setSidebar }) => {
         </div>
 
         <div className="nav-right flex-div">
-          <Link to={'/debug'}><button class="button userdebug">UserDebug</button>
+          <Link to={'/debug'}><button className="button userdebug">UserDebug</button>
           </Link>
 
           <div className="user-login">

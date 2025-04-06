@@ -111,3 +111,11 @@
     background-color: #6b34c9;
     border: 2px solid rgba(255, 255, 255, 0.708);
 }
+
+.live-feed {
+    margin-top: 20px;
+}
+.video-container {
+    width: 320px;
+    height: 250px;
+}
