@@ -13,6 +13,7 @@ const Forum_post = ({ postId, eventName, title, body, ownerName, timestamp, upvo
   
 
   return (
+    //Route to individual post
     <div className="forum-post" onClick={() => navigate(`/Forum/post/${postId}`)}>
       <div className="post-thumbnail">
         <img src={thumbnailID || "/api/placeholder/64/64"} alt="" />
