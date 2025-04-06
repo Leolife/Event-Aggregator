@@ -63,3 +63,10 @@ def random_events():
         if num:
             return json.loads(events.db.sample(n = num).fillna(value='').to_json(orient='index')), 200
         return {'Message':'Bad Input'}, 400
+    
+@app.post("/search_idx")
+def search_idx():
+    if request.is_json:
+        incoming_request = request.get_json()
+        idx: int = int(incoming_request['IDX']) if 'IDX'  in incoming_request else None
+    return json.loads((events.db.iloc[idx].fillna(value = '').to_json(orient='index'))), 200
