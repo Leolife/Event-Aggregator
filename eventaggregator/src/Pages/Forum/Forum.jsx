@@ -46,7 +46,7 @@ export const Forum = ({ sidebar }) => {
         const voteScore = Math.log(Math.abs(post.upvoteCount - post.downvoteCount) + 1);
         const recencyScore = age / ageWeight;
 
-        return voteScore  + recencyScore
+        return voteScore + recencyScore
     }
 
     

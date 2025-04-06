@@ -29,9 +29,11 @@ const Navbar = ({ setSidebar }) => {
   const sortParam = searchParams.get('sort');
   const [events, setEvents] = useState([]);
   const [filteredEvents, setFilteredEvents] = useState([]);
+  const auth = getAuth();
 
   // Fetches event names attached to the forums
   useEffect(() => {
+    
     const loadEvents = async () => {
       const fetchedEvents = await fetchForumEvents();
       setEvents(fetchedEvents);
@@ -45,7 +47,7 @@ const Navbar = ({ setSidebar }) => {
     setIsOpen(true);
 
     // Below is Purely Debugging information for the user state (not critical for openModal)
-    const auth = getAuth();
+    
     // Check if the user is logged in before accessing uid
     if (auth.currentUser) {
       console.log("User:", auth.currentUser);
@@ -59,7 +61,7 @@ const Navbar = ({ setSidebar }) => {
 
   const handleProfileClick = () => {
     if (isLoggedIn) {
-      navigate('/profile');
+      navigate(`/profile/${auth.currentUser.uid}`);
     } else {
       openModal('login');
     }

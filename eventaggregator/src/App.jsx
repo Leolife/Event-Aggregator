@@ -44,7 +44,7 @@ function App() {
         <Route path='/forum' element={<Forum sidebar={sidebar} user={user} />}/>
         <Route path="/forum/post/:postId" element={<IndividualPostView sidebar={sidebar} />} />
         <Route path='/mycalendars' element={ <Calendar sidebar={sidebar} user={user} />} />
-        <Route path='/profile' element={ <Profile sidebar={sidebar} user={user} />} />
+        <Route path='/profile/:userId' element={ <Profile sidebar={sidebar} user={user} />} />
         <Route path='/friends' element={ <Friends sidebar={sidebar} user={user} />} />
         <Route path='settings' element={<Settings />}/>
         <Route path='/event/category/:categoryName' element={ <EventCategory sidebar={sidebar} user={user} />} />
