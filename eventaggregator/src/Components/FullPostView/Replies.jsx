@@ -1,7 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import './FullPostView.css';
 import { auth, firestore } from '../../firebase';
-import { collection, addDoc, deleteDoc, doc, onSnapshot, query, orderBy, Timestamp } from 'firebase/firestore';
+import { 
+    collection, 
+    addDoc, 
+    deleteDoc, 
+    doc, 
+    onSnapshot, 
+    query, 
+    orderBy, 
+    Timestamp, 
+    updateDoc, 
+    increment 
+} from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import UserData from '../../utils/UserData';
 import ReplyUpvoteButton from '../Votes/ReplyUpvoteButton';
@@ -52,6 +63,12 @@ const Replies = ({ postId }) => {
             };
 
             await addDoc(collection(firestore, 'forum', postId, 'replies'), replyData);
+
+            // Increment replyCount in the parent forum document
+            await updateDoc(doc(firestore, 'forum', postId), {
+                replyCount: increment(1)
+            });
+
             setReplyText('');
         } catch (error) {
             console.error('Error adding reply:', error);
@@ -69,6 +86,11 @@ const Replies = ({ postId }) => {
 
         try {
             await deleteDoc(doc(firestore, 'forum', postId, 'replies', replyId));
+
+            // Decrement replyCount in the parent forum document
+            await updateDoc(doc(firestore, 'forum', postId), {
+                replyCount: increment(-1)
+            });
         } catch (error) {
             console.error("Error deleting post:", error);
             alert("Failed to delete the post.");
@@ -100,7 +122,7 @@ const Replies = ({ postId }) => {
                                 {reply.ownerName?.[0]?.toUpperCase() || 'U'}
                             </div>
                             <span>{reply.ownerName}</span>
-                            <span className="post-time">{timeAgo}</span> {/* Display time ago */}
+                            <span className="post-time">{timeAgo}</span>
                             
                             {user?.uid === reply.ownerId && (
                                 <button className="delete-post"
