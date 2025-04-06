@@ -4,7 +4,7 @@ import Sidebar from '../../Components/Sidebar/Sidebar';
 import headerimage from '../../assets/profile-header-image.png';
 import profileimage from '../../assets/profile-picture.png';
 import { auth } from '../../firebase';
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import UserData from '../../utils/UserData';
 import Overlays from '../../Components/Overlays';
 
@@ -37,6 +37,12 @@ export const Profile = ({ sidebar }) => {
 
     const [bio, setBio] = useState("");
 
+    const { userId } = useParams();
+
+    // Determine if the current authenticated user is the owner of the profile
+    const currentUser = auth.currentUser;
+    const isOwner = currentUser && currentUser.uid === userId;
+
     // modal control for editing mode
     const [modalType, setModalType] = useState('');
     const [isOpen, setIsOpen] = useState(false);
@@ -45,33 +51,33 @@ export const Profile = ({ sidebar }) => {
         setModalType(type);
         setIsOpen(true);
     }
+
     // page setup
     useEffect(() => {
         const fetchProfileData = async () => {
             const user = auth.currentUser;
+            const userData = new UserData(userId);
+            const userName = await userData.getName();
+            const picture = await userData.getProfilePicture();
+            const banner = await userData.getProfileBanner();
+            const userBio = await userData.getBio();
+            const userFavorites = await userData.getFavorites();
+            const userCalendars = await userData.getCalendars();
+
+            setProfileName(userName);
+            setProfilePicture(picture);
+            setProfileBanner(banner);
+            setProfileFavorites(userFavorites);
+            setProfileCalendars(userCalendars);
+            setBio(userBio);
+
             if (user) {
-                const userData = new UserData(user.uid);
-                const userName = await userData.getName();
-                const picture = await userData.getProfilePicture();
-                const banner = await userData.getProfileBanner();
-                const userBio = await userData.getBio();
-                const userFavorites = await userData.getFavorites();
-                const userCalendars = await userData.getCalendars();
-
-                setProfileName(userName);
-                setProfilePicture(picture);
-                setProfileBanner(banner);
-                setProfileFavorites(userFavorites);
-                setProfileCalendars(userCalendars);
-                setBio(userBio);
-
                 setTempProfileBanner(banner); // Initialize temp banner
-                setTempProfilePicture(picture); // Initialize temp pictire
-
+                setTempProfilePicture(picture); // Initialize temp picture
             }
         };
         fetchProfileData();
-    }, []);
+    }, [userId]);
 
     // Callback to receive the new banner link from the modal
     const handleBannerSubmit = (link) => {
@@ -86,7 +92,6 @@ export const Profile = ({ sidebar }) => {
         // Optionally, close the modal here or leave that to the modal itself
         setIsOpen(false);
     };
-
 
     // Whenever the saved profileName is updated, update the temporary name
     useEffect(() => {
@@ -121,8 +126,8 @@ export const Profile = ({ sidebar }) => {
     // Global "Discard Changes" button handler: revert temp value and exit edit modes
     const handleDiscardChanges = () => {
         setTempProfileName(profileName);
-        setTempProfileBanner(profileBanner)
-        setTempProfilePicture(profilePicture)
+        setTempProfileBanner(profileBanner);
+        setTempProfilePicture(profilePicture);
         setEditMode(false);
         setEditingProfileName(false);
     };
@@ -141,7 +146,7 @@ export const Profile = ({ sidebar }) => {
     function renderTab(tab) {
         switch (tab) {
             case TABS.ABOUT:
-                return <About editMode={editMode} bio={bio} setBio={setBio} favorites ={profileFavorites} />;
+                return <About editMode={editMode} bio={bio} setBio={setBio} favorites={profileFavorites} />;
             case TABS.USERCALENDAR:
                 return <UserCalendar />;
             case TABS.USERPOSTS:
@@ -190,8 +195,8 @@ export const Profile = ({ sidebar }) => {
                                         {editMode && (
                                             <button
                                                 className="edit-profile-picture-button"
-                                                onClick={() => { openModal('submit-prof-pic') }
-                                                }>
+                                                onClick={() => { openModal('submit-prof-pic') }}
+                                            >
                                                 Edit
                                             </button>
                                         )}
@@ -240,7 +245,7 @@ export const Profile = ({ sidebar }) => {
                                     </div>
                                 </div>
                                 <div className="profile-buttons">
-                                    {!editMode && (
+                                    {!editMode && isOwner && (
                                         <button className="edit-profile-button" onClick={handleEditClick}>
                                             Edit Profile
                                         </button>
@@ -289,7 +294,6 @@ export const Profile = ({ sidebar }) => {
                 onSubmitBanner={handleBannerSubmit}
                 onSubmitPicture={handlePictureSubmit}
             />
-
         </>
     );
 };
