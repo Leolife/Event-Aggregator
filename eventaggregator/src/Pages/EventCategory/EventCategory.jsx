@@ -154,7 +154,10 @@ export const EventCategory = ({ sidebar, user }) => {
     }
 
     // Handler for opening the Add to Calendar modal
-    const handleAddToCalendarClick = (event) => {
+    const handleAddToCalendarClick = (event, e) => {
+        // stops event propagation to prevent clicking into the event via event tile
+        e.stopPropagation();
+
         // Check if user is logged in
         const currentUser = user || auth.currentUser;
         if (!currentUser) {
@@ -199,7 +202,10 @@ export const EventCategory = ({ sidebar, user }) => {
     };
 
     // Function to add event to the Favorites calendar when heart button is clicked
-    const handleHeartClick = async (event) => {
+    const handleHeartClick = async (event, e) => {
+        // stops event propagation to prevent clicking into the event via event tile
+        e.stopPropagation();
+
         // Check if user is logged in
         const currentUser = user || auth.currentUser;
         if (!currentUser) {
@@ -420,7 +426,7 @@ export const EventCategory = ({ sidebar, user }) => {
                                                 <div className="add-options">
                                                     <button
                                                         className={favoritedEvents.includes(event.eventId) ? 'heartfilled-btn' : 'heart-btn'}
-                                                        onClick={() => handleHeartClick(event)}
+                                                        onClick={(e) => handleHeartClick(event, e)}
                                                     >
                                                         <HeartIcon className="heart-icon" />
                                                         {favoritedEvents.includes(event.eventId) ? 'Unfavorite' : 'Favorite'}
@@ -428,7 +434,7 @@ export const EventCategory = ({ sidebar, user }) => {
                                                     </button>
                                                     <button
                                                         className="add-btn"
-                                                        onClick={() => handleAddToCalendarClick(event)}
+                                                        onClick={(e) => handleAddToCalendarClick(event, e)}
                                                     >
                                                         Add to Calendar
                                                     </button>
