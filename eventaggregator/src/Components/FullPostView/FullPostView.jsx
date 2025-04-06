@@ -61,12 +61,17 @@ const FullPostView = ({ post, comments }) => {
                         <div className="title-section">
                             <div className="title-left">
                                 <h1 className="post-title">{post.title}</h1>
-                                <div className="author-info">
+                                <div 
+                                    className="author-info clickable-author" 
+                                    onClick={() => navigate(`/profile/${post.ownerId}`)}
+                                    style={{ cursor: 'pointer' }}
+                                >
                                     <div className="author-avatar">
                                         {post.ownerName?.[0]?.toUpperCase() || 'U'}
                                     </div>
                                     <span>{post.ownerName}</span>
                                 </div>
+
                                 {user?.uid === post.ownerId && (
                                     <button className="delete-post" onClick={handleDeletion}>
                                         Delete Post
