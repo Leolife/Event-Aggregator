@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, Outlet } from 'react-router-dom';
 import { collection, getDocs } from 'firebase/firestore';
-import { firestore } from '../../firebase';
+import { auth, firestore } from '../../firebase';
 import thumbnail1 from '../../assets/thumbnail1.png';
 import './AddPostButton.css'
 
@@ -25,7 +25,7 @@ export const fetchForumPosts = async () => {
             upvoteCount: doc.data().upvoteCount || 0,
             downvoteCount: doc.data().downvoteCount || 0,
             replyCount: doc.data().replyCount || 0,
-            thumbnailID: doc.data().thumbnailID || thumbnail1  // using LoL as a filler image if none exists because LoL > default error pic
+            thumbnailID: doc.data().thumbnailID || thumbnail1,  // using LoL as a filler image if none exists because LoL > default error pic
         }));
 
         return forumPosts;

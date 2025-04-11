@@ -144,7 +144,7 @@ const Replies = ({ postId }) => {
                         </div>
                         <p className="post-body">{reply.commentBody}</p>
                         <div className="votes-section">
-                            <ReplyVoteControls postId={postId} replyId={reply.id} userId={user.uid} />
+                            <ReplyVoteControls postId={postId} replyId={reply.id} userId={user?.uid} />
                         </div>
                     </div>
                 );

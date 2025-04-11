@@ -24,33 +24,42 @@ const ReplyVoteControls = ({ postId, replyId, userId }) => {
       try {
         const replyRef = doc(db, "forum", postId, "replies", replyId);
         const replySnap = await getDoc(replyRef);
+
         if (replySnap.exists()) {
           const data = replySnap.data();
           setUpvotes(data.upvoteCount || 0);
           setDownvotes(data.downvoteCount || 0);
         }
 
-        const userUpvoteRef = doc(db, "users", userId, "replyUpvotes", replyId);
-        const userDownvoteRef = doc(db, "users", userId, "replyDownvotes", replyId);
-        const [upSnap, downSnap] = await Promise.all([
-          getDoc(userUpvoteRef),
-          getDoc(userDownvoteRef),
-        ]);
-        setUserUpvoted(upSnap.exists());
-        setUserDownvoted(downSnap.exists());
+        if (userId) {
+          const userUpvoteRef = doc(db, "users", userId, "reply_upvotes", replyId);
+          const userDownvoteRef = doc(db, "users", userId, "reply_downvotes", replyId);
+          const [upSnap, downSnap] = await Promise.all([
+            getDoc(userUpvoteRef),
+            getDoc(userDownvoteRef),
+          ]);
+          setUserUpvoted(upSnap.exists());
+          setUserDownvoted(downSnap.exists());
+        }
       } catch (error) {
         console.error("Error fetching reply votes:", error);
       }
     };
 
-    if (postId && replyId && userId) fetchVotes();
+    if (postId && replyId) fetchVotes();
   }, [db, postId, replyId, userId]);
 
   const handleVote = async (type) => {
+    if (!userId) {
+      alert("You must be logged in to vote.");
+      return;
+    }
+
     try {
       const replyRef = doc(db, "forum", postId, "replies", replyId);
-      const userUpvoteRef = doc(db, "users", userId, "replyUpvotes", replyId);
-      const userDownvoteRef = doc(db, "users", userId, "replyDownvotes", replyId);
+      const userUpvoteRef = doc(db, "users", userId, "reply_upvotes", replyId);
+      const userDownvoteRef = doc(db, "users", userId, "reply_downvotes", replyId);
+
       const [upSnap, downSnap] = await Promise.all([
         getDoc(userUpvoteRef),
         getDoc(userDownvoteRef),
@@ -70,7 +79,6 @@ const ReplyVoteControls = ({ postId, replyId, userId }) => {
         setDownvotes((prev) => prev - 1);
         setUserDownvoted(false);
       } else {
-        // If switching from opposite vote, remove it first
         if (isUpvote && downSnap.exists()) {
           await deleteDoc(userDownvoteRef);
           await updateDoc(replyRef, { downvoteCount: increment(-1) });
@@ -98,7 +106,7 @@ const ReplyVoteControls = ({ postId, replyId, userId }) => {
         }
       }
     } catch (error) {
-      console.error("Error handling vote:", error);
+      console.error("Error handling reply vote:", error);
     }
   };
 
