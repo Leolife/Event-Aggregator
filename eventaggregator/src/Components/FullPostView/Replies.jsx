@@ -11,7 +11,8 @@ import {
     orderBy, 
     Timestamp, 
     updateDoc, 
-    increment 
+    increment,
+    setDoc // Import setDoc for creating the document with a specific ID
 } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import UserData from '../../utils/UserData';
@@ -62,7 +63,17 @@ const Replies = ({ postId }) => {
                 downvoteCount: 0
             };
 
-            await addDoc(collection(firestore, 'forum', postId, 'replies'), replyData);
+            // Add the reply to the forum's replies subcollection
+            const replyDocRef = await addDoc(
+                collection(firestore, 'forum', postId, 'replies'),
+                replyData
+            );
+
+            // Create a new document in the user's replies subcollection with the same replyId
+            await setDoc(
+                doc(firestore, 'users', user.uid, 'replies', replyDocRef.id),
+                { timestamp: replyData.timestamp }
+            );
 
             // Increment replyCount in the parent forum document
             await updateDoc(doc(firestore, 'forum', postId), {
