@@ -16,9 +16,8 @@ import {
 } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import UserData from '../../utils/UserData';
-import ReplyUpvoteButton from '../Votes/ReplyUpvoteButton';
-import ReplyDownvoteButton from '../Votes/ReplyDownvoteButton';
 import { formatDistanceToNowStrict } from 'date-fns';
+import ReplyVoteControls from '../Votes/ReplyVoteControls';
 
 const Replies = ({ postId }) => {
     const [replyText, setReplyText] = useState('');
@@ -145,8 +144,7 @@ const Replies = ({ postId }) => {
                         </div>
                         <p className="post-body">{reply.commentBody}</p>
                         <div className="votes-section">
-                            <ReplyUpvoteButton postId={postId} replyId={reply.id} userId={user.uid}/>
-                            <ReplyDownvoteButton postId={postId} replyId={reply.id} userId={user.uid}/>
+                            <ReplyVoteControls postId={postId} replyId={reply.id} userId={user.uid} />
                         </div>
                     </div>
                 );

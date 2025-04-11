@@ -1,9 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Forum_post.css';
-import UpvoteButton from '../Votes/UpvoteButton';
-import DownvoteButton from '../Votes/DownvoteButton';
 import { formatDistanceToNow } from 'date-fns'; // Import the necessary function
+import VoteControls from '../Votes/VoteControls';
 
 const Forum_post = ({ postId, eventName, title, body, ownerName, ownerId, timestamp, upvoteCount, downvoteCount, replyCount, thumbnailID }) => {
   const navigate = useNavigate();
@@ -42,8 +41,7 @@ const Forum_post = ({ postId, eventName, title, body, ownerName, ownerId, timest
 
           <div className="post-stats">
             <div className="votes" onClick={(e) => e.stopPropagation()}>
-              <UpvoteButton postId={postId} userId={ownerId}/>
-              <DownvoteButton postId={postId} userId={ownerId}/>
+              <VoteControls postId={postId} userId={ownerId}/>
             </div>
             <div className="replyCount">
               See {replyCount} Replies
