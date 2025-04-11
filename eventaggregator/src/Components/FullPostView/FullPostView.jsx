@@ -7,9 +7,9 @@ import ForumData from '../../utils/ForumData';
 import Replies from './Replies';
 import { onAuthStateChanged } from 'firebase/auth';
 import UserData from '../../utils/UserData';
-import DownvoteButton from '../Votes/DownvoteButton';
-import UpvoteButton from '../Votes/UpvoteButton';
 import { formatDistanceToNow } from 'date-fns';
+import VoteControls from '../Votes/VoteControls';
+
 
 
 const FullPostView = ({ post, comments }) => {
@@ -104,11 +104,8 @@ const FullPostView = ({ post, comments }) => {
                     <div className="post-footer">
                         <span className="post-time">Posted: {timeAgo} </span>
                         <div className="votes-section">
-                            <div className="vote-count upvotes">
-                                <UpvoteButton postId={postId}/>
-                            </div>
-                            <div className="vote-count downvotes">
-                                <DownvoteButton postId={postId}/>
+                            <div className="vote-count">
+                                <VoteControls postId={postId} userId={user.uid}/>
                             </div>
                         </div>
                     </div>

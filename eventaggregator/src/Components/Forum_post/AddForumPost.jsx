@@ -36,7 +36,7 @@ export const AddForumPost = ({ isOpen, onClose }) => {
             downvoteCount: 0,
             replyCount: 0,
             thumbnailID: 0,
-            timestamp: new Date(),
+            timestamp: Timestamp.now(),  // use Timestamp from Firestore for consistency
             ownerId: user.uid,
             ownerName: userName || "Anonymous", // Fallback if displayName is not set
         };
@@ -48,11 +48,16 @@ export const AddForumPost = ({ isOpen, onClose }) => {
             // Create an empty "replies" subcollection by adding a placeholder doc.
             await setDoc(doc(newDocRef, 'replies', 'placeholder'), {});
 
-            await updateDoc( 
-                newDocRef, {
-                    ["postId"]: newDocRef.id,
-                }
-            )
+            // Update the new post document with its own ID for reference
+            await updateDoc(newDocRef, {
+                postId: newDocRef.id,
+            });
+
+            // Create a new document in the user's posts subcollection with the post ID and timestamp
+            await setDoc(
+                doc(firestore, 'users', user.uid, 'posts', newDocRef.id),
+                { timestamp: newPostData.timestamp }
+            );
 
             console.log("Document written with ID:", newDocRef.id);
             
@@ -62,7 +67,7 @@ export const AddForumPost = ({ isOpen, onClose }) => {
             setEventName('');
             onClose();
             
-            navigate(`/Forum/post/${newDocRef.id}`)
+            navigate(`/Forum/post/${newDocRef.id}`);
 
         } catch (error) {
             console.error("Error adding document:", error);

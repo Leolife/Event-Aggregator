@@ -11,13 +11,13 @@ import {
     orderBy, 
     Timestamp, 
     updateDoc, 
-    increment 
+    increment,
+    setDoc // Import setDoc for creating the document with a specific ID
 } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import UserData from '../../utils/UserData';
-import ReplyUpvoteButton from '../Votes/ReplyUpvoteButton';
-import ReplyDownvoteButton from '../Votes/ReplyDownvoteButton';
 import { formatDistanceToNowStrict } from 'date-fns';
+import ReplyVoteControls from '../Votes/ReplyVoteControls';
 
 const Replies = ({ postId }) => {
     const [replyText, setReplyText] = useState('');
@@ -62,7 +62,17 @@ const Replies = ({ postId }) => {
                 downvoteCount: 0
             };
 
-            await addDoc(collection(firestore, 'forum', postId, 'replies'), replyData);
+            // Add the reply to the forum's replies subcollection
+            const replyDocRef = await addDoc(
+                collection(firestore, 'forum', postId, 'replies'),
+                replyData
+            );
+
+            // Create a new document in the user's replies subcollection with the same replyId
+            await setDoc(
+                doc(firestore, 'users', user.uid, 'replies', replyDocRef.id),
+                { timestamp: replyData.timestamp }
+            );
 
             // Increment replyCount in the parent forum document
             await updateDoc(doc(firestore, 'forum', postId), {
@@ -134,8 +144,7 @@ const Replies = ({ postId }) => {
                         </div>
                         <p className="post-body">{reply.commentBody}</p>
                         <div className="votes-section">
-                            <ReplyUpvoteButton postId={postId} replyId={reply.id} />
-                            <ReplyDownvoteButton postId={postId} replyId={reply.id} />
+                            <ReplyVoteControls postId={postId} replyId={reply.id} userId={user.uid} />
                         </div>
                     </div>
                 );
