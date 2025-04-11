@@ -16,7 +16,7 @@ const FullPostView = ({ post, comments }) => {
     const [showDropdown, setShowDropdown] = useState(false);
 
     const user = auth.currentUser;
-    const userData = user ? new UserData(user.uid) : null;
+    const userData = user ? new UserData(user?.uid) : null;
     const navigate = useNavigate();
     const { postId } = useParams();
 
@@ -105,7 +105,7 @@ const FullPostView = ({ post, comments }) => {
                         <span className="post-time">Posted: {timeAgo} </span>
                         <div className="votes-section">
                             <div className="vote-count">
-                                <VoteControls postId={postId} userId={user.uid}/>
+                                <VoteControls postId={postId} userId={user?.uid}/>
                             </div>
                         </div>
                     </div>

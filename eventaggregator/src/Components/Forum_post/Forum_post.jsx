@@ -3,8 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import './Forum_post.css';
 import { formatDistanceToNow } from 'date-fns'; // Import the necessary function
 import VoteControls from '../Votes/VoteControls';
+import { auth } from '../../firebase';
 
-const Forum_post = ({ postId, eventName, title, body, ownerName, ownerId, timestamp, upvoteCount, downvoteCount, replyCount, thumbnailID }) => {
+const Forum_post = ({ postId, eventName, title, body, ownerName, ownerId, timestamp, upvoteCount, downvoteCount, replyCount, thumbnailID}) => {
+  const user = auth.currentUser
   const navigate = useNavigate();
   const timestampInMilliseconds = timestamp * 60 * 1000; // Convert minutes to milliseconds
   const date = new Date(Date.now() - timestampInMilliseconds); // Subtract to get the past date
@@ -41,7 +43,7 @@ const Forum_post = ({ postId, eventName, title, body, ownerName, ownerId, timest
 
           <div className="post-stats">
             <div className="votes" onClick={(e) => e.stopPropagation()}>
-              <VoteControls postId={postId} userId={ownerId}/>
+              <VoteControls postId={postId} userId={user?.uid}/>
             </div>
             <div className="replyCount">
               See {replyCount} Replies

@@ -29,24 +29,32 @@ const VoteControls = ({ postId, userId }) => {
           setUpvotes(data.upvoteCount || 0);
           setDownvotes(data.downvoteCount || 0);
         }
-
-        const userUpvoteRef = doc(db, "users", userId, "upvotes", postId);
-        const userDownvoteRef = doc(db, "users", userId, "downvotes", postId);
-        const [upSnap, downSnap] = await Promise.all([
-          getDoc(userUpvoteRef),
-          getDoc(userDownvoteRef),
-        ]);
-        setUserUpvoted(upSnap.exists());
-        setUserDownvoted(downSnap.exists());
+  
+        // Only fetch user-specific voting state if user is logged in
+        if (userId) {
+          const userUpvoteRef = doc(db, "users", userId, "upvotes", postId);
+          const userDownvoteRef = doc(db, "users", userId, "downvotes", postId);
+          const [upSnap, downSnap] = await Promise.all([
+            getDoc(userUpvoteRef),
+            getDoc(userDownvoteRef),
+          ]);
+          setUserUpvoted(upSnap.exists());
+          setUserDownvoted(downSnap.exists());
+        }
       } catch (error) {
         console.error("Error fetching post votes:", error);
       }
     };
-
-    if (postId && userId) fetchVotes();
+  
+    if (postId) fetchVotes();
   }, [db, postId, userId]);
 
   const handleVote = async (type) => {
+    if (!userId) {
+        alert("You must be logged in to vote.");
+        return;
+    }
+
     try {
       const postRef = doc(db, "forum", postId);
       const userUpvoteRef = doc(db, "users", userId, "upvotes", postId);
