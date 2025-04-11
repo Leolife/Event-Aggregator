@@ -30,8 +30,8 @@ const VoteControls = ({ postId, userId }) => {
           setDownvotes(data.downvoteCount || 0);
         }
 
-        const userUpvoteRef = doc(db, "users", userId, "postUpvotes", postId);
-        const userDownvoteRef = doc(db, "users", userId, "postDownvotes", postId);
+        const userUpvoteRef = doc(db, "users", userId, "upvotes", postId);
+        const userDownvoteRef = doc(db, "users", userId, "downvotes", postId);
         const [upSnap, downSnap] = await Promise.all([
           getDoc(userUpvoteRef),
           getDoc(userDownvoteRef),
@@ -49,8 +49,8 @@ const VoteControls = ({ postId, userId }) => {
   const handleVote = async (type) => {
     try {
       const postRef = doc(db, "forum", postId);
-      const userUpvoteRef = doc(db, "users", userId, "postUpvotes", postId);
-      const userDownvoteRef = doc(db, "users", userId, "postDownvotes", postId);
+      const userUpvoteRef = doc(db, "users", userId, "upvotes", postId);
+      const userDownvoteRef = doc(db, "users", userId, "downvotes", postId);
       const [upSnap, downSnap] = await Promise.all([
         getDoc(userUpvoteRef),
         getDoc(userDownvoteRef),
