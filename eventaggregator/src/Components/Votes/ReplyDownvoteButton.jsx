@@ -1,16 +1,25 @@
 import React, { useEffect, useState } from "react";
-import { getFirestore, doc, getDoc, updateDoc, increment, setDoc } from "firebase/firestore";
-import DownvoteArrow from "../../assets/downvotearrow.png";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  updateDoc,
+  increment,
+  setDoc,
+  deleteDoc,
+} from "firebase/firestore";
+import DownvoteArrow from "../../assets/downvotearrow.png";  // Ensure correct path to your icon
 import "./VoteButton.css";
 
-const ReplyDownvoteButton = ({ postId, replyId }) => {
+const ReplyDownvoteButton = ({ postId, replyId, userId }) => {
   const [downvotes, setDownvotes] = useState(null);
+  const [userDownvoted, setUserDownvoted] = useState(false);
   const db = getFirestore();
 
   useEffect(() => {
-    const fetchDownvotes = async () => {
+    const fetchVotes = async () => {
       try {
-        // Reference the reply document in the "replies" subcollection under the forum post
+        // Reference the reply document from the forum post's "replies" subcollection
         const replyRef = doc(db, "forum", postId, "replies", replyId);
         const replySnap = await getDoc(replyRef);
 
@@ -20,32 +29,51 @@ const ReplyDownvoteButton = ({ postId, replyId }) => {
         } else {
           console.log("No such reply!");
         }
+
+        // Check if the user has already downvoted this reply.
+        const userDownvoteRef = doc(db, "users", userId, "replyDownvotes", replyId);
+        const userDownvoteSnap = await getDoc(userDownvoteRef);
+        setUserDownvoted(userDownvoteSnap.exists());
       } catch (error) {
-        console.error("Error getting reply document:", error);
+        console.error("Error fetching reply downvotes:", error);
       }
     };
 
-    if (postId && replyId) fetchDownvotes();
-  }, [db, postId, replyId]);
+    if (postId && replyId && userId) {
+      fetchVotes();
+    }
+  }, [db, postId, replyId, userId]);
 
   const handleDownVote = async () => {
     try {
       const replyRef = doc(db, "forum", postId, "replies", replyId);
-      const replySnap = await getDoc(replyRef);
+      const userDownvoteRef = doc(db, "users", userId, "replyDownvotes", replyId);
+      const userUpvoteRef = doc(db, "users", userId, "replyUpvotes", replyId);
 
-      if (replySnap.exists()) {
-        // If the reply document exists, increment downvoteCount
-        await updateDoc(replyRef, {
-          downvoteCount: increment(1),
-        });
+      // Check the user's current vote status
+      const userDownvoteSnap = await getDoc(userDownvoteRef);
+      const userUpvoteSnap = await getDoc(userUpvoteRef);
+
+      if (userDownvoteSnap.exists()) {
+        // Remove the downvote if it already exists.
+        await deleteDoc(userDownvoteRef);
+        await updateDoc(replyRef, { downvoteCount: increment(-1) });
+        setDownvotes((prev) => (prev !== null ? prev - 1 : 0));
+        setUserDownvoted(false);
+        console.log("Removed downvote for reply:", replyId);
       } else {
-        // If the reply document doesn't exist, create it with downvoteCount = 1
-        await setDoc(replyRef, { downvoteCount: 1 });
+        // If an upvote exists, remove it first.
+        if (userUpvoteSnap.exists()) {
+          await deleteDoc(userUpvoteRef);
+          await updateDoc(replyRef, { upvoteCount: increment(-1) });
+        }
+        // Then apply the downvote.
+        await setDoc(userDownvoteRef, { downvotedAt: new Date() }, { merge: true });
+        await updateDoc(replyRef, { downvoteCount: increment(1) });
+        setDownvotes((prev) => (prev !== null ? prev + 1 : 1));
+        setUserDownvoted(true);
+        console.log("Downvoted reply:", replyId);
       }
-
-      // Update UI
-      setDownvotes((prev) => (prev !== null ? prev + 1 : 1));
-      console.log("Downvoted reply:", replyId);
     } catch (error) {
       console.error("Error updating reply downvote count:", error);
     }
@@ -55,7 +83,10 @@ const ReplyDownvoteButton = ({ postId, replyId }) => {
     <div>
       <div className="vote-count downvotes">
         <p>{downvotes !== null ? downvotes : "0"}</p>
-        <button className="vote-button down" onClick={handleDownVote}>
+        <button
+          className={`vote-button down ${userDownvoted ? "active" : ""}`}
+          onClick={handleDownVote}
+        >
           <img src={DownvoteArrow} alt="Downvote" className="vote-icon down" />
         </button>
       </div>

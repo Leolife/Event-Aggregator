@@ -134,8 +134,8 @@ const Replies = ({ postId }) => {
                         </div>
                         <p className="post-body">{reply.commentBody}</p>
                         <div className="votes-section">
-                            <ReplyUpvoteButton postId={postId} replyId={reply.id} />
-                            <ReplyDownvoteButton postId={postId} replyId={reply.id} />
+                            <ReplyUpvoteButton postId={postId} replyId={reply.id} userId={user.uid}/>
+                            <ReplyDownvoteButton postId={postId} replyId={reply.id} userId={user.uid}/>
                         </div>
                     </div>
                 );

@@ -1,16 +1,25 @@
 import React, { useEffect, useState } from "react";
-import { getFirestore, doc, getDoc, updateDoc, increment, setDoc } from "firebase/firestore";
-import UpvoteArrow from "../../assets/upvotearrow.png";  // Replace with your upvote icon
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  updateDoc,
+  increment,
+  setDoc,
+  deleteDoc,
+} from "firebase/firestore";
+import UpvoteArrow from "../../assets/upvotearrow.png";  // Ensure correct path to your icon
 import "./VoteButton.css";
 
-const ReplyUpvoteButton = ({ postId, replyId }) => {
+const ReplyUpvoteButton = ({ postId, replyId, userId }) => {
   const [upvotes, setUpvotes] = useState(null);
+  const [userUpvoted, setUserUpvoted] = useState(false);
   const db = getFirestore();
 
   useEffect(() => {
-    const fetchUpvotes = async () => {
+    const fetchVotes = async () => {
       try {
-        // Reference the reply document in the "replies" subcollection under the forum post
+        // Reference the reply document from the forum post's "replies" subcollection
         const replyRef = doc(db, "forum", postId, "replies", replyId);
         const replySnap = await getDoc(replyRef);
 
@@ -20,32 +29,51 @@ const ReplyUpvoteButton = ({ postId, replyId }) => {
         } else {
           console.log("No such reply!");
         }
+
+        // Check if the user has already upvoted this reply.
+        const userUpvoteRef = doc(db, "users", userId, "replyUpvotes", replyId);
+        const userUpvoteSnap = await getDoc(userUpvoteRef);
+        setUserUpvoted(userUpvoteSnap.exists());
       } catch (error) {
-        console.error("Error getting reply document:", error);
+        console.error("Error fetching reply upvotes:", error);
       }
     };
 
-    if (postId && replyId) fetchUpvotes();
-  }, [db, postId, replyId]);
+    if (postId && replyId && userId) {
+      fetchVotes();
+    }
+  }, [db, postId, replyId, userId]);
 
   const handleUpVote = async () => {
     try {
       const replyRef = doc(db, "forum", postId, "replies", replyId);
-      const replySnap = await getDoc(replyRef);
+      const userUpvoteRef = doc(db, "users", userId, "replyUpvotes", replyId);
+      const userDownvoteRef = doc(db, "users", userId, "replyDownvotes", replyId);
 
-      if (replySnap.exists()) {
-        // If the reply document exists, increment upvoteCount
-        await updateDoc(replyRef, {
-          upvoteCount: increment(1),
-        });
+      // Check the user's current vote status
+      const userUpvoteSnap = await getDoc(userUpvoteRef);
+      const userDownvoteSnap = await getDoc(userDownvoteRef);
+
+      if (userUpvoteSnap.exists()) {
+        // Remove the upvote if already exists.
+        await deleteDoc(userUpvoteRef);
+        await updateDoc(replyRef, { upvoteCount: increment(-1) });
+        setUpvotes((prev) => (prev !== null ? prev - 1 : 0));
+        setUserUpvoted(false);
+        console.log("Removed upvote for reply:", replyId);
       } else {
-        // If the reply document doesn't exist, create it with upvoteCount = 1
-        await setDoc(replyRef, { upvoteCount: 1 });
+        // If a downvote exists, remove it first.
+        if (userDownvoteSnap.exists()) {
+          await deleteDoc(userDownvoteRef);
+          await updateDoc(replyRef, { downvoteCount: increment(-1) });
+        }
+        // Now apply the upvote.
+        await setDoc(userUpvoteRef, { upvotedAt: new Date() }, { merge: true });
+        await updateDoc(replyRef, { upvoteCount: increment(1) });
+        setUpvotes((prev) => (prev !== null ? prev + 1 : 1));
+        setUserUpvoted(true);
+        console.log("Upvoted reply:", replyId);
       }
-
-      // Update UI
-      setUpvotes((prev) => (prev !== null ? prev + 1 : 1));
-      console.log("Upvoted reply:", replyId);
     } catch (error) {
       console.error("Error updating reply upvote count:", error);
     }
@@ -55,7 +83,10 @@ const ReplyUpvoteButton = ({ postId, replyId }) => {
     <div>
       <div className="vote-count upvotes">
         <p>{upvotes !== null ? upvotes : "0"}</p>
-        <button className="vote-button up" onClick={handleUpVote}>
+        <button
+          className={`vote-button up ${userUpvoted ? "active" : ""}`}
+          onClick={handleUpVote}
+        >
           <img src={UpvoteArrow} alt="Upvote" className="vote-icon up" />
         </button>
       </div>

@@ -105,10 +105,10 @@ const FullPostView = ({ post, comments }) => {
                         <span className="post-time">Posted: {timeAgo} </span>
                         <div className="votes-section">
                             <div className="vote-count upvotes">
-                                <UpvoteButton postId={postId}/>
+                                <UpvoteButton postId={postId} userId={user.uid}/>
                             </div>
                             <div className="vote-count downvotes">
-                                <DownvoteButton postId={postId}/>
+                                <DownvoteButton postId={postId} userId={user.uid}/>
                             </div>
                         </div>
                     </div>

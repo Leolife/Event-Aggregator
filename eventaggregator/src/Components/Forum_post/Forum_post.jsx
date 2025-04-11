@@ -42,8 +42,8 @@ const Forum_post = ({ postId, eventName, title, body, ownerName, ownerId, timest
 
           <div className="post-stats">
             <div className="votes" onClick={(e) => e.stopPropagation()}>
-              <UpvoteButton postId={postId}/>
-              <DownvoteButton postId={postId}/>
+              <UpvoteButton postId={postId} userId={ownerId}/>
+              <DownvoteButton postId={postId} userId={ownerId}/>
             </div>
             <div className="replyCount">
               See {replyCount} Replies
