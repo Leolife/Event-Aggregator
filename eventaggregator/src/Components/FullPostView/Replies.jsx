@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './FullPostView.css';
 import { auth, firestore } from '../../firebase';
-import { collection, addDoc, deleteDoc, doc, onSnapshot, query, orderBy, Timestamp } from 'firebase/firestore';
+import { collection, addDoc, deleteDoc, doc, onSnapshot, query, orderBy, Timestamp, setDoc, updateDoc, increment } from 'firebase/firestore';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import UserData from '../../utils/UserData';
 import { formatDistanceToNowStrict } from 'date-fns';
