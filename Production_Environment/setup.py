@@ -61,22 +61,33 @@ if __name__ == '__main__':
     # -- Obtain the path for each server
     prod_env       = os.path.join(default_path,'Production_Environment')
     server_dir     = os.path.join(prod_env,'Servers')
+
+    # Under Servers Directory
     collectors_dir = os.path.join(server_dir,'Collectors')
+    front_dir      = os.path.join(server_dir,'Front Server') 
 
     # Under Collectors Direcrtory
     events_dir   = os.path.join(collectors_dir,'Events')
     userbase_dir = os.path.join(collectors_dir, 'UserBase')
 
+    # Under Front Direcrtory
+    ...
+
     server_list = {
                    'EventsDB_API.py': {
                        'DIR' : events_dir,
                        'IP'  : '0.0.0.0',
-                       'PORT': '5000'
+                       'PORT': '5001'
                         },
                    'UserBase_API.py': {
                        'DIR' : userbase_dir,
                        'IP'  : '0.0.0.0',
-                       'PORT': '5001'
+                       'PORT': '5002'
+                        },
+                    'main_server.py': {
+                       'DIR' : front_dir,
+                       'IP'  : '0.0.0.0',
+                       'PORT': '5000'
                         }
                    }
     #########################################################
@@ -99,5 +110,6 @@ if __name__ == '__main__':
 
     # Test
     os.chdir(prod_env)
-    input("Press Enter to Disable")
+    time.sleep(2)
+    input("Press Enter to Shutdown")
     run_cmd(['python','shutdown.py'])

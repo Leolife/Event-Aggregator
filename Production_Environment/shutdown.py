@@ -11,7 +11,7 @@ if __name__ == '__main__':
     events_path     = os.path.join(collectors_path,'Events')
 
     processes = [entry for entry in run_cmd(cmd = ['ps']).split('\n') if '.venv/bin/flask' in entry]
-    assert(len(processes)) == 2
+    assert(len(processes)) == 3
     t = [p.split()[0] for p in processes]
     t = list(map(int,t))
     for p in t:
