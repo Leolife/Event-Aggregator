@@ -1,23 +1,11 @@
 """
 Required Features:
-- Obtain the metrics of a particular user
-- Search by multiple criteria. (email)
 - 
 """
 from flask       import Flask, request, jsonify
 from Levenshtein import ratio
 
-import random
-import json
 import os
-
-def set_default_path(directory: str | None = 'Event-Aggregator') -> str:
-    """Changes the working directory to Event-Aggregator"""
-    while not os.getcwd().endswith(directory):
-        os.chdir('..')
-        if len(os.getcwd()) == 0:
-            raise FileExistsError
-    return os.getcwd()
 
 ########################################## Run the Flask App
 app = Flask(__name__)
@@ -25,7 +13,7 @@ app = Flask(__name__)
 @app.get("/num_users")
 def return_features():
     """Needs to return dtypes as well."""
-    return len(UserBase.users.keys())
+    return None
 
 @app.post("/search")
 def search_func():
@@ -41,9 +29,8 @@ def search_func():
 def random_events():
     if request.is_json:
         incoming_request = request.get_json()
-        num: int = incoming_request['NUMBER']  if 'NUMBER'  in incoming_request else None
-    selected_users = random.choices(population=list(UserBase.users.keys()), k = num)
-    return {u:UserBase.users[u] for u in selected_users}
+        # num: int = incoming_request['NUMBER']  if 'NUMBER'  in incoming_request else None
+    ...
 
 @app.post("/user_base_o")
 def user_base_o():

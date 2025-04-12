@@ -5,6 +5,7 @@ NC='\033[0m' # No Color
 ###################################################
 #             Dir in Event-Aggregator             #
 ###################################################
+cd ..
 mypath=$(pwd)
 echo Working Dir: $mypath
 #read -p "Please make sure that the working directory is in Event Aggregator. Continue? (Y/N): " confirm && [[ $confirm == [yY] || $confirm == [yY][eE][sS] ]] || exit 1
@@ -24,4 +25,5 @@ fi
 ###################################################
 #               Run Setup.py in venv              #
 ###################################################
+cd Production_Environment
 python3 setup.py $mypath

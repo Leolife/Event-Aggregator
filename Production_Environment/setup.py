@@ -8,6 +8,14 @@ import time
 import sys
 import os
 
+def set_default_path(directory: str | None = 'Event-Aggregator') -> str:
+    """Changes the working directory to """
+    while not os.getcwd().endswith(directory):
+        os.chdir('..')
+        if len(os.getcwd()) == 0:
+            raise FileExistsError
+    return os.getcwd()
+
 def run_cmd(cmd: list[str]) -> str:
     return subprocess.run(cmd, stdout=subprocess.PIPE).stdout.decode('utf-8')
 
@@ -23,12 +31,12 @@ if __name__ == '__main__':
     #               Validating Libraries                    #
     #########################################################
     with open('requiremnts.txt', mode = 'r') as f:
-        required_lib = [lib.strip() for lib in f.readlines()]
+        required_libs = [lib.strip() for lib in f.readlines()]
 
     print(f'{"Libraries":<22}{"State":<15}')
     print(f'{"-"*20:<15} {"-"*10:<15}')
     
-    for l in required_lib:
+    for l in required_libs:
         if l in libs:
             print(f'{l:<22}{IGreen}Installed{White}')
         else:
@@ -42,15 +50,35 @@ if __name__ == '__main__':
     from tqdm        import tqdm
     
     #########################################################
-    #         Obtain all the working dir                    #
+    #               Obtain the working dir                  #
     #########################################################
-    assert(len(sys.argv)) == 2
-    _, default_path = sys.argv
-    # -- Obtain the path for each 
-    prod_env = os.path.join(default_path,'Production_Environment')
-    server_dir = os.path.join(prod_env,'Server')
+    #assert(len(sys.argv)) == 2
+    #_, default_path = sys.argv
+    set_default_path()
+    default_path = os.getcwd()
+    assert(default_path.endswith('Event-Aggregator'))
+    assert(os.path.isdir(default_path))
+    # -- Obtain the path for each server
+    prod_env       = os.path.join(default_path,'Production_Environment')
+    server_dir     = os.path.join(prod_env,'Servers')
+    collectors_dir = os.path.join(server_dir,'Collectors')
 
-    server_list = [os.path.join(server_dir,'db_API.py')]
+    # Under Collectors Direcrtory
+    events_dir   = os.path.join(collectors_dir,'Events')
+    userbase_dir = os.path.join(collectors_dir, 'UserBase')
+
+    server_list = {
+                   'EventsDB_API.py': {
+                       'DIR' : events_dir,
+                       'IP'  : '0.0.0.0',
+                       'PORT': '5000'
+                        },
+                   'UserBase_API.py': {
+                       'DIR' : userbase_dir,
+                       'IP'  : '0.0.0.0',
+                       'PORT': '5001'
+                        }
+                   }
     #########################################################
     #         Add Environment to working path               #
     #########################################################
@@ -58,17 +86,18 @@ if __name__ == '__main__':
     #########################################################
     #                   Running Scripts                     #
     #########################################################
-    colors = ["BLACK", "RED", "GREEN", "YELLOW", "BLUE", "MAGENTA", "CYAN", "WHITE"]
-    jobs = []
-    for idx in tqdm(range(len(server_list)),colour=random.choice(colors)): #hex (#00ff00),
-        jobs.append(threading.Thread(target=os.system, 
-                                  args = (f'export FLASK_APP={server_list[idx]};flask run -h localhost -p 300{idx}',) ))
-    time.sleep(1)
-    for thread in jobs:
-        thread.start()
-    
-    for thread in jobs:
-        thread.join()
-    #########################################################
-    #                   Running Scripts                     #
-    #########################################################
+    colors = ["RED", "GREEN", "YELLOW", "BLUE", "MAGENTA", "CYAN", "WHITE"]
+    for (FileName,config) in tqdm((server_list.items()), colour=random.choice(colors) , bar_format='{l_bar}{bar:10}{r_bar}{bar:-10b}'): #hex (#00ff00),
+        
+        dir_path = config['DIR']
+        assert(os.path.isdir(dir_path))
+        os.chdir(dir_path)
+        ip_address = config['IP']
+        port = config['PORT']
+
+        subprocess.Popen([f'export FLASK_APP={FileName}; flask run --host {ip_address} --port {port}'], shell=True)
+
+    # Test
+    os.chdir(prod_env)
+    input("Press Enter to Disable")
+    run_cmd(['python','shutdown.py'])
