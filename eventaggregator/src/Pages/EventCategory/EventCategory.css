@@ -140,17 +140,17 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     animation: fadeInOut 3s ease-in-out;
     text-align: center;
-    background-color: #3ed0e4;
+    background-color: var(--secondary);
     color: white;
 }
 
 .notification-toast.success {
-    background-color: #3ed0e4;
+    background-color: var(--secondary);
     border-color: black;
 }
 
 .notification-toast.error {
-    background-color: #3ed0e4;
+    background-color: red;
 }
 
 @keyframes fadeInOut {

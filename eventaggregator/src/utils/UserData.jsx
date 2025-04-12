@@ -8,7 +8,6 @@ class UserData {
         }
         this.uid = uid;
         this.userRef = doc(firestore, "users", this.uid); // Direct reference using UID as document ID
-        console.log(this.userRef)
     }
 
     // Getter: Fetch user data from Firestore
@@ -37,17 +36,17 @@ class UserData {
         }
     }
 
+    // Getter: Fetch user calendar data from Firestore
     async getUserCalendarData() {
         try {
             const calendarsCollection = collection(firestore, 'calendars');
-            const calendarsSnapshot = await getDocs(calendarsCollection);
+            const userCalendarsQuery = query(calendarsCollection, where ('uid', '==', this.uid))
+            const calendarsSnapshot = await getDocs(userCalendarsQuery);
             const fetchedCalendars = calendarsSnapshot.docs
-                .map(doc => {
-                    const data = doc.data();
-                    return { ...data };
-                })
-                // Filter to only the favorites calendar
-                .filter(calendar => calendar.uid === this.uid);
+                .map(doc => ({
+                    firestoreId: doc.id, 
+                    ...doc.data(),
+                }));
             return fetchedCalendars
         } catch (error) {
             console.error("Error fetching user data:", error);

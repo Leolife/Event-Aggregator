@@ -72,6 +72,7 @@ const Calendar_layout = ({ calendarTitle, calendarId, onChangeMonth, onDelete, i
                     eventType: event.eventType || '',
                     originalDate: event.date // Keep the original date string
                 }));
+                console.log(formattedEvents)
                 
                 setCalendarEvents(formattedEvents);
                 

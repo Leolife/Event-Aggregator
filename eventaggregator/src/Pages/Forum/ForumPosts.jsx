@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, Outlet } from 'react-router-dom';
-import { collection, getDocs } from 'firebase/firestore';
-import { auth, firestore } from '../../firebase';
+import { collection, getDocs, collectionGroup, query, where } from 'firebase/firestore';
+import { firestore } from '../../firebase';
 import thumbnail1 from '../../assets/thumbnail1.png';
 import './AddPostButton.css'
 
@@ -35,6 +35,18 @@ export const fetchForumPosts = async () => {
     }
 };
 
+export const fetchReplies = async () => {
+    try {
+        const repliesCollection = collectionGroup(firestore, 'replies');
+        const repliesSnap = await getDocs(repliesCollection);
+        const replies = repliesSnap.docs.map(doc => ({ ...doc.data() })).filter(reply => reply.commentBody);
+        return replies
+    } catch (error) {
+        console.error("Error fetching comments:", error);
+        return [];
+    }
+}
+
 // fetches just the event names attached to the post so that they can be searched in the search bar 
 export const fetchForumEvents = async () => {
     try {
@@ -65,11 +77,11 @@ export const Forum = () => {
             navigate('/forum/recommended');
         }
     }, [navigate]);
-    
+
     if (loading) {
         return <div>Loading forum posts...</div>;
     }
-    
+
     return <Outlet />;
 }
 

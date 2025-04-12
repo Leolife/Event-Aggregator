@@ -1,20 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import './FullPostView.css';
 import { auth, firestore } from '../../firebase';
-import { 
-    collection, 
-    addDoc, 
-    deleteDoc, 
-    doc, 
-    onSnapshot, 
-    query, 
-    orderBy, 
-    Timestamp, 
-    updateDoc, 
-    increment,
-    setDoc // Import setDoc for creating the document with a specific ID
-} from 'firebase/firestore';
-import { useNavigate } from 'react-router-dom';
+import { collection, addDoc, deleteDoc, doc, onSnapshot, query, orderBy, Timestamp } from 'firebase/firestore';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import UserData from '../../utils/UserData';
 import { formatDistanceToNowStrict } from 'date-fns';
 import ReplyVoteControls from '../Votes/ReplyVoteControls';
@@ -22,6 +10,8 @@ import ReplyVoteControls from '../Votes/ReplyVoteControls';
 const Replies = ({ postId }) => {
     const [replyText, setReplyText] = useState('');
     const [replies, setReplies] = useState([]);
+    const [searchParams, setSearchParams] = useSearchParams();
+    const typeParam = searchParams.get('type');
 
     // Current user from Firebase Auth
     const user = auth.currentUser;
@@ -109,7 +99,7 @@ const Replies = ({ postId }) => {
 
     return (
         <div className="comments-section">
-            <div className="reply-container">
+            <div className="reply-container" style={{display : typeParam === "comments" ? "none" : "flex" }}>
                 <textarea
                     className="reply-input"
                     placeholder="Comment..."

@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import './Event_tile.css';
-const Event_tile = ({ name, thumbnail, total_events, total_upcomming, tags, link }) => {
+import './CategoryCard.css';
+const CategoryCard = ({ name, thumbnail, total_events, total_upcomming, tags, link }) => {
     return (
         <Link to={link} className='tile'>
             <div className='img-sizer'>
@@ -23,4 +23,4 @@ const Event_tile = ({ name, thumbnail, total_events, total_upcomming, tags, link
     )
 }
 
-export default Event_tile
+export default CategoryCard
