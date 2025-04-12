@@ -25,7 +25,7 @@ export const fetchForumPosts = async () => {
             upvoteCount: doc.data().upvoteCount || 0,
             downvoteCount: doc.data().downvoteCount || 0,
             replyCount: doc.data().replyCount || 0,
-            thumbnailID: doc.data().thumbnailID || thumbnail1  // using LoL as a filler image if none exists because LoL > default error pic
+            thumbnailID: doc.data().thumbnailID || thumbnail1,  // using LoL as a filler image if none exists because LoL > default error pic
         }));
 
         return forumPosts;

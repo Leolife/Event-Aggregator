@@ -1,30 +1,22 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Forum_post.css';
+import { formatDistanceToNow } from 'date-fns'; // Import the necessary function
+import VoteControls from '../Votes/VoteControls';
+import { auth } from '../../firebase';
 
-const Forum_post = ({ postId, eventName, title, body, ownerName, timestamp, upvoteCount, downvoteCount, replyCount, thumbnailID }) => {
+const Forum_post = ({ postId, eventName, title, body, ownerName, ownerId, timestamp, upvoteCount, downvoteCount, replyCount, thumbnailID}) => {
+  const user = auth.currentUser
   const navigate = useNavigate();
-  let timeAgo;
-  // Convert minutes to "time ago"
-  if (timestamp < 60) {
-    timeAgo = `${timestamp} minute${timestamp !== 1 ? 's' : ''} ago`;
-  } else if (timestamp < 1440) {
-    const hours = Math.floor(timestamp / 60);
-    timeAgo = `${hours} hour${hours !== 1 ? 's' : ''} ago`;
-  } else if (timestamp < 43200) { // 30 days in minutes
-    const days = Math.floor(timestamp / 1440);
-    timeAgo = `${days} day${days !== 1 ? 's' : ''} ago`;
-  } else if (timestamp < 525600) { // 365 days in minutes
-    const months = Math.floor(timestamp / 43200); // Roughly 30 days/month
-    timeAgo = `${months} month${timestamp !== 1 ? 's' : ''} ago`;
-  } else {
-    const years = Math.floor(timestamp / 525600); // 365 days/year
-    timeAgo = `${years} year${years !== 1 ? 's' : ''} ago`;
-  }
+  const timestampInMilliseconds = timestamp * 60 * 1000; // Convert minutes to milliseconds
+  const date = new Date(Date.now() - timestampInMilliseconds); // Subtract to get the past date
+  const timeAgo = formatDistanceToNow(date, { addSuffix: true });
+  
 
   return (
-    <div className="forum-post" onClick={() => navigate(`/Forum/post/${postId}`)}>
-      <div className="post-thumbnail">
+    //Route to individual post
+    <div className="forum-post linkable" onClick={() => navigate(`/Forum/post/${postId}`)}>
+      <div className="post-thumbnail" >
         <img src={thumbnailID || "/api/placeholder/64/64"} alt="" />
       </div>
 
@@ -35,13 +27,23 @@ const Forum_post = ({ postId, eventName, title, body, ownerName, timestamp, upvo
         </div>
         <div className="post-info">
           <div className="post-meta">
-            <span>{timeAgo} • {ownerName}</span>
+            <span> 
+              {timeAgo} • <span 
+                className="profile-link" 
+                onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(`/profile/${ownerId}`)
+                  }
+                }
+              >
+                  {ownerName}
+              </span>
+            </span>
           </div>
 
           <div className="post-stats">
-            <div className="votes">
-              <span className="upvoteCount">{upvoteCount}↑</span>
-              <span className="downvoteCount">{downvoteCount}↓</span>
+            <div className="votes" onClick={(e) => e.stopPropagation()}>
+              <VoteControls postId={postId} userId={user?.uid}/>
             </div>
             <div className="replyCount">
               See {replyCount} Replies

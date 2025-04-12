@@ -4,6 +4,7 @@ import { ReactComponent as Logo } from '../../assets/calendar-icon.svg';
 import { auth, firestore } from '../../firebase'; // Adjusted for your firebase.js location
 import { createUserWithEmailAndPassword, sendEmailVerification  } from 'firebase/auth';
 import { collection, addDoc, doc, setDoc } from 'firebase/firestore';
+import Interests from '../../Pages/Settings/Tabs/Interests';
 
 
 const Signup = ({ isOpen, onClose }) => {
@@ -31,6 +32,10 @@ const Signup = ({ isOpen, onClose }) => {
                 name: name,
                 email: email,
                 dob: dob,
+                bio: "",
+                profileBanner: "",
+                profilePicture: "",
+                interests: [],
                 createdAt: new Date(), // Optionally, add a timestamp
             });
 

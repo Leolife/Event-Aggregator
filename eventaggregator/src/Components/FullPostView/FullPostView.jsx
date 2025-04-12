@@ -7,15 +7,23 @@ import ForumData from '../../utils/ForumData';
 import Replies from './Replies';
 import { onAuthStateChanged } from 'firebase/auth';
 import UserData from '../../utils/UserData';
+import { formatDistanceToNow } from 'date-fns';
+import VoteControls from '../Votes/VoteControls';
+
 
 
 const FullPostView = ({ post, comments }) => {
     const [showDropdown, setShowDropdown] = useState(false);
 
     const user = auth.currentUser;
-    const userData = user ? new UserData(user.uid) : null;
+    const userData = user ? new UserData(user?.uid) : null;
     const navigate = useNavigate();
     const { postId } = useParams();
+
+    const timestampInMilliseconds = post.timestamp * 60 * 1000; // Convert minutes to milliseconds
+    const date = new Date(Date.now() - timestampInMilliseconds); // Subtract to get the past date
+    const timeAgo = formatDistanceToNow(date, { addSuffix: true });
+      
 
     const handleDeletion = async (e) => {
         e.preventDefault();
@@ -53,12 +61,17 @@ const FullPostView = ({ post, comments }) => {
                         <div className="title-section">
                             <div className="title-left">
                                 <h1 className="post-title">{post.title}</h1>
-                                <div className="author-info">
+                                <div 
+                                    className="author-info clickable-author" 
+                                    onClick={() => navigate(`/profile/${post.ownerId}`)}
+                                    style={{ cursor: 'pointer' }}
+                                >
                                     <div className="author-avatar">
                                         {post.ownerName?.[0]?.toUpperCase() || 'U'}
                                     </div>
                                     <span>{post.ownerName}</span>
                                 </div>
+
                                 {user?.uid === post.ownerId && (
                                     <button className="delete-post" onClick={handleDeletion}>
                                         Delete Post
@@ -89,13 +102,10 @@ const FullPostView = ({ post, comments }) => {
                     </div>
 
                     <div className="post-footer">
-                        <span className="post-time">Posted: {post.timestamp} minutes ago</span>
+                        <span className="post-time">Posted: {timeAgo} </span>
                         <div className="votes-section">
-                            <div className="vote-count upvotes">
-                                {post.upvoteCount} <span className="vote-arrow">↑</span>
-                            </div>
-                            <div className="vote-count downvotes">
-                                {post.downvoteCount} <span className="vote-arrow">↓</span>
+                            <div className="vote-count">
+                                <VoteControls postId={postId} userId={user?.uid}/>
                             </div>
                         </div>
                     </div>
