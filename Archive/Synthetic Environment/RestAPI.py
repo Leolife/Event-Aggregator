@@ -1,8 +1,6 @@
 from flask import Flask, request, jsonify
-from Levenshtein import ratio
 
 import pandas as pd
-
 ########################################## Running the Flask App
 app = Flask(__name__)
 ########################################## Event Listings
@@ -11,7 +9,7 @@ class event_listings:
         self.data = i
 
 # Reading the file and load in the dataset
-df = pd.read_csv(filepath_or_buffer = 'Data/Final_Events.csv', index_col = 0)
+df = pd.read_csv(filepath_or_buffer = 'Data/events.csv', index_col = 0)
 events = event_listings(i = df)
 ########################################## Saving the user's data.
 class user_metrics:
@@ -20,42 +18,27 @@ class user_metrics:
         self.data = {}
 user_db = user_metrics()
 ##########################################
+games_URL = "https://api.igdb.com/v4/games"
+headers = {
+    'Content-Type': 'application/json',
+    'Client-ID': 'ekp4auk5xo1dmmqdaz0a22aud0gym9',
+    'Authorization': 'Bearer 56shn9khhwand5f7cd9rsdrhykdpsb'
+}
 
-
-###########################################################################
 @app.get("/events/random_one")
 def get_random_event():
     """Get a random events and returns the detail"""
-    return (events.data.sample(n = 1).to_dict())
-
-@app.post("/events/search")
-def search_listing():
-    """Return the most simlar result based on the levenshtein distance"""
-    if not request.is_json:
-        return {"error": "Request must be JSON"}, 415
-    search_item: str = request.get_json()['EVENT']
-    max_r       = 0
-    curr_idx    = 0
-    for idx, item in enumerate(df['Title']):
-        item: str = item.lower()
-        r = ratio(search_item,item)
-        if r > max_r:
-            curr_idx = idx
-            max_r    = r
-    if max_r < 0.6:
-        return jsonify([]),200
-    return df.iloc[curr_idx].to_json(),200
-
+    return eval(events.data.sample(n = 1).to_json(orient='records'))[0]
 
 @app.post("/events/random")
 def get_random_events():
     """Returns the NUMBER of n events. Expects: {NUMBER: [int]}"""
     if request.is_json:
         n = request.get_json()['NUMBER']
-        return eval(events.data.sample(n = n).to_json(orient='records'))
+        fetchedEvents =  eval(events.data.sample(n = n).to_json(orient='records'))
+        return fetchedEvents
     return {"error": "Request must be JSON"}, 415
 
-###########################################################################
 @app.get("/dump_records")
 def return_records():
     """Return an internal view of the records and what users have seen"""
@@ -99,11 +82,11 @@ def record_seen():
         user_db.data[user_ID][event] = 0
     return {'Message': 'ok'}, 200
 
-# @app.get("/tags")
-# def unique_tags():
-#     s = set()
-#     s = {tag for tags in events.data['tags'] for tag in eval(tags)}
-#     return list(s), 200
+@app.get("/tags")
+def unique_tags():
+    s = set()
+    s = {tag for tags in events.data['tags'] for tag in eval(tags)}
+    return list(s), 200
 
 
 # @app.post("/events")
