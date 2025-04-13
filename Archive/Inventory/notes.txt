@@ -1,0 +1,41 @@
+https://serpapi.com/pricing
+https://www.predicthq.com/pricing
+
+https://docs.python.org/3/library/unittest.html
+
+# Generate Random Addresses
+https://pypi.org/project/random-address/
+
+# Schedule Modules for scheduling tasks
+https://schedule.readthedocs.io/en/stable/
+
+# Dataset for content moderation
+https://www.kaggle.com/datasets/uetchy/vtuber-livechat?select=ban_events.parquet
+
+# Dataset for Popular Video Games
+https://www.kaggle.com/datasets/arnabchaki/popular-video-games-1980-2023
+
+# Steam Video games
+https://www.kaggle.com/datasets/srgiomanhes/steam-games-dataset-2025
+
+# Connecting to a NoQSL server with python
+https://realpython.com/introduction-to-mongodb-and-python/
+
+# Spark
+https://spark.apache.org/docs/latest/quick-start.html
+
+# liquipediapy API
+https://github.com/c00kie17/liquipediapy/blob/master/liquipediapy/liquipediapy.py
+
+# Pattern matching
+https://scastie.scala-lang.org/xm3QqmVgRemOqxIARxxWkg
+https://docs.scala-lang.org/tour/pattern-matching.html
+
+# BeautifulSoup Documentation
+https://www.crummy.com/software/BeautifulSoup/bs4/doc/
+
+# Installing PowerShell on linux
+https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-linux?view=powershell-7.5#ubuntu
+
+# Gensim
+https://radimrehurek.com/gensim/

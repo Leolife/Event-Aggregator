@@ -1,0 +1,22 @@
+Ticketing Services/Other Event Aggregators
+[ ] https://10times.com/
+[ ] https://en.wikipedia.org/wiki/Category%3AEvent_venues_in_the_United_States
+[ ] https://www.cvent.com/, [(cvent api)]
+[ ] (https://developers.cvent.com/) (paid)
+
+Venues:
+[ ] https://www.anaheim.net/1871/Calendar-of-Events
+[ ] https://www.laconventioncenter.com/
+[ ] https://javitscenter.com/events/
+[ ] https://www.vegasmeansbusiness.com/listing/las-vegas-convention-center/31137/
+[ ] https://www.signatureboston.com/BCEC
+[ ] https://www.phoenixconventioncenter.com/
+
+Convention Collections:
+[X] https://animecons.com/events/ (Anime Conventions)
+[X] https://fancons.com/ (General Otaku/Fandom Conventions)
+
+[ ] https://liquipedia.net/ (Esports events)
+[ ] https://www.mediawiki.org/wiki/API:Main_page (API to harvest information from Liquipedia/Wikipedia)
+[ ] https://escharts.com/upcoming-tournaments (Esports events)
+[ ] https://videogamecons.com/ (Video Game Conventions)
