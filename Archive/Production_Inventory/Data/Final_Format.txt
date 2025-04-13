@@ -1,0 +1,13 @@
+Inventory of Events (Final Format)
+
+# Event Information
+Name       : str       -> The name of the Events.
+Description: str       -> A small description about the "event" in this case it is the video game.
+
+# Geographical
+address1   : str       -> Main address
+address2   : str       -> appt or suit nunber
+
+# Temporal
+Start time : datetime  -> The time the event will start.
+When       : str       -> The time the event will end. 

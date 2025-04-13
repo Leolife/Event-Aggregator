@@ -1,0 +1,4 @@
+tqdm
+load-dotenv
+Flask
+Levenshtein
