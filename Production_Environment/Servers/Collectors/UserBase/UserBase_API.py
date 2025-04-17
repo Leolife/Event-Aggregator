@@ -47,8 +47,8 @@ def search_func():
     if request.is_json:
         incoming_request = request.get_json()
         u    : str = incoming_request['USER']       if 'USER'   in incoming_request  else None
-        search_by: str = incoming_request['BY']     if 'BY'      in incoming_request else 'Title'
-        num      : int = incoming_request['NUMBER'] if 'NUMBER'  in incoming_request else None
+        search_by: str = incoming_request['BY']     if 'BY'     in incoming_request else 'Title'
+        num      : int = incoming_request['NUMBER'] if 'NUMBER' in incoming_request else None
     ...
 
 @app.post("/random_sample")
@@ -61,6 +61,7 @@ def random_events():
 
 @app.post("/user_base_o")
 def user_base_o():
+    """Returns every user except for the unspecficied user."""
     if request.is_json:
         incoming_request = request.get_json()
         select_user: str = incoming_request['USER']  if 'USER'  in incoming_request else None

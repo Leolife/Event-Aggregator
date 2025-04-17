@@ -1,0 +1,21 @@
+services:
+  central_server:
+    build: ./Server
+    volumes:
+      - type: bind
+        source: /Users/avaldivia/Documents/GitHub/Federated-Learning/Docker_Env/Server/Results
+        target: /Results
+
+    networks:
+      main_network:
+        ipv4_address: 192.168.150.2
+    
+    expose:
+      - 8888
+
+networks:
+  main_network:
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.150.0/24

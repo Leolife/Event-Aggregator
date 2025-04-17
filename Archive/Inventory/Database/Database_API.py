@@ -83,3 +83,16 @@ def Incoming_Events():
     events_DB.print_table()
     events_DB.clear_table()
     return {'Message': 'ok'}, 200
+
+@app.post("/search")
+def Incoming_Events():
+    """Process the event information coming from the webscrappers"""
+    if not request.is_json:
+        return {"error": "Request must be JSON"}, 415
+
+    event_listings: list = request.get_json()
+    event_listings = [(v['TITLE'],v['DATE'],v['LOCATION']) for v in event_listings]
+    events_DB.save_events(event_listings)
+    events_DB.print_table()
+    events_DB.clear_table()
+    return {'Message': 'ok'}, 200

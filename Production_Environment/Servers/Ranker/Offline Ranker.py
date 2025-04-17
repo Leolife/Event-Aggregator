@@ -1,11 +1,8 @@
 """
 Required Features:
-- Allows for events to be searched based on criterias
-- Abstracts the underlying rec system for both item to item and user to user
 - 
 """
 from flask       import Flask, request, jsonify
-from Levenshtein import ratio
 import requests
 import json
 
@@ -45,15 +42,14 @@ class IP_Data:
             case _:
                 return None
         
-##########################################
+    
 IPs = IP_Data()
 
 app = Flask(__name__)
 ##########################################
 @app.get("/get_columns")
 def return_features():
-    url = IPs.get_url(server='events' , func='columns')
-    return query(url, mode='GET'), 200
+    ...
 
 @app.post("/search")
 def search_func():
@@ -66,51 +62,4 @@ def search_func():
         q        : str = incoming_request['QUERY']
         search_by: str = incoming_request['BY']
         n        : int = incoming_request['NUMBER']
-
-    # Makes requests to the front server
-
-    url = IPs.get_url(server='events' , func='sby')
-
-    data = {
-            "QUERY"  : q,
-            "BY"     : search_by,
-            "NUMBER" : n
-            }
-
-    items = query(url,data, mode='POST')
-    
-    return items, 200
-
-@app.post("/recc")
-def reccomendation():
-    """Makes a recommendation provided a user"""
-    if request.is_json:
-        """
-        Format:
-        query : 
-        {
-            USER_ID : str -> user id provided by front end in the format of firebase.
-            MODE    : str -> Method of providing recc. 
-            NUMBER  : int -> Number of events to return
-        }
-        """
-        incoming_request = request.get_json()
-        assert("USER_ID" in incoming_request)
-        assert("NUMBER"  in incoming_request)
-
-        user_ID = incoming_request['USER_ID'] 
-        number = incoming_request['NUMBER']
-        mode   = incoming_request['MODE'] if 'MODE' in incoming_request else 'auto'
-
-    match mode:
-        case 'auto':
-            ...
-        case 'item':
-            """
-            1. Makes a request to Online Ranker.
-            """
-            ...
-        case 'user':
-            ...
-        case _:
-            print('Mode does not match any specified method.')
+   
