@@ -36,6 +36,8 @@ export const Profile = ({ sidebar }) => {
     const [profileCalendars, setProfileCalendars] = useState([]);
 
     const [bio, setBio] = useState("");
+    const [isFriend, setIsFriend] = useState(false);
+    const [friendshipChecked, setFriendshipChecked] = useState(false);
 
     const { userId } = useParams();
 
@@ -74,10 +76,42 @@ export const Profile = ({ sidebar }) => {
             if (user) {
                 setTempProfileBanner(banner); // Initialize temp banner
                 setTempProfilePicture(picture); // Initialize temp picture
+
+                // Check if the logged-in user is friends with the profile user
+                checkFriendshipStatus(user.uid, userId);
             }
         };
         fetchProfileData();
     }, [userId]);
+
+    // Check if the current user is friends with the profile user
+    const checkFriendshipStatus = async (currentUserId, profileUserId) => {
+        if (currentUserId === profileUserId) {
+            // User is viewing their own profile, no need to check friendship
+            setFriendshipChecked(true);
+            return;
+        }
+
+        try {
+            const userData = new UserData(currentUserId);
+            const userDataObj = await userData.getUserData();
+            
+            // Check if the user has a friendsList and if it contains the profile user
+            const friendsList = userDataObj.friendsList || [];
+            setIsFriend(friendsList.includes(profileUserId));
+            setFriendshipChecked(true);
+        } catch (error) {
+            console.error("Error checking friendship status:", error);
+            setIsFriend(false);
+            setFriendshipChecked(true);
+        }
+    };
+
+    // Handler for add friend button
+    const handleAddFriend = () => {
+        // This will be implemented later
+        console.log("Add friend button clicked");
+    };
 
     // Callback to receive the new banner link from the modal
     const handleBannerSubmit = (link) => {
@@ -239,6 +273,15 @@ export const Profile = ({ sidebar }) => {
                                             <h2><span>30</span> Friends</h2>
                                             <h2><span>30</span> Posts</h2>
                                         </div>
+                                        
+                                        {/* Add Friend Button - Only shows when friendship status is checked, current user is not the profile owner and not already friends */}
+                                        {currentUser && !isOwner && !isFriend && friendshipChecked && (
+                                            <div className="friend-button-container">
+                                                <button className="add-friend-button" onClick={handleAddFriend}>
+                                                    Add Friend
+                                                </button>
+                                            </div>
+                                        )}
                                     </div>
                                     <div className="profile-header-more">
                                         {/* Additional header content */}
