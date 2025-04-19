@@ -135,6 +135,11 @@ class event_database:
 
 ########################################## SETUP
 events_DB = event_database(FilePath = os.path.join('Data','Event Data.db'))
+
+@app.get("/identify")
+def identify():
+    print('Events Database')
+    return {'Message':'ok'}, 200
 ########################################## Table Management
 @app.post("/save_events")
 def Incoming_Events():

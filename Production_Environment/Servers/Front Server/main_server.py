@@ -50,6 +50,11 @@ IPs = IP_Data()
 
 app = Flask(__name__)
 ##########################################
+@app.get("/identify")
+def identify():
+    print('Front Server')
+    return {'Message':'ok'}, 200
+
 @app.get("/get_columns")
 def return_features():
     url = IPs.get_url(server='events' , func='columns')

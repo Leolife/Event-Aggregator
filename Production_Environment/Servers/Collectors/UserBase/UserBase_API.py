@@ -35,6 +35,11 @@ events_path  = os.path.join('Data'   ,'User_Data.json')
 UserBase    = user_Metrics(file_path=events_path)
 ########################################## Run the Flask App
 app = Flask(__name__)
+
+@app.get("/identify")
+def identify():
+    print('User Base')
+    return {'Message':'ok'}, 200
 ##########################################
 @app.get("/num_users")
 def return_features():

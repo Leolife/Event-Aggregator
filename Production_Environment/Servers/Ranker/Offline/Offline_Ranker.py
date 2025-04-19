@@ -69,7 +69,7 @@ def kmeans_tune(X_lsa, n_clusters_max = 15,trials = 5) -> list[float]:
 class IP_Data:
     def __init__(self):
         self.local_host  = '127.0.0.1'
-        self.events_port = '5000'
+        self.events_port = '5001'
 
     def get_url(self,server, func) -> str:
         """Returns the url"""
@@ -156,6 +156,12 @@ IPs        = IP_Data()
 eventRanks = EventRanks(url = IPs.get_url(server='events', func = 'desc'))
 ##########################################
 app = Flask(__name__)
+
+@app.get("/identify")
+def identify():
+    print('Offline Ranker')
+    return {'Message':'ok'}, 200
+
 ##########################################
 @app.get("/force_update")
 def force_update(): 
