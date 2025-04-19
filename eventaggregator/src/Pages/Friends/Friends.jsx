@@ -3,12 +3,14 @@ import { auth } from '../../firebase';
 import Sidebar from '../../Components/Sidebar/Sidebar';
 import './Friends.css';
 import UserData from '../../utils/UserData';
+import { useNavigate } from 'react-router-dom';
 
 export const Friends = ({ sidebar }) => {
     const [loading, setLoading] = useState(true);
     const [friendsList, setFriendsList] = useState([]);
     const [friendsInfo, setFriendsInfo] = useState([]);
     const [error, setError] = useState(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchFriendsList = async () => {
@@ -150,7 +152,8 @@ export const Friends = ({ sidebar }) => {
                                     <div className="friend-actions">
                                         <button 
                                             className="view-profile-btn"
-                                            onClick={() => window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ')}
+                                            onClick={() => navigate(`/profile/${friend.uid}`)}
+                                            style={{ cursor: 'pointer' }}
                                         >
                                             View Profile
                                         </button>
