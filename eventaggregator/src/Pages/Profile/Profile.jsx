@@ -108,9 +108,42 @@ export const Profile = ({ sidebar }) => {
     };
 
     // Handler for add friend button
-    const handleAddFriend = () => {
-        // This will be implemented later
-        console.log("Add friend button clicked");
+    const handleAddFriend = async () => {
+        try {
+            // Get current user
+            const user = auth.currentUser;
+            if (!user) {
+                console.error("You must be logged in to add friends");
+                return;
+            }
+    
+            // Get the target user's data
+            const targetUserData = new UserData(userId);
+            const targetUserObj = await targetUserData.getUserData();
+            
+            // Check if the incomingFriendRequests array exists, if not create it
+            let currentRequests = targetUserObj.incomingFriendRequests || [];
+            
+            // Check if the request is already pending to avoid duplicates
+            if (currentRequests.includes(user.uid)) {
+                console.log("Friend request already sent");
+                return;
+            }
+            
+            // Add current user's UID to the target user's incomingFriendRequests
+            currentRequests.push(user.uid);
+            
+            // Update the target user's document with the new incomingFriendRequests array
+            await targetUserData.setUserData({ incomingFriendRequests: currentRequests });
+            
+            console.log("Friend request sent successfully");
+            
+            // Update UI to reflect the pending request
+            // This could be a "Request Pending" button or similar UI change
+            // For now, we'll just log the success
+        } catch (error) {
+            console.error("Error sending friend request:", error);
+        }
     };
 
     // Callback to receive the new banner link from the modal
