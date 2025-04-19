@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import './Sidebar.css'
 import { ReactComponent as CalendarIcon } from '../../assets/calendar-icon.svg';
 import { ReactComponent as ForumsIcon } from '../../assets/forums-icon.svg';
@@ -12,11 +12,45 @@ import { ReactComponent as TriangleIcon } from '../../assets/triangle-icon.svg';
 import { Link, useNavigate, createSearchParams } from 'react-router-dom';
 import { getAuth } from 'firebase/auth';
 import Overlays from '../Overlays';
+import { firestore } from '../../firebase';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 
 const Sidebar = ({ sidebar }) => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [modalType, setModalType] = useState('');
+  const [friendRequests, setFriendRequests] = useState(0);
+
+  // Fetch the number of friend requests
+  useEffect(() => {
+    const fetchFriendRequests = async () => {
+      const auth = getAuth();
+      const user = auth.currentUser;
+      
+      if (!user) return;
+      
+      try {
+        const usersRef = collection(firestore, "users");
+        const q = query(usersRef, where("uid", "==", user.uid));
+        const querySnapshot = await getDocs(q);
+        
+        if (!querySnapshot.empty) {
+          const userData = querySnapshot.docs[0].data();
+          const requests = userData.incomingFriendRequests || [];
+          setFriendRequests(requests.length);
+        }
+      } catch (error) {
+        console.error("Error fetching friend requests:", error);
+      }
+    };
+    
+    fetchFriendRequests();
+    
+    // Set up interval to check for new requests periodically
+    const interval = setInterval(fetchFriendRequests, 60000); // Check every minute
+    
+    return () => clearInterval(interval);
+  }, []);
 
   // Navigates to the forum page with the respective sort 
   function forumLink(sort) {
@@ -35,7 +69,7 @@ const Sidebar = ({ sidebar }) => {
   const handleProfileClick = () => {
     const auth = getAuth();
     if (auth.currentUser) {
-      navigate('/profile');
+      navigate(`/profile/${getAuth().currentUser.uid}`);
     } else {
       openModal('login');
     }
@@ -96,12 +130,20 @@ const Sidebar = ({ sidebar }) => {
             <ProfileIcon className="profile-icon" /><h3>Profile</h3><TriangleIcon className="triangle-icon" />
           </div>
 
-          <div className="side-link">
-            <ProfileIcon className="profile-icon" /><p onClick={handleProfileClick}> My Profile </p>
+          <div className="side-link"
+            onClick={handleProfileClick}
+          >
+            <ProfileIcon className="profile-icon" /><p> My Profile </p>
           </div>
 
-          <div className="side-link">
-            <FriendIcon className="friend-icon" /><p onClick={handleFriendsClick}>Friends</p>
+          <div className="side-link"
+            onClick={handleFriendsClick}
+          >
+            <FriendIcon className="friend-icon" />
+            <p>Friends</p>
+            {friendRequests > 0 && (
+              <span className="sidebar-request-badge">{friendRequests}</span>
+            )}
           </div>
         </div>
         <hr />

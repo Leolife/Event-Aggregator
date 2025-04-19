@@ -14,6 +14,52 @@
 .friends-header h1 {
     font-size: 28px;
     color: #3ed0e4;
+    margin-bottom: 15px;
+}
+
+/* Tab navigation styles */
+.friends-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.tab-button {
+    padding: 10px 20px;
+    border: none;
+    background-color: #f5f5f5;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    color: #666;
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.tab-button:hover {
+    background-color: #e5e5e5;
+}
+
+.tab-button.active {
+    background-color: #3ed0e4;
+    color: white;
+}
+
+.request-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: #ff3b30;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
 }
 
 .loading-message,
@@ -110,21 +156,39 @@
     -webkit-box-orient: vertical;
 }
 
-.friend-actions {
+.friend-actions, .friend-request-actions {
     display: flex;
     flex-direction: column;
     gap: 10px;
     margin-left: 20px;
 }
 
+.friend-request-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-left: 20px;
+    min-width: 110px; /* Ensure enough space for buttons */
+}
+
+/* Container for accept/decline buttons */
+.request-decision-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
 .view-profile-btn,
-.remove-friend-btn {
+.remove-friend-btn,
+.accept-request-btn,
+.decline-request-btn {
     padding: 8px 16px;
     border: none;
     border-radius: 6px;
     font-weight: 600;
     cursor: pointer;
     transition: background-color 0.2s ease;
+    text-align: center;
 }
 
 .view-profile-btn {
@@ -143,6 +207,25 @@
 
 .remove-friend-btn:hover {
     background-color: #ff3b30;
+    color: white;
+}
+
+.accept-request-btn {
+    background-color: #34c759;
+    color: white;
+}
+
+.accept-request-btn:hover {
+    background-color: #2aa44a;
+}
+
+.decline-request-btn {
+    background-color: #ff564d;
+    color: white;
+}
+
+.decline-request-btn:hover {
+    background-color: #b9443e;
     color: white;
 }
 
@@ -168,9 +251,25 @@
         justify-content: center;
     }
     
+    .friend-request-actions {
+        margin-left: 0;
+        margin-top: 15px;
+        width: 100%;
+    }
+    
+    .request-decision-buttons {
+        width: 100%;
+        justify-content: center;
+    }
+    
     .view-profile-btn,
     .remove-friend-btn {
         flex: 1;
         max-width: 130px;
+    }
+    
+    .accept-request-btn,
+    .decline-request-btn {
+        width: 120px;
     }
 }

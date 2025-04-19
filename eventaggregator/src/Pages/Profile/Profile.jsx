@@ -36,6 +36,8 @@ export const Profile = ({ sidebar }) => {
     const [profileCalendars, setProfileCalendars] = useState([]);
 
     const [bio, setBio] = useState("");
+    const [isFriend, setIsFriend] = useState(false);
+    const [friendshipChecked, setFriendshipChecked] = useState(false);
 
     const { userId } = useParams();
 
@@ -74,10 +76,75 @@ export const Profile = ({ sidebar }) => {
             if (user) {
                 setTempProfileBanner(banner); // Initialize temp banner
                 setTempProfilePicture(picture); // Initialize temp picture
+
+                // Check if the logged-in user is friends with the profile user
+                checkFriendshipStatus(user.uid, userId);
             }
         };
         fetchProfileData();
     }, [userId]);
+
+    // Check if the current user is friends with the profile user
+    const checkFriendshipStatus = async (currentUserId, profileUserId) => {
+        if (currentUserId === profileUserId) {
+            // User is viewing their own profile, no need to check friendship
+            setFriendshipChecked(true);
+            return;
+        }
+
+        try {
+            const userData = new UserData(currentUserId);
+            const userDataObj = await userData.getUserData();
+            
+            // Check if the user has a friendsList and if it contains the profile user
+            const friendsList = userDataObj.friendsList || [];
+            setIsFriend(friendsList.includes(profileUserId));
+            setFriendshipChecked(true);
+        } catch (error) {
+            console.error("Error checking friendship status:", error);
+            setIsFriend(false);
+            setFriendshipChecked(true);
+        }
+    };
+
+    // Handler for add friend button
+    const handleAddFriend = async () => {
+        try {
+            // Get current user
+            const user = auth.currentUser;
+            if (!user) {
+                console.error("You must be logged in to add friends");
+                return;
+            }
+    
+            // Get the target user's data
+            const targetUserData = new UserData(userId);
+            const targetUserObj = await targetUserData.getUserData();
+            
+            // Check if the incomingFriendRequests array exists, if not create it
+            let currentRequests = targetUserObj.incomingFriendRequests || [];
+            
+            // Check if the request is already pending to avoid duplicates
+            if (currentRequests.includes(user.uid)) {
+                console.log("Friend request already sent");
+                return;
+            }
+            
+            // Add current user's UID to the target user's incomingFriendRequests
+            currentRequests.push(user.uid);
+            
+            // Update the target user's document with the new incomingFriendRequests array
+            await targetUserData.setUserData({ incomingFriendRequests: currentRequests });
+            
+            console.log("Friend request sent successfully");
+            
+            // Update UI to reflect the pending request
+            // This could be a "Request Pending" button or similar UI change
+            // For now, we'll just log the success
+        } catch (error) {
+            console.error("Error sending friend request:", error);
+        }
+    };
 
     // Callback to receive the new banner link from the modal
     const handleBannerSubmit = (link) => {
@@ -239,6 +306,15 @@ export const Profile = ({ sidebar }) => {
                                             <h2><span>30</span> Friends</h2>
                                             <h2><span>30</span> Posts</h2>
                                         </div>
+                                        
+                                        {/* Add Friend Button - Only shows when friendship status is checked, current user is not the profile owner and not already friends */}
+                                        {currentUser && !isOwner && !isFriend && friendshipChecked && (
+                                            <div className="friend-button-container">
+                                                <button className="add-friend-button" onClick={handleAddFriend}>
+                                                    Add Friend
+                                                </button>
+                                            </div>
+                                        )}
                                     </div>
                                     <div className="profile-header-more">
                                         {/* Additional header content */}

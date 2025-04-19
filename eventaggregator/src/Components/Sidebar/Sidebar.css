@@ -17,6 +17,7 @@
     flex-wrap: wrap;
     cursor: pointer;
     color: #5a5a5a;
+    position: relative; /* Added for positioning the badge */
 }
 
 .side-link h3 {
@@ -38,7 +39,6 @@
     margin-right: 20px;
 }
 
-
 .sidebar svg path {
     stroke: #5a5a5a;
 }
@@ -54,6 +54,27 @@
 
 .sidebar .heart-icon path{
     stroke: none;
+}
+
+/* Notification Badge Styles */
+.sidebar-request-badge {
+    position: absolute;
+    right: 20px;
+    background-color: #ff3b30;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+/* Responsive adjustments for the badge in small sidebar mode */
+.small-sidebar .sidebar-request-badge {
+    right: 8px;
 }
 
 .small-sidebar {
