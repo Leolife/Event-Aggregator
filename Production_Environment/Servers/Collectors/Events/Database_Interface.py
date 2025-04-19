@@ -68,6 +68,20 @@ class event_database:
             conn.close()
         
         return data
+
+    def select_rows(self, rows) -> tuple:
+        assert(type(rows) == tuple)
+        try:
+            conn   = sqlite3.connect(self.DATABASE_FILENAME)
+            cursor = conn.cursor()
+            data   = cursor.execute(f'''SELECT * FROM EVENTS WHERE ID in {rows}; ''') 
+            data   = list(data)
+        except Exception as e:
+            print(e)
+        finally:
+            conn.close()
+        
+        return data
     
     def print_table(self) -> None:
         try:
@@ -177,6 +191,20 @@ def get_col():
         return {"error": "Request must be JSON"}, 415
     col_data = events_DB.select_column(col=col)
     return list(col_data), 200
+
+@app.post("/get_rows")
+def get_rows():
+    """Given a list of selected events, return all the additinoal information"""
+    if request.is_json:
+        req = request.get_json()
+        if 'IDS' not in req:
+            return {'Message':'Invalid Request'}, 400
+        assert(type(req['IDS']))
+        rows = tuple(req['IDS'])
+    else:
+        return {"error": "Request must be JSON"}, 415
+    col_data = events_DB.select_rows(rows = rows)
+    return col_data, 200
 
 @app.get("/sample")
 def get_sample():
