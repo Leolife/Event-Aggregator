@@ -11,7 +11,7 @@ services:
         ipv4_address: 192.168.150.2
     
     expose:
-      - 8888
+      - 5000:50001
 
 networks:
   main_network:

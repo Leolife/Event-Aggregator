@@ -45,13 +45,13 @@ class IP_Data:
     
 IPs = IP_Data()
 
-app = Flask(__name__)
+#app = Flask(__name__)
 ##########################################
-@app.get("/get_columns")
+#@app.get("/get_columns")
 def return_features():
     ...
 
-@app.post("/search")
+#@app.post("/search")
 def search_func():
     """ """
     if request.is_json:
@@ -62,4 +62,7 @@ def search_func():
         q        : str = incoming_request['QUERY']
         search_by: str = incoming_request['BY']
         n        : int = incoming_request['NUMBER']
+
+if __name__ == '__main__':
+    ...
    

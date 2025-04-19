@@ -48,7 +48,7 @@ class event_database:
                 #cursor.execute('''INSERT INTO STUDENT VALUES ('Raju', '7th', 'A')''')
                 cursor.execute(
                 f"""INSERT INTO EVENTS(TITLE, DATE, MAINPAGE, ADDRESS1, ADDRESS2, WEHN, THUMB, IMAGE, DESC, LongDesc)
-                               VALUES {event} """)
+                    VALUES {event} """)
             # commit
             conn.commit()
         except Exception as e:
@@ -106,6 +106,19 @@ class event_database:
         
         return [item[0] for item in data]
 
+    def select_desc(self) -> list:
+        try:
+            conn   = sqlite3.connect(self.DATABASE_FILENAME)
+            cursor = conn.cursor()
+            data   = cursor.execute(f'''SELECT ID,DESC FROM EVENTS''') 
+            data   = list(data)
+        except Exception as e:
+            print(e)
+        finally:
+            conn.close()
+        
+        return data
+
 ########################################## SETUP
 events_DB = event_database(FilePath = os.path.join('Data','Event Data.db'))
 ########################################## Table Management
@@ -116,13 +129,13 @@ def Incoming_Events():
         return {"error": "Request must be JSON"}, 415
 
     event_listings: list = request.get_json()
-    ########################################## Ensure Events are in the proper format
+    ##################################### Ensure Events are in the proper format
     assert(event_listings != 0)
     sample = event_listings[0]
     # Make sure all the columns we are looking for are in our sample
     for col in events_DB.columns:
         assert(col in sample.keys())
-    ##########################################
+    #####################################
 
     """
     ['TITLE','DATE','MAINPAGE',' ADDRESS1','ADDRESS2','WEHN','THUMB','IMAGE','DESC','LongDesc']
@@ -171,4 +184,9 @@ def get_sample():
     r = random.randint(0,100)
     data = events_DB.select_row(row = r)
     return data, 200
+
+@app.get("/get_descs")
+def get_desc():
+    data = events_DB.select_desc()
+    return data,200
     
