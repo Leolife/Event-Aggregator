@@ -1,21 +1,18 @@
 services:
-  central_server:
-    build: ./Server
+  events_database:
+    build: ./Servers/Collectors/Events
     volumes:
       - type: bind
-        source: /Users/avaldivia/Documents/GitHub/Federated-Learning/Docker_Env/Server/Results
-        target: /Results
-
-    networks:
-      main_network:
-        ipv4_address: 192.168.150.2
+        source: ./Servers/Collectors/Events/Data
+        target: /Data
     
-    expose:
-      - 5000:50001
+    networks:
+      - main_network
+    
+    ports:
+      - "127.0.0.1:5000:5000"
 
 networks:
   main_network:
-    ipam:
-      driver: default
-      config:
-        - subnet: 192.168.150.0/24
+    driver: bridge
+
