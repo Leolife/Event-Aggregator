@@ -6,14 +6,11 @@ Required Features:
 from flask       import Flask, request, jsonify
 from collections import Counter
 
-import pandas as pd
-import numpy  as np
-import random
 import requests
+import random
 import json
 import gzip
 import math
-import os
 
 def cosine_dic(dic1,dic2):
     numerator = 0

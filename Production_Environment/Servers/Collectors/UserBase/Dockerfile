@@ -1,5 +1,5 @@
 FROM python:3.12
 
-ADD main.py .
-
-CMD ["python","./main.py"] 
+RUN pip install flask
+ADD UserBase_API.py .
+CMD ["flask","--app","UserBase_API.py","run","--host", "0.0.0.0","--port","5000"]

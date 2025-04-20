@@ -4,8 +4,8 @@ Required Features:
 - Abstracts the underlying rec system for both item to item and user to user
 - 
 """
-from flask       import Flask, request, jsonify
-from Levenshtein import ratio
+from flask import Flask, request, jsonify
+
 import requests
 import json
 

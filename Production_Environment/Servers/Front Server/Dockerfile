@@ -1,5 +1,7 @@
 FROM python:3.12
 
-ADD main.py .
+RUN pip install flask
 
-CMD ["python","./main.py"] 
+ADD main_server.py .
+
+CMD ["flask","--app","main_server.py","run","--host", "0.0.0.0","--port","5000"]

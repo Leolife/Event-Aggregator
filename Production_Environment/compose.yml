@@ -1,16 +1,38 @@
 services:
-  events_database:
-    build: ./Servers/Collectors/Events
+  # events_database:
+  #   build: ./Servers/Collectors/Events
+  #   volumes:
+  #     - type: bind
+  #       source: ./Servers/Collectors/Events/Data
+  #       target: /Data
+    
+  #   networks:
+  #     - main_network
+    
+  #   ports:
+  #     - "127.0.0.1:5000:5000"
+  
+  User_Database:
+    build: ./Servers/Collectors/UserBase
     volumes:
       - type: bind
-        source: ./Servers/Collectors/Events/Data
+        source: ./Servers/Collectors/UserBase/Data
         target: /Data
     
     networks:
       - main_network
     
-    ports:
+    expose:
       - "127.0.0.1:5000:5000"
+  
+  # Front Server:
+  #   build: ./Servers/Front Server
+    
+  #   networks:
+  #     - main_network
+    
+  #   ports:
+  #     - "127.0.0.1:5000:5000"
 
 networks:
   main_network:
