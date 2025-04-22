@@ -9,7 +9,6 @@ from collections import Counter
 import requests
 import random
 import json
-import gzip
 import math
 
 def cosine_dic(dic1,dic2):
@@ -42,6 +41,10 @@ def query(url, data = None, mode = None):
 class IP_Data:
     def __init__(self):
         self.local_host   = '127.0.0.1'
+        self.eventsdb_ip  = '192.168.150.3'
+        self.offline_ip   = '192.168.150.5'
+        self.user_db_ip   = '192.168.150.4'
+
         self.events_port  = '5001'
         self.Offline_R    = '5003'
         self.user_db      = '5002'
@@ -52,11 +55,11 @@ class IP_Data:
         match server:
             case 'events':
                 # Makes requests to the front server
-                url = f'http://{self.local_host}:{self.events_port}'
+                url = f'http://{self.eventsdb_ip}:{self.events_port}'
             case 'ranker':
-                url = f'http://{self.local_host}:{self.Offline_R}'
+                url = f'http://{self.offline_ip}:{self.Offline_R}'
             case 'users':
-                url = f'http://{self.local_host}:{self.user_db}'
+                url = f'http://{self.user_db_ip}:{self.user_db}'
             case _:
                 return None
 

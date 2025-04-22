@@ -67,6 +67,7 @@ def kmeans_tune(X_lsa, n_clusters_max = 15,trials = 5) -> list[float]:
 class IP_Data:
     def __init__(self):
         self.local_host  = '127.0.0.1'
+        self.event_db_ip = '192.168.150.3'
         self.events_port = '5001'
 
     def get_url(self,server, func) -> str:
@@ -75,7 +76,7 @@ class IP_Data:
         match server:
             case 'events':
                 # Makes requests to the front server
-                url = f'http://{self.local_host}:{self.events_port}'
+                url = f'http://{self.event_db_ip}:{self.events_port}'
             case _:
                 return None
 

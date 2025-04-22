@@ -23,6 +23,8 @@ def query(url, data = None, mode = None):
 class IP_Data:
     def __init__(self):
         self.local_host  = '127.0.0.1'
+        self.event_ip    = '192.168.150.3'
+        self.recc_ip     = '192.168.150.6'
         self.events_port = '5001'
         self.reccs       = '5004'
 
@@ -32,9 +34,9 @@ class IP_Data:
         match server:
             case 'events':
                 # Makes requests to the front server
-                url = f'http://{self.local_host}:{self.events_port}'
+                url = f'http://{self.event_ip}:{self.events_port}'
             case 'ranker':
-                url = f'http://{self.local_host}:{self.reccs}'
+                url = f'http://{self.recc_ip}:{self.reccs}'
             case _:
                 return None
 
@@ -116,6 +118,7 @@ def reccomendation():
             """
             """
             url = IPs.get_url(server = 'ranker',func = 'item')
+            print(url)
             select = {
                 'USER_ID': user_ID,
                 'NUMBER': number
@@ -123,6 +126,7 @@ def reccomendation():
             return query(url,select,mode = 'POST'), 200
         case 'user':
             url = IPs.get_url(server = 'ranker',func = 'user')
+            print(url)
             select = {
                 'USER_ID': user_ID,
                 'NUMBER': number

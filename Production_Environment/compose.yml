@@ -1,18 +1,22 @@
 services:
-  # events_database:
-  #   build: ./Servers/Collectors/Events
-  #   volumes:
-  #     - type: bind
-  #       source: ./Servers/Collectors/Events/Data
-  #       target: /Data
+  events_database:
+    build: ./Servers/Collectors/Events
+    volumes:
+      - type: bind
+        source: ./Servers/Collectors/Events/Data
+        target: /Data
     
-  #   networks:
-  #     - main_network
+    networks:
+      main_network:
+        ipv4_address: 192.168.150.3
     
-  #   ports:
-  #     - "127.0.0.1:5000:5000"
+    ports:
+      - 5001:5001
+    
+    expose:
+      - 5001
   
-  User_Database:
+  user_database:
     build: ./Servers/Collectors/UserBase
     volumes:
       - type: bind
@@ -20,21 +24,62 @@ services:
         target: /Data
     
     networks:
-      - main_network
+      main_network:
+        ipv4_address: 192.168.150.4
+    
+    ports:
+      - 5002:5002
     
     expose:
-      - "127.0.0.1:5000:5000"
+      - 5002
   
-  # Front Server:
-  #   build: ./Servers/Front Server
+  front_server:
+    build: ./Servers/Front_Server
     
-  #   networks:
-  #     - main_network
+    networks:
+      main_network:
+        ipv4_address: 192.168.150.2
     
-  #   ports:
-  #     - "127.0.0.1:5000:5000"
+    ports:
+      - 5000:5000
+    
+    expose:
+      - 5000
+
+  online_ranker:
+    build: ./Servers/Ranker/Online
+    
+    networks:
+      main_network:
+        ipv4_address: 192.168.150.6
+    
+    ports:
+      - 5004:5004
+    
+    expose:
+      - 5004
+
+  offline_ranker:
+    build: ./Servers/Ranker/Offline
+    volumes:
+      - type: bind
+        source: ./Servers/Ranker/Offline/Data
+        target: /Data
+    
+    networks:
+      main_network:
+        ipv4_address: 192.168.150.5
+    
+    ports:
+      - 5003:5003
+    
+    expose:
+      - 5003
 
 networks:
   main_network:
-    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.150.0/24
 
