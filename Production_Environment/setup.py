@@ -40,7 +40,7 @@ if __name__ == '__main__':
         if l in libs:
             print(f'{l:<22}{IGreen}Installed{White}')
         else:
-            print(f'{l:<22}{IRed}Missing')
+            print(f'{l:<22}{IRed}Missing{White}')
     
     #########################################################
     #               Importing  Libraries                    #
@@ -64,30 +64,46 @@ if __name__ == '__main__':
 
     # Under Servers Directory
     collectors_dir = os.path.join(server_dir,'Collectors')
-    front_dir      = os.path.join(server_dir,'Front Server') 
 
     # Under Collectors Direcrtory
-    events_dir   = os.path.join(collectors_dir,'Events')
-    userbase_dir = os.path.join(collectors_dir, 'UserBase')
+    events_dir   = os.path.join(collectors_dir,'Events'  )
+    userbase_dir = os.path.join(collectors_dir,'UserBase')
 
     # Under Front Direcrtory
-    ...
+    front_dir    = os.path.join(server_dir,'Front Server') 
+
+    # Under Ranker Directory
+    ranker_dir  = os.path.join(server_dir,'Ranker' )
+    Offline_dir = os.path.join(ranker_dir,'Offline')
+    Online_dir  = os.path.join(ranker_dir,'Online' )
 
     server_list = {
-                   'EventsDB_API.py': {
+                    'main_server.py': {
+                       'DIR' : front_dir,
+                       'IP'  : '0.0.0.0',
+                       'PORT': '5000'
+                        },
+                    # Offline Collector
+                   'Database_Interface.py': {
                        'DIR' : events_dir,
                        'IP'  : '0.0.0.0',
                        'PORT': '5001'
                         },
+                    # Online Collector
                    'UserBase_API.py': {
                        'DIR' : userbase_dir,
                        'IP'  : '0.0.0.0',
                        'PORT': '5002'
                         },
-                    'main_server.py': {
-                       'DIR' : front_dir,
+                    'Offline_Ranker.py': {
+                       'DIR' : Offline_dir,
                        'IP'  : '0.0.0.0',
-                       'PORT': '5000'
+                       'PORT': '5003'
+                        },
+                    'Online_Ranker.py': {
+                       'DIR' : Online_dir,
+                       'IP'  : '0.0.0.0',
+                       'PORT': '5004'
                         }
                    }
     #########################################################
@@ -98,7 +114,7 @@ if __name__ == '__main__':
     #                   Running Scripts                     #
     #########################################################
     colors = ["RED", "GREEN", "YELLOW", "BLUE", "MAGENTA", "CYAN", "WHITE"]
-    for (FileName,config) in tqdm((server_list.items()), colour=random.choice(colors) , bar_format='{l_bar}{bar:10}{r_bar}{bar:-10b}'): #hex (#00ff00),
+    for (FileName,config) in tqdm((server_list.items()), colour=random.choice(colors) , bar_format='{l_bar}{bar:40}{r_bar}{bar:-40b}'): #hex (#00ff00),
         
         dir_path = config['DIR']
         assert(os.path.isdir(dir_path))
@@ -110,6 +126,6 @@ if __name__ == '__main__':
 
     # Test
     os.chdir(prod_env)
-    time.sleep(2)
+    time.sleep(6)
     input("Press Enter to Shutdown")
     run_cmd(['python','shutdown.py'])
