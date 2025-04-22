@@ -63,20 +63,18 @@ def random_events():
     selected_users = random.choices(population=list(UserBase.users.keys()), k = num)
     return {u:UserBase.users[u] for u in selected_users}
 
-@app.post("/user_base_o")
-def user_base_o():
-    """Returns every user except for the unspecficied user."""
-    if request.is_json:
-        incoming_request = request.get_json()
-        select_user: str = incoming_request['USER']  if 'USER'  in incoming_request else None
-    if select_user not in UserBase.users:
-        print(f'{select_user=}')
-        return {'Message': 'Missing User'}, 400
-    print(select_user)
-    others = {u:UserBase.users[u]['CLICKED'] for u in UserBase.users.keys() if u != select_user}
-    return jsonify(others), 200
-
 @app.get("/user_base")
 def user_base():
     others = {u:UserBase.users[u]['CLICKED'] for u in UserBase.users.keys()}
     return jsonify(others), 200
+
+@app.post("/interactions")
+def get_interactions():
+    if request.is_json:
+        incoming_request = request.get_json()
+        assert('USER_ID' in incoming_request)
+        user_id = incoming_request['USER_ID']
+        assert(user_id in UserBase.users)
+
+    interact: list = UserBase.users[user_id]['CLICKED']
+    return interact, 200

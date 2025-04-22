@@ -24,6 +24,7 @@ class IP_Data:
     def __init__(self):
         self.local_host  = '127.0.0.1'
         self.events_port = '5001'
+        self.reccs       = '5004'
 
     def get_url(self,server, func) -> str:
         """Returns the url"""
@@ -32,6 +33,8 @@ class IP_Data:
             case 'events':
                 # Makes requests to the front server
                 url = f'http://{self.local_host}:{self.events_port}'
+            case 'ranker':
+                url = f'http://{self.local_host}:{self.reccs}'
             case _:
                 return None
 
@@ -42,6 +45,10 @@ class IP_Data:
                 return f'{url}/search_literal'
             case 'columns':
                 return f'{url}/get_features'
+            case 'item':
+                return f'{url}/item'
+            case 'user':
+                return f'{url}/user_recc'
             case _:
                 return None
         
@@ -54,11 +61,6 @@ app = Flask(__name__)
 def identify():
     print('Front Server')
     return {'Message':'ok'}, 200
-
-@app.get("/get_columns")
-def return_features():
-    url = IPs.get_url(server='events' , func='columns')
-    return query(url, mode='GET'), 200
 
 @app.post("/search")
 def search_func():
@@ -112,10 +114,19 @@ def reccomendation():
             ...
         case 'item':
             """
-            1. Makes a request to Online Ranker.
             """
-            ...
+            url = IPs.get_url(server = 'ranker',func = 'item')
+            select = {
+                'USER_ID': user_ID,
+                'NUMBER': number
+            }
+            return query(url,select,mode = 'POST'), 200
         case 'user':
-            ...
+            url = IPs.get_url(server = 'ranker',func = 'user')
+            select = {
+                'USER_ID': user_ID,
+                'NUMBER': number
+            }
+            return query(url,select,mode = 'POST'), 200
         case _:
             print('Mode does not match any specified method.')

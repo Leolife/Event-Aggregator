@@ -76,6 +76,10 @@ class IP_Data:
             case 'sample':
                 # Returns weights from offline ranker
                 return f'{url}/random_sample'
+            case 'userbase':
+                return f'{url}/user_base'
+            case 'interact':
+                return f'{url}/interactions'
             case _:
                 return None
 
@@ -109,12 +113,11 @@ def item_to_item():
         n_items = incoming_request['NUMBER']
     #############################################################
     # 2 Obtain the user interactions
-    url  = IPs.get_url(server='users',func = 'sample')
+    url  = IPs.get_url(server='users',func = 'interact')
     select = {
-        'NUMBER': 1
+        'USER_ID': user_id
     }
-    sample_user = query(url = url, data = select, mode = 'POST')
-    interactions: Counter = list(sample_user.values())[0]['CLICKED']
+    interactions = query(url = url, data = select, mode = 'POST')
     #############################################################
     # 3 Obtain the weights
     url  = IPs.get_url(server='ranker',func = 'weights')
@@ -150,17 +153,26 @@ def item_to_item():
 def user_recc():
     if request.is_json:
         incoming_request = request.get_json()
-        sample_user: str = incoming_request['USER'] if 'USER' in incoming_request else None
-    item = requests.get("http://127.0.0.1:5000/user_base")
-    item = json.loads(item.content.decode())
+        sample_user: str = incoming_request['USER_ID'] if 'USER_ID' in incoming_request else None
+        n_events   : int = incoming_request['NUMBER']  if 'NUMBER' in incoming_request else None
+ 
+    url = IPs.get_url(server = 'users',func = 'userbase')
+
+    item = query(url = url, mode = 'GET')
+
+    assert(sample_user in item.keys()) # This may fail
+
     user_data = item[sample_user]
     others = {u:item[u] for u in item.keys() if u != sample_user}
     scores = [(o_data, cosine_dic(o_data,user_data)) for o_user,o_data in others.items()]
     scores.sort(key = lambda x: x[1], reverse=True)
     updated_sim = scores[0][0] # Gets the user data of the one's closest to the user
-    return jsonify(random.choices(population=list(updated_sim.keys()),weights = list(updated_sim.values()), k = 1) )
+    event_ids = random.choices(population=list(updated_sim.keys()),weights = list(updated_sim.values()), k = n_events)
+    #############################################################
+    url  =  IPs.get_url(server='events',func = 'rows')
+    select = {
+        'IDS': event_ids
+    }
+    events_items  = query(url = url, data = select, mode = 'POST')
 
-
-if __name__ == '__main__':
-    ...
-    # get_weights(example_request)
+    return events_items, 200
