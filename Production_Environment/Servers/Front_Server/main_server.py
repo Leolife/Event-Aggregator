@@ -41,8 +41,6 @@ class IP_Data:
                 return None
 
         match func:
-            case 'sby':
-                return f'{url}/search_by'
             case 'literal':
                 return f'{url}/search_literal'
             case 'columns':
@@ -51,6 +49,8 @@ class IP_Data:
                 return f'{url}/item'
             case 'user':
                 return f'{url}/user_recc'
+            case 'search':
+                return f'{url}/search'
             case _:
                 return None
         
@@ -70,23 +70,22 @@ def search_func():
     if request.is_json:
         incoming_request = request.get_json()
         assert('QUERY'  in incoming_request)
-        assert('BY'     in incoming_request)
+        #assert('BY'     in incoming_request)
         assert('NUMBER' in incoming_request)
         q        : str = incoming_request['QUERY']
-        search_by: str = incoming_request['BY']
+        #search_by: str = incoming_request['BY']
         n        : int = incoming_request['NUMBER']
 
     # Makes requests to the front server
 
-    url = IPs.get_url(server='events' , func='sby')
+    url = IPs.get_url(server='events' , func='search')
 
     data = {
             "QUERY"  : q,
-            "BY"     : search_by,
             "NUMBER" : n
             }
 
-    items = query(url,data, mode='POST')
+    items = query(url, data, mode='POST')
     
     return items, 200
 
