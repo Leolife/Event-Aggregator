@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+from Levenshtein import ratio, jaro, distance
 import sqlite3
 import random
 import os
@@ -133,6 +134,19 @@ class event_database:
         
         return data
 
+    def select_title(self) -> list:
+        try:
+            conn   = sqlite3.connect(self.DATABASE_FILENAME)
+            cursor = conn.cursor()
+            data   = cursor.execute(f'''SELECT ID,TITLE FROM EVENTS''') 
+            data   = list(data)
+        except Exception as e:
+            print(e)
+        finally:
+            conn.close()
+        
+        return data
+
 ########################################## SETUP
 events_DB = event_database(FilePath = os.path.join('Data','Event Data.db'))
 
@@ -184,6 +198,24 @@ def print_table():
 def delete_table():
     events_DB.clear_table()
     return {'Message': 'ok'}, 200
+########################################## Table Search
+@app.post("/search")
+def search_table():
+    """ """
+    if request.is_json:
+        incoming_request = request.get_json()
+        n = incoming_request['NUMBER']    
+        search_phrase = incoming_request['SEARCH']
+    
+    event_data: tuple = events_DB.select_title()
+    scores  = [(event_id, jaro(search_phrase, title)) for event_id, title in event_data]
+    scores = sorted(scores, key = lambda x : x[1],reverse=True)
+    event_ids, _ = zip(*scores)
+    event_ids = event_ids[:n]
+
+    event_info = events_DB.select_rows(event_ids)
+    return event_info, 200
+
 
 ########################################## Data Manipulation
 @app.post("/get_col")
@@ -204,7 +236,6 @@ def get_rows():
         req = request.get_json()
         if 'IDS' not in req:
             return {'Message':'Invalid Request'}, 400
-        assert(type(req['IDS']))
         rows = tuple(req['IDS'])
     else:
         return {"error": "Request must be JSON"}, 415
@@ -221,5 +252,10 @@ def get_sample():
 @app.get("/get_descs")
 def get_desc():
     data = events_DB.select_desc()
+    return data,200
+
+@app.get("/gett")
+def get_title():
+    data = events_DB.select_title()
     return data,200
     
