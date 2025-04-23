@@ -85,9 +85,23 @@ def search_func():
             "NUMBER" : n
             }
 
-    items = query(url, data, mode='POST')
-    
-    return items, 200
+    items: list[tuple] = query(url, data, mode='POST')
+
+    results = {}
+    for item in items:
+        assert(len(item) == 11)
+        results[item[0]] = {
+            'Title': item[1],
+            'Date' : item[2],
+            'Mainpage' : item[3],
+            'address1' : item[4],
+            'address2' : item[5],
+            'when'     : item[6],
+            'Thumb'    : item[7],
+            'Image'    : item[8],
+            'Desc'     : item[9]
+        }
+    return jsonify(items), 200
 
 @app.post("/recc")
 def reccomendation():
