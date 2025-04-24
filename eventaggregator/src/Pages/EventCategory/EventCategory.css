@@ -14,30 +14,29 @@
     height: 80%;
 }
 
-
 .event-card .event-type {
     font-style: italic;
 }
 
 .event-card .date-text {
     font-weight: bold;
-    color: rgb(65, 65, 65) ;
+    color: rgb(65, 65, 65);
 }
 
 .event-card .location-text {
-    font-size:small;
-    color: rgb(75, 75, 75) ;
+    font-size: small;
+    color: rgb(75, 75, 75);
 }
 
 .event-card .price {
     font-style: italic;
-    color: rgb(65, 65, 65) ;
+    color: rgb(65, 65, 65);
 }
-
 
 .event-card .timestamp-container {
     margin-top: 10px;
     margin-bottom: 10px;
+    display: flex;
 }
 
 .event-card .img-sizer {
@@ -61,10 +60,6 @@
     word-break: break-word;
 }
 
-.event-card .timestamp-container {
-    display: flex;
-}
-
 .event-card h2 {
     color: var(--secondary);
 }
@@ -85,16 +80,16 @@
 }
 
 .export-btn:hover {
-    transform: translateY(-1px); /* Slight lift effect */
+    transform: translateY(-1px);
 }
 
 .save-btn:hover {
-    transform: translateY(-1px); /* Slight lift effect */
+    transform: translateY(-1px);
     background-color: #6b34c9 !important;
 }
 
 .add-btn:hover {
-    transform: translateY(-1px); /* Slight lift effect */
+    transform: translateY(-1px);
 }
 
 .add-options {
@@ -186,11 +181,35 @@
     height: 25px;
 }
 
-/* Add a visual effect for the heart button when clicked */
 .heart-btn:active .heart-icon path {
-    transform: translateY(1px); /* Slight lift effect */
+    transform: translateY(1px);
 }
 
 .heart-btn:hover {
-    transform: translateY(-1px); /* Slight lift effect */
+    transform: translateY(-1px);
+}
+
+
+.calendar-link-container {
+    display: flex;
+    justify-content: flex-end;
+    margin: 10px 20px;
+}
+
+.calendar-link-button {
+    background-color: #7c3aed; 
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.calendar-link-button:hover {
+    background-color: #6b34c9;
+    transform: translateY(-1px);
 }
