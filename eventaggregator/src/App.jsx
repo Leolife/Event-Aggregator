@@ -13,6 +13,7 @@ import { auth } from './firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import Settings from './Pages/Settings/Settings';
 import TestUserData from './utils/Debuguser';
+import PreGeneratedCalendar from './Components/Calendar/PreGeneratedCalendar';
 
 
 function App() {
@@ -50,6 +51,7 @@ function App() {
         <Route path='/event/category/:categoryName' element={ <EventCategory sidebar={sidebar} user={user} />} />
         <Route path="/event/:eventId" element={<EventPage sidebar={sidebar} user = {user} />} />
         <Route path='/debug' element={<TestUserData />}/>
+        <Route path="/calendar-static/:calendarType" element={<PreGeneratedCalendar />} />
       </Routes>
       
     </div>

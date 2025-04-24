@@ -207,6 +207,17 @@ export const EventCategory = ({ sidebar, user }) => {
             <Sidebar sidebar={sidebar} />
             <div className="events">
                 <Header title={formatCategoryName(categoryName)} sidebar={sidebar} sendData={sendData} options={options} />
+                
+                {/* ✅ New calendar button below header */}
+                <div className="calendar-link-container">
+                                    <button
+                                        className="calendar-link-button"
+                                        onClick={() =>
+                                            navigate(`/calendar-static/${encodeURIComponent(formatCategoryName(categoryName).toLowerCase())}`)}>
+                                        📅 View {formatCategoryName(categoryName)} Calendar
+                                    </button>
+                                </div>
+
                 <div className={`container ${sidebar ? "" : 'large-container'}`}>
                     <Alert notification = {notification}> </Alert>
                     <div className="feed">

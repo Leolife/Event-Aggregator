@@ -1,0 +1,119 @@
+.calendar-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.calendar-title {
+  background: #00cfff;
+  padding: 10px;
+  font-weight: bold;
+  border-radius: 8px 8px 0 0;
+  color: black;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.month-navigation {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 16px;
+  gap: 20px;
+}
+
+.month-navigation h3 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.month-navigation button {
+  padding: 6px 12px;
+  border: none;
+  background-color: #00cfff;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.month-navigation button:hover {
+  background-color: #00b8e6;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr); /* 7 columns for 7 days */
+  gap: 6px;
+}
+
+.cell {
+  border: 1px solid #ccc;
+  min-height: 100px;
+  padding: 5px;
+  background: white;
+  border-radius: 5px;
+  overflow-y: auto;
+  font-size: 0.9rem;
+}
+
+.cell.header {
+  background: #f0f0f0;
+  font-weight: bold;
+  text-align: center;
+  min-height: 40px;
+}
+
+.cell.empty {
+  background: transparent;
+  border: none;
+}
+
+.day-num {
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.event-block {
+  background: rgba(0, 0, 255, 0.1);
+  margin-top: 5px;
+  padding: 4px;
+  border-radius: 4px;
+  font-size: 0.85em;
+}
+
+.calendar-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin: 1rem 0;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+    position: relative;
+  }
+  
+  .calendar-nav button {
+    background-color: #00cfff;
+    color: white;
+    border: none;
+    padding: 0.4rem 1rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .calendar-nav button:hover {
+    background-color: #00b0d4;
+  }
+  
+  .calendar-nav h3 {
+    margin: 0;
+    text-align: center;
+    min-width: 140px;
+  }
+  
