@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import UserData from '../../../utils/UserData'; // Adjust path if needed
 import { auth } from '../../../firebase';
-import './Notifications.css'; 
+import './Notifications.css';
+import sendNotificationPreferencesEmail from "../../../utils/emailTemplates";
 
 function Notifications() {
     const [selectedOption, setSelectedOption] = useState("NotSubscribed");
@@ -74,6 +75,10 @@ function Notifications() {
 
             setHasChanged(false); 
             alert("Notification settings saved!");
+            await sendNotificationPreferencesEmail({
+                subscriptionStatus: selectedOption,
+                customOptions
+              });
         } catch (error) {
             console.error("Error saving notification settings:", error.message);
             alert("Failed to save settings. Please try again.");
