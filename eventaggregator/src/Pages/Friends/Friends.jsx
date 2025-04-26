@@ -3,7 +3,8 @@ import { auth } from '../../firebase';
 import Sidebar from '../../Components/Sidebar/Sidebar';
 import './Friends.css';
 import UserData from '../../utils/UserData';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+
 
 export const Friends = ({ sidebar }) => {
     const [loading, setLoading] = useState(true);
@@ -11,6 +12,14 @@ export const Friends = ({ sidebar }) => {
     const [friendsInfo, setFriendsInfo] = useState([]);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
+    const location = useLocation();
+        useEffect(() => {
+        const tabQuery = new URLSearchParams(location.search).get('tab');
+        if (tabQuery === 'requests') {
+            setActiveTab('requests');
+        }
+        }, [location]);
+
     
     // New state variables for friend requests
     const [activeTab, setActiveTab] = useState('friends'); // 'friends' or 'requests'

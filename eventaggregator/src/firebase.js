@@ -30,16 +30,6 @@ export const auth = getAuth(app);  // currently using for login authentication
 export const firestore = getFirestore(app);
 
 
-
-sendEmailVerification(auth.currentUser)
-  .then(() => {
-    console.log("Verification email sent!");
-  })
-  .catch((error) => {
-    console.error("Error sending email verification: ", error);
-  });
-
-
 // function to delete a user's account
 export const deleteUserAccount = async () => {
   const auth = getAuth();
