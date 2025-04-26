@@ -155,3 +155,7 @@ nav {
     stroke: grey;
     stroke-width: 5%;
 }
+
+.profile-icon {
+    cursor: pointer;
+}

@@ -209,7 +209,7 @@ const Navbar = ({ setSidebar }) => {
 
 
           <Overlays modalType={modalType} isOpen={isOpen} onClose={() => setIsOpen(false)} />
-          <ProfileIcon className="profile-icon" />
+          <a><ProfileIcon className="profile-icon" onClick={handleProfileClick} /></a>
 
           <Link to={'/settings'}><SettingsIcon className="settings-icon"></SettingsIcon></Link>
         </div>
