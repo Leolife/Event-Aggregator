@@ -13,6 +13,8 @@ import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { fetchForumEvents } from '../../Pages/Forum/ForumPosts';
 import logo from '../../assets/logo-text.png';
 import Overlays from '../Overlays';
+import NotificationDropdown from '../../Components/Notification/NotificationDropdown.jsx';
+
 
 
 
@@ -201,6 +203,10 @@ const Navbar = ({ setSidebar }) => {
               </>
             )}
           </div>
+          {isLoggedIn && (
+              <NotificationDropdown />
+            )}
+
 
           <Overlays modalType={modalType} isOpen={isOpen} onClose={() => setIsOpen(false)} />
           <ProfileIcon className="profile-icon" />

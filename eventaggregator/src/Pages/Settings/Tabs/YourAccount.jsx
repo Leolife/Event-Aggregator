@@ -9,8 +9,14 @@ import { generateEmailTemplate } from "../../../utils/emailTemplates";
 
 
 const sendEmailNotification = async (type, data = {}) => {
-    const email = auth.currentUser?.email;
-    const displayName = data.name || auth.currentUser?.displayName || "User";
+    const user = auth.currentUser;
+    if (!user) {
+      console.error("❌ No user logged in. Cannot send email.");
+      return;
+    }
+  
+    const email = user.email;
+    const displayName = data.name || user.displayName || "User";
   
     let subject = "Account Notification";
     let body = "Something in your account has been updated.";
@@ -45,10 +51,12 @@ const sendEmailNotification = async (type, data = {}) => {
           html: generateEmailTemplate({ subject, body, email }),
         },
       });
+      console.log("✅ Email queued successfully");
     } catch (err) {
-      console.error("Failed to queue email:", err);
+      console.error("❌ Failed to queue email:", err.message);
     }
   };
+  
 
 const YourAccount = () => {
     const [userData, setUserData] = useState({});
@@ -88,23 +96,28 @@ const YourAccount = () => {
    // Save updated user data
    const handleSave = async (field) => {
     if (!user) return console.error("User not authenticated.");
-
+  
     if (!newData[field] || newData[field].trim() === "") {
-        alert(`${field} cannot be empty!`);
-        return;
+      alert(`${field} cannot be empty!`);
+      return;
     }
-
+  
     try {
-        const userDataInstance = new UserData(user.uid);
-        await userDataInstance.setUserData({ [field]: newData[field] });
-        setUserData((prev) => ({ ...prev, [field]: newData[field] }));
-        alert(`${field} updated successfully!`);
-        setEditMode(null);
+      const userDataInstance = new UserData(user.uid);
+      await userDataInstance.setUserData({ [field]: newData[field] });
+      setUserData((prev) => ({ ...prev, [field]: newData[field] }));
+      alert(`${field} updated successfully!`);
+      await sendEmailNotification(`${field}Update`, {
+        updatedValue: newData[field],
+        name: newData.name || userData.name
+      });
+      setEditMode(null);
     } catch (error) {
-        console.error(`Error updating ${field}:`, error);
-        alert(`Failed to update ${field}: ${error.message}`);
+      console.error(`Error updating ${field}:`, error);
+      alert(`Failed to update ${field}: ${error.message}`);
     }
-};
+  };
+  
 
        // Validate and update password
        const handleSavePassword = async () => {

@@ -7,6 +7,7 @@ import { auth } from '../../firebase';
 import { Link, useParams } from "react-router-dom";
 import UserData from '../../utils/UserData';
 import Overlays from '../../Components/Overlays';
+import { sendInAppNotification } from '../../utils/notificationUtils';
 
 // Include all tabs from the tabs folder
 import About from './Tabs/About';
@@ -138,6 +139,18 @@ export const Profile = ({ sidebar }) => {
             
             console.log("Friend request sent successfully");
             
+            const fromUserData = new UserData(user.uid);
+                      const senderName = user.displayName || await fromUserData.getName() || "Someone";
+                  
+                      console.log("Sending notification to", userId, "from", senderName);
+                  
+                      await sendInAppNotification(
+                        userId,
+                        "🫂 New Friend Request",
+                        `${senderName} sent you a friend request.`
+                      );
+                  
+                      console.log("Notification sent");
             // Update UI to reflect the pending request
             // This could be a "Request Pending" button or similar UI change
             // For now, we'll just log the success
