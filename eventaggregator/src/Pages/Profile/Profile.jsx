@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import './Profile.css';
 import Sidebar from '../../Components/Sidebar/Sidebar';
-import headerimage from '../../assets/profile-header-image.png';
-import profileimage from '../../assets/profile-picture.png';
+import headerimage from '../../assets/blockListheader.png';
+import profileimage from '../../assets/blockListpfp.png';
 import { auth } from '../../firebase';
 import { Link, useParams } from "react-router-dom";
 import UserData from '../../utils/UserData';
@@ -42,6 +42,10 @@ export const Profile = ({ sidebar }) => {
     
     // State for the three-dot menu
     const [showDropdown, setShowDropdown] = useState(false);
+    
+    // New state for block status
+    const [isBlocked, setIsBlocked] = useState(false);
+    const [blockCheckComplete, setBlockCheckComplete] = useState(false);
 
     const { userId } = useParams();
 
@@ -62,6 +66,27 @@ export const Profile = ({ sidebar }) => {
     useEffect(() => {
         const fetchProfileData = async () => {
             const user = auth.currentUser;
+            
+            // If not the profile owner, check block status first
+            if (user && user.uid !== userId) {
+                // Check if either user has blocked the other
+                const isBlocked = await checkBlockStatus(user.uid, userId);
+                setIsBlocked(isBlocked);
+                setBlockCheckComplete(true);
+                
+                // If blocked, don't fetch profile data
+                if (isBlocked) {
+                    setProfileName("User");
+                    setProfilePicture("");
+                    setProfileBanner("");
+                    setBio("");
+                    return;
+                }
+            } else {
+                // If viewing own profile or not logged in, no block check needed
+                setBlockCheckComplete(true);
+            }
+            
             const userData = new UserData(userId);
             const userName = await userData.getName();
             const picture = await userData.getProfilePicture();
@@ -87,6 +112,34 @@ export const Profile = ({ sidebar }) => {
         };
         fetchProfileData();
     }, [userId]);
+
+    // Function to check if either user has blocked the other
+    const checkBlockStatus = async (currentUserId, profileUserId) => {
+        try {
+            // First check if current user has blocked profile user
+            const currentUserData = new UserData(currentUserId);
+            const currentUserObj = await currentUserData.getUserData();
+            const currentUserBlockList = currentUserObj.blockList || [];
+            
+            if (currentUserBlockList.includes(profileUserId)) {
+                return true; // Current user has blocked profile user
+            }
+            
+            // Then check if profile user has blocked current user
+            const profileUserData = new UserData(profileUserId);
+            const profileUserObj = await profileUserData.getUserData();
+            const profileUserBlockList = profileUserObj.blockList || [];
+            
+            if (profileUserBlockList.includes(currentUserId)) {
+                return true; // Profile user has blocked current user
+            }
+            
+            return false; // No block in either direction
+        } catch (error) {
+            console.error("Error checking block status:", error);
+            return false; // Default to not blocked on error
+        }
+    };
 
     // Close dropdown when clicking outside
     useEffect(() => {
@@ -135,17 +188,6 @@ export const Profile = ({ sidebar }) => {
                 return;
             }
     
-            // Get the current user's data
-            const currentUserData = new UserData(user.uid);
-            const currentUserObj = await currentUserData.getUserData();
-            
-            // Check if the user is in blockList
-            const blockList = currentUserObj.blockList || [];
-            if (blockList.includes(userId)) {
-                console.error("Cannot add this user as a friend because they are blocked");
-                return;
-            }
-    
             // Get the target user's data
             const targetUserData = new UserData(userId);
             const targetUserObj = await targetUserData.getUserData();
@@ -173,9 +215,9 @@ export const Profile = ({ sidebar }) => {
             console.log("Sending notification to", userId, "from", senderName);
             
             await sendInAppNotification(
-                userId,
-                "New Friend Request",
-                `${senderName} sent you a friend request.`
+              userId,
+              "New Friend Request",
+              `${senderName} sent you a friend request.`
             );
             
             console.log("Notification sent");
@@ -186,75 +228,43 @@ export const Profile = ({ sidebar }) => {
         }
     };
 
-    // Handler for blocking users
+    // Handler for block user button
     const handleBlockUser = async () => {
         try {
-            // Get current user
             const user = auth.currentUser;
             if (!user) {
                 console.error("You must be logged in to block users");
                 return;
             }
-        
+            
             // Get current user data
             const userData = new UserData(user.uid);
             const userDataObj = await userData.getUserData();
             
-            // Check if the blockList array exists, if not create it
-            let currentBlockList = userDataObj.blockList || [];
+            // Initialize blockList if it doesn't exist
+            const blockList = userDataObj.blockList || [];
             
-            // Check if the user is already blocked to avoid duplicates
-            if (currentBlockList.includes(userId)) {
+            // Check if user is already blocked
+            if (blockList.includes(userId)) {
                 console.log("User is already blocked");
                 return;
             }
             
-            // Add profile user's UID to the current user's blockList
-            currentBlockList.push(userId);
+            // Add user to block list
+            blockList.push(userId);
             
-            // Check if the blocked user is in friendsList and remove them if present
-            let currentFriendsList = userDataObj.friendsList || [];
-            let updatedFriendsList = currentFriendsList.filter(id => id !== userId);
+            // Save updated block list
+            await userData.setUserData({ blockList });
             
-            // Update the current user's data
-            await userData.setUserData({ 
-                blockList: currentBlockList,
-                friendsList: updatedFriendsList
-            });
-            
-            // Now handle the other user's data to remove any pending friend requests
-            const blockedUserData = new UserData(userId);
-            const blockedUserObj = await blockedUserData.getUserData();
-            
-            // Check if current user has a pending friend request to the blocked user
-            let theirIncomingRequests = blockedUserObj.incomingFriendRequests || [];
-            
-            // If current user has sent a friend request, remove it
-            if (theirIncomingRequests.includes(user.uid)) {
-                const updatedIncomingRequests = theirIncomingRequests.filter(id => id !== user.uid);
-                
-                // Update the blocked user's incomingFriendRequests
-                await blockedUserData.setUserData({ 
-                incomingFriendRequests: updatedIncomingRequests 
-                });
-                
-                console.log("Friend request removed from the blocked user");
-            }
-            
-            // Update local state if the user was a friend
-            if (currentFriendsList.length !== updatedFriendsList.length) {
-                setIsFriend(false);
-                console.log("User removed from friends list and blocked");
-            } else {
-                console.log("User blocked successfully");
-            }
-            
-            // Close the dropdown after blocking
+            // Update UI state
+            setIsBlocked(true);
             setShowDropdown(false);
-            } catch (error) {
-                console.error("Error blocking user:", error);
-            }
-      };
+            
+            console.log("User blocked successfully");
+        } catch (error) {
+            console.error("Error blocking user:", error);
+        }
+    };
 
     // Toggle dropdown menu
     const toggleDropdown = (e) => {
@@ -327,6 +337,15 @@ export const Profile = ({ sidebar }) => {
 
     // Renders the active tab content
     function renderTab(tab) {
+        // If profile is blocked, only show a message about the blocked status
+        if (isBlocked) {
+            return (
+                <div className="blocked-profile-message">
+                    <p>This profile is not available.</p>
+                </div>
+            );
+        }
+        
         switch (tab) {
             case TABS.ABOUT:
                 return <About editMode={editMode} bio={bio} setBio={setBio} favorites={profileFavorites} />;
@@ -357,10 +376,10 @@ export const Profile = ({ sidebar }) => {
                                     <div className="profile-banner-sizer">
                                         <img
                                             className="profile-banner-image"
-                                            src={editMode ? tempProfileBanner : profileBanner}
+                                            src={isBlocked ? headerimage : (editMode ? tempProfileBanner : profileBanner)}
                                             alt="Profile Banner"
                                         />
-                                        {editMode && (
+                                        {editMode && !isBlocked && (
                                             <button
                                                 className="edit-profile-banner-button"
                                                 onClick={() => { openModal('submit-prof-ban') }}
@@ -372,10 +391,10 @@ export const Profile = ({ sidebar }) => {
                                     <div className="profile-picture-container">
                                         <img
                                             className="profile-picture"
-                                            src={editMode ? tempProfilePicture : profilePicture}
+                                            src={isBlocked ? profileimage : (editMode ? tempProfilePicture : profilePicture)}
                                             alt="Profile Picture"
                                         />
-                                        {editMode && (
+                                        {editMode && !isBlocked && (
                                             <button
                                                 className="edit-profile-picture-button"
                                                 onClick={() => { openModal('submit-prof-pic') }}
@@ -388,7 +407,7 @@ export const Profile = ({ sidebar }) => {
                                 <div className="profile-header-content">
                                     <div className="header-caption">
                                         <div className="header-names">
-                                            {editingProfileName ? (
+                                            {editingProfileName && !isBlocked ? (
                                                 <>
                                                     <input
                                                         type="text"
@@ -406,8 +425,8 @@ export const Profile = ({ sidebar }) => {
                                             ) : (
                                                 <>
                                                     {/* If in edit mode, show the temporary (preview) name */}
-                                                    <h1>{editMode ? tempProfileName : profileName}</h1>
-                                                    {editMode && (
+                                                    <h1>{isBlocked ? "User" : (editMode ? tempProfileName : profileName)}</h1>
+                                                    {editMode && !isBlocked && (
                                                         <button
                                                             className="edit-profile-name-button"
                                                             onClick={() => setEditingProfileName(true)}
@@ -418,13 +437,15 @@ export const Profile = ({ sidebar }) => {
                                                 </>
                                             )}
                                         </div>
-                                        <div className="header-details">
-                                            <h2><span>30</span> Friends</h2>
-                                            <h2><span>30</span> Posts</h2>
-                                        </div>
+                                        {!isBlocked && (
+                                            <div className="header-details">
+                                                <h2><span>30</span> Friends</h2>
+                                                <h2><span>30</span> Posts</h2>
+                                            </div>
+                                        )}
                                         
                                         {/* Three-dot menu for non-profile owners who aren't already friends */}
-                                        {currentUser && !isOwner && friendshipChecked && (
+                                        {currentUser && !isOwner && friendshipChecked && blockCheckComplete && !isBlocked && (
                                             <div className="profile-actions-dropdown">
                                                 <button className="three-dots-button" onClick={toggleDropdown}>
                                                     &#8226;&#8226;&#8226;
@@ -437,8 +458,8 @@ export const Profile = ({ sidebar }) => {
                                                             </button>
                                                         )}
                                                         <button className="dropdown-item" onClick={handleBlockUser}>
-                                                                Block User
-                                                            </button>
+                                                            Block User
+                                                        </button>
                                                     </div>
                                                 )}
                                             </div>
@@ -449,12 +470,12 @@ export const Profile = ({ sidebar }) => {
                                     </div>
                                 </div>
                                 <div className="profile-buttons">
-                                    {!editMode && isOwner && (
+                                    {!editMode && isOwner && !isBlocked && (
                                         <button className="edit-profile-button" onClick={handleEditClick}>
                                             Edit Profile
                                         </button>
                                     )}
-                                    {editMode && (
+                                    {editMode && !isBlocked && (
                                         <>
                                             <button className="save-changes" onClick={handleSaveClick}>
                                                 Save Changes
@@ -468,18 +489,20 @@ export const Profile = ({ sidebar }) => {
                             </div>
                         </div>
 
-                        <div className="profile-tabs">
-                            {Object.entries(TABS).map(([tabKey, tabName]) => (
-                                <button
-                                    key={tabName}
-                                    className={`tab-link ${activeTab === tabName ? 'active' : ''}`}
-                                    onClick={() => setActiveTab(tabName)}
-                                >
-                                    {tabName}
-                                </button>
-                            ))}
-                            <hr />
-                        </div>
+                        {!isBlocked && (
+                            <div className="profile-tabs">
+                                {Object.entries(TABS).map(([tabKey, tabName]) => (
+                                    <button
+                                        key={tabName}
+                                        className={`tab-link ${activeTab === tabName ? 'active' : ''}`}
+                                        onClick={() => setActiveTab(tabName)}
+                                    >
+                                        {tabName}
+                                    </button>
+                                ))}
+                                <hr />
+                            </div>
+                        )}
                     </div>
                     <div className="section-content">
                         <div className="profile-content">
