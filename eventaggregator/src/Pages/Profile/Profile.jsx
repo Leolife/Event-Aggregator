@@ -135,6 +135,17 @@ export const Profile = ({ sidebar }) => {
                 return;
             }
     
+            // Get the current user's data
+            const currentUserData = new UserData(user.uid);
+            const currentUserObj = await currentUserData.getUserData();
+            
+            // Check if the user is in blockList
+            const blockList = currentUserObj.blockList || [];
+            if (blockList.includes(userId)) {
+                console.error("Cannot add this user as a friend because they are blocked");
+                return;
+            }
+    
             // Get the target user's data
             const targetUserData = new UserData(userId);
             const targetUserObj = await targetUserData.getUserData();
@@ -162,9 +173,9 @@ export const Profile = ({ sidebar }) => {
             console.log("Sending notification to", userId, "from", senderName);
             
             await sendInAppNotification(
-              userId,
-              "New Friend Request",
-              `${senderName} sent you a friend request.`
+                userId,
+                "New Friend Request",
+                `${senderName} sent you a friend request.`
             );
             
             console.log("Notification sent");
@@ -174,6 +185,76 @@ export const Profile = ({ sidebar }) => {
             console.error("Error sending friend request:", error);
         }
     };
+
+    // Handler for blocking users
+    const handleBlockUser = async () => {
+        try {
+            // Get current user
+            const user = auth.currentUser;
+            if (!user) {
+                console.error("You must be logged in to block users");
+                return;
+            }
+        
+            // Get current user data
+            const userData = new UserData(user.uid);
+            const userDataObj = await userData.getUserData();
+            
+            // Check if the blockList array exists, if not create it
+            let currentBlockList = userDataObj.blockList || [];
+            
+            // Check if the user is already blocked to avoid duplicates
+            if (currentBlockList.includes(userId)) {
+                console.log("User is already blocked");
+                return;
+            }
+            
+            // Add profile user's UID to the current user's blockList
+            currentBlockList.push(userId);
+            
+            // Check if the blocked user is in friendsList and remove them if present
+            let currentFriendsList = userDataObj.friendsList || [];
+            let updatedFriendsList = currentFriendsList.filter(id => id !== userId);
+            
+            // Update the current user's data
+            await userData.setUserData({ 
+                blockList: currentBlockList,
+                friendsList: updatedFriendsList
+            });
+            
+            // Now handle the other user's data to remove any pending friend requests
+            const blockedUserData = new UserData(userId);
+            const blockedUserObj = await blockedUserData.getUserData();
+            
+            // Check if current user has a pending friend request to the blocked user
+            let theirIncomingRequests = blockedUserObj.incomingFriendRequests || [];
+            
+            // If current user has sent a friend request, remove it
+            if (theirIncomingRequests.includes(user.uid)) {
+                const updatedIncomingRequests = theirIncomingRequests.filter(id => id !== user.uid);
+                
+                // Update the blocked user's incomingFriendRequests
+                await blockedUserData.setUserData({ 
+                incomingFriendRequests: updatedIncomingRequests 
+                });
+                
+                console.log("Friend request removed from the blocked user");
+            }
+            
+            // Update local state if the user was a friend
+            if (currentFriendsList.length !== updatedFriendsList.length) {
+                setIsFriend(false);
+                console.log("User removed from friends list and blocked");
+            } else {
+                console.log("User blocked successfully");
+            }
+            
+            // Close the dropdown after blocking
+            setShowDropdown(false);
+            } catch (error) {
+                console.error("Error blocking user:", error);
+            }
+      };
 
     // Toggle dropdown menu
     const toggleDropdown = (e) => {
@@ -355,6 +436,9 @@ export const Profile = ({ sidebar }) => {
                                                                 Add Friend
                                                             </button>
                                                         )}
+                                                        <button className="dropdown-item" onClick={handleBlockUser}>
+                                                                Block User
+                                                            </button>
                                                     </div>
                                                 )}
                                             </div>
