@@ -200,7 +200,7 @@ export const Friends = ({ sidebar }) => {
                 setError("Please log in to manage friend requests");
                 return;
             }
-
+    
             // Get current user data
             const userData = new UserData(user.uid);
             const userDataObj = await userData.getUserData();
@@ -209,17 +209,30 @@ export const Friends = ({ sidebar }) => {
             const currentFriendsList = userDataObj.friendsList || [];
             const currentRequests = userDataObj.incomingFriendRequests || [];
             
-            // Add requester to friends list
+            // Add requester to current user's friends list
             const newFriendsList = [...currentFriendsList, requesterId];
             
             // Remove requester from incoming requests
             const newRequests = currentRequests.filter(id => id !== requesterId);
             
-            // Update both lists in Firestore
+            // Update current user's data in Firestore
             await userData.setUserData({ 
                 friendsList: newFriendsList,
                 incomingFriendRequests: newRequests
             });
+            
+            // Also update the requester's friendsList to include the current user
+            const requesterData = new UserData(requesterId);
+            const requesterDataObj = await requesterData.getUserData();
+            const requesterFriendsList = requesterDataObj.friendsList || [];
+            
+            // Add current user to requester's friends list (if not already there)
+            if (!requesterFriendsList.includes(user.uid)) {
+                const updatedRequesterFriendsList = [...requesterFriendsList, user.uid];
+                await requesterData.setUserData({ 
+                    friendsList: updatedRequesterFriendsList 
+                });
+            }
             
             // Update local state
             setFriendsList(newFriendsList);
