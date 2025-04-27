@@ -16,6 +16,7 @@ const VoteControls = ({ postId, userId }) => {
   const [upvotes, setUpvotes] = useState(0);
   const [downvotes, setDownvotes] = useState(0);
   const [text, setText] = useState("");
+  const [title, setTitle] = useState("");
   const [userUpvoted, setUserUpvoted] = useState(false);
   const [userDownvoted, setUserDownvoted] = useState(false);
   const db = getFirestore();
@@ -30,6 +31,7 @@ const VoteControls = ({ postId, userId }) => {
           setUpvotes(data.upvoteCount || 0);
           setDownvotes(data.downvoteCount || 0);
           setText(data.body || "");
+          setTitle(data.title || "");
         }
   
         // Only fetch user-specific voting state if user is logged in
@@ -97,7 +99,12 @@ const VoteControls = ({ postId, userId }) => {
         const field = isUpvote ? "upvoteCount" : "downvoteCount";
 
         //Add additional/update doc information here
-        await setDoc(ref, { votedAt: new Date(), body: text},  { merge: true });
+        await setDoc(ref, { 
+          otedAt: new Date(), 
+          postId: postId, 
+          body: text, 
+          title: title 
+        },  { merge: true });
         await updateDoc(postRef, { [field]: increment(1) });
 
         if (isUpvote) {

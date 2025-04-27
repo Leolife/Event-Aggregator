@@ -16,6 +16,8 @@ const ReplyVoteControls = ({ postId, replyId, userId }) => {
   const [upvotes, setUpvotes] = useState(0);
   const [downvotes, setDownvotes] = useState(0);
   const [text, setText] = useState("");
+  const [postTitle, setPostTitle] = useState("");
+  const [postBody, setPostBody] = useState("");
   const [userUpvoted, setUserUpvoted] = useState(false);
   const [userDownvoted, setUserDownvoted] = useState(false);
   const db = getFirestore();
@@ -31,6 +33,15 @@ const ReplyVoteControls = ({ postId, replyId, userId }) => {
           setUpvotes(data.upvoteCount || 0);
           setDownvotes(data.downvoteCount || 0);
           setText(data.commentBody || "");
+        }
+
+        const postRef = doc(db, "forum", postId);
+        const postSnap = await getDoc(postRef);
+
+        if (postSnap.exists()) {
+          const postData = postSnap.data();
+          setPostTitle(postData.title || "");
+          setPostBody(postData.body || "");
         }
 
         if (userId) {
@@ -98,7 +109,14 @@ const ReplyVoteControls = ({ postId, replyId, userId }) => {
         const field = isUpvote ? "upvoteCount" : "downvoteCount";
 
         //Add additional/update doc information here
-        await setDoc(ref, { votedAt: new Date(), body: text },  { merge: true });
+        await setDoc(ref, { 
+          votedAt: new Date(), 
+          postId: postId,
+          replyId: replyId,
+          postTitle: postTitle,
+          postBody: postBody,
+          replyBody: text, 
+        },  { merge: true });
         await updateDoc(replyRef, { [field]: increment(1) });
 
         if (isUpvote) {
