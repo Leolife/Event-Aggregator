@@ -56,7 +56,7 @@ export const AddForumPost = ({ isOpen, onClose }) => {
             // Create a new document in the user's posts subcollection with the post ID and timestamp
             await setDoc(
                 doc(firestore, 'users', user.uid, 'posts', newDocRef.id),
-                { timestamp: newPostData.timestamp }
+                { timestamp: newPostData.timestamp, body: body }
             );
 
             console.log("Document written with ID:", newDocRef.id);
