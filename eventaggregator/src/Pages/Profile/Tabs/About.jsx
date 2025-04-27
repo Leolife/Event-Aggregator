@@ -1,6 +1,8 @@
 import { auth } from '../../../firebase'; // Adjusted for your firebase.js location
 import UserData from '../../../utils/UserData';
 import { useState } from 'react';
+import { getAuth } from 'firebase/auth';
+import { useNavigate } from 'react-router-dom';
 import "./About.css"
 import EventCard from '../../../Components/Events/EventCard'
 const user = auth.currentUser;
@@ -8,9 +10,28 @@ const userData = user ? new UserData(user.uid) : null;
 
 // import './About.css'
 function About({ editMode, bio, setBio, favorites }) {
+    const navigate = useNavigate();
     const userFavorites = favorites.eventsData
     const handleBioChange = (e) => {
         setBio(e.target.value);
+    };
+
+    // modal control for editing mode
+    const [modalType, setModalType] = useState('');
+    const [isOpen, setIsOpen] = useState(false);
+
+    const openModal = (type) => {
+        setModalType(type);
+        setIsOpen(true);
+      };
+
+    const handleFriendsClick = () => {
+        const auth = getAuth();
+        if (auth.currentUser) {
+            navigate('/Friends');
+        } else {
+            openModal('login')
+        }
     };
 
     return (
@@ -27,13 +48,13 @@ function About({ editMode, bio, setBio, favorites }) {
                 <p className="userBio">{bio}</p>
             )}
             <hr />
-            <div className="profile-friends">
-                <h2>Friends (30)</h2>
+            <div className="profile-friends" onClick={handleFriendsClick} >
+                <h2>Friends</h2> 
             </div>
             <hr />
             {/* Display the favorites section if the user has favorited events */}
             <div style={{ display: favorites?.eventsData ? "inline" : "none" }} className="profile-favorites">
-                <h2>Favorites {favorites?.eventsData ? `(${favorites.eventsData.length})` : "(0)"}</h2>
+                <h2>Favorites</h2>
                 <div className="favorites-container">
                     {userFavorites && userFavorites.length > 0 ? (
                         userFavorites.map((event) => (
