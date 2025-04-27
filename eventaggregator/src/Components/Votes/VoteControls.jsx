@@ -10,6 +10,8 @@ import {
 } from "firebase/firestore";
 import UpvoteArrow from "../../assets/upvotearrow.png";
 import DownvoteArrow from "../../assets/downvotearrow.png";
+import ForumData from "../../utils/ForumData";
+import UserData from "../../utils/UserData";
 import "./VoteButton.css";
 
 const VoteControls = ({ postId, userId }) => {
@@ -58,7 +60,34 @@ const VoteControls = ({ postId, userId }) => {
     }
 
     try {
+      // Check block relationship before voting
       const postRef = doc(db, "forum", postId);
+      const postSnap = await getDoc(postRef);
+      
+      if (!postSnap.exists()) {
+          console.error("Post does not exist");
+          return;
+      }
+      
+      const postData = postSnap.data();
+      const postOwnerId = postData.ownerId;
+      
+      // Get current user data
+      const currentUserData = new UserData(userId);
+      const currentUserObj = await currentUserData.getUserData();
+      const currentUserBlockList = currentUserObj.blockList || [];
+      
+      // Get post owner's data
+      const postOwnerData = new UserData(postOwnerId);
+      const postOwnerObj = await postOwnerData.getUserData();
+      const postOwnerBlockList = postOwnerObj.blockList || [];
+      
+      // Check if either user has blocked the other
+      if (currentUserBlockList.includes(postOwnerId) || postOwnerBlockList.includes(userId)) {
+          alert('You cannot comment on this post. You either blocked this user or this user blocked you.');
+          return;
+      }
+      
       const userUpvoteRef = doc(db, "users", userId, "upvotes", postId);
       const userDownvoteRef = doc(db, "users", userId, "downvotes", postId);
       const [upSnap, downSnap] = await Promise.all([

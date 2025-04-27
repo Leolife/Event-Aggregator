@@ -3,6 +3,7 @@ import './FullPostView.css';
 import { auth, firestore } from '../../firebase';
 import { collection, addDoc, deleteDoc, doc, onSnapshot, query, orderBy, Timestamp, setDoc, updateDoc, increment } from 'firebase/firestore';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import ForumData from '../../utils/ForumData';
 import UserData from '../../utils/UserData';
 import { formatDistanceToNowStrict } from 'date-fns';
 import ReplyVoteControls from '../Votes/ReplyVoteControls';
@@ -34,15 +35,36 @@ const Replies = ({ postId }) => {
     const handleReplySubmit = async (e) => {
         e.preventDefault();
         if (!replyText.trim()) return;
-
+    
         if (!user) {
             alert('You must be logged in to comment.');
             return;
         }
-
-        const userName = await userData.getName();
-
+    
         try {
+            const userName = await userData.getName();
+            
+            // Check if the current user is blocked by or has blocked the post owner
+            const postInstance = new ForumData(postId);
+            const postData = await postInstance.getPostData();
+            const postOwnerId = postData.ownerId;
+            
+            // Get current user data
+            const currentUserData = new UserData(user.uid);
+            const currentUserObj = await currentUserData.getUserData();
+            const currentUserBlockList = currentUserObj.blockList || [];
+            
+            // Get post owner's data
+            const postOwnerData = new UserData(postOwnerId);
+            const postOwnerObj = await postOwnerData.getUserData();
+            const postOwnerBlockList = postOwnerObj.blockList || [];
+            
+            // Check if either user has blocked the other
+            if (currentUserBlockList.includes(postOwnerId) || postOwnerBlockList.includes(user.uid)) {
+                alert('You cannot comment on this post. You either blocked this user or this user blocked you.');
+                return;
+            }
+    
             const replyData = {
                 ownerName: userName || 'Anonymous',
                 ownerId: user.uid,
@@ -51,27 +73,28 @@ const Replies = ({ postId }) => {
                 upvoteCount: 0,
                 downvoteCount: 0
             };
-
+    
             // Add the reply to the forum's replies subcollection
             const replyDocRef = await addDoc(
                 collection(firestore, 'forum', postId, 'replies'),
                 replyData
             );
-
+    
             // Create a new document in the user's replies subcollection with the same replyId
             await setDoc(
                 doc(firestore, 'users', user.uid, 'replies', replyDocRef.id),
                 { timestamp: replyData.timestamp, body: replyText }
             );
-
+    
             // Increment replyCount in the parent forum document
             await updateDoc(doc(firestore, 'forum', postId), {
                 replyCount: increment(1)
             });
-
+    
             setReplyText('');
         } catch (error) {
             console.error('Error adding reply:', error);
+            alert('Failed to add reply. Please try again later.');
         }
     };
 
