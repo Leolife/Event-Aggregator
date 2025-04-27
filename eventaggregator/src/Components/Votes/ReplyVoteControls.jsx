@@ -15,6 +15,7 @@ import "./VoteButton.css";
 const ReplyVoteControls = ({ postId, replyId, userId }) => {
   const [upvotes, setUpvotes] = useState(0);
   const [downvotes, setDownvotes] = useState(0);
+  const [text, setText] = useState("");
   const [userUpvoted, setUserUpvoted] = useState(false);
   const [userDownvoted, setUserDownvoted] = useState(false);
   const db = getFirestore();
@@ -29,6 +30,7 @@ const ReplyVoteControls = ({ postId, replyId, userId }) => {
           const data = replySnap.data();
           setUpvotes(data.upvoteCount || 0);
           setDownvotes(data.downvoteCount || 0);
+          setText(data.commentBody || "");
         }
 
         if (userId) {
@@ -94,7 +96,9 @@ const ReplyVoteControls = ({ postId, replyId, userId }) => {
 
         const ref = isUpvote ? userUpvoteRef : userDownvoteRef;
         const field = isUpvote ? "upvoteCount" : "downvoteCount";
-        await setDoc(ref, { votedAt: new Date() }, { merge: true });
+
+        //Add additional/update doc information here
+        await setDoc(ref, { votedAt: new Date(), body: text },  { merge: true });
         await updateDoc(replyRef, { [field]: increment(1) });
 
         if (isUpvote) {

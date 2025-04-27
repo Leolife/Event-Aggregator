@@ -15,6 +15,7 @@ import "./VoteButton.css";
 const VoteControls = ({ postId, userId }) => {
   const [upvotes, setUpvotes] = useState(0);
   const [downvotes, setDownvotes] = useState(0);
+  const [text, setText] = useState("");
   const [userUpvoted, setUserUpvoted] = useState(false);
   const [userDownvoted, setUserDownvoted] = useState(false);
   const db = getFirestore();
@@ -28,6 +29,7 @@ const VoteControls = ({ postId, userId }) => {
           const data = postSnap.data();
           setUpvotes(data.upvoteCount || 0);
           setDownvotes(data.downvoteCount || 0);
+          setText(data.body || "");
         }
   
         // Only fetch user-specific voting state if user is logged in
@@ -93,7 +95,7 @@ const VoteControls = ({ postId, userId }) => {
 
         const ref = isUpvote ? userUpvoteRef : userDownvoteRef;
         const field = isUpvote ? "upvoteCount" : "downvoteCount";
-        await setDoc(ref, { votedAt: new Date() }, { merge: true });
+        await setDoc(ref, { votedAt: new Date(), body: text},  { merge: true });
         await updateDoc(postRef, { [field]: increment(1) });
 
         if (isUpvote) {

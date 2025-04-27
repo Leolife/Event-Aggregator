@@ -61,7 +61,7 @@ const Replies = ({ postId }) => {
             // Create a new document in the user's replies subcollection with the same replyId
             await setDoc(
                 doc(firestore, 'users', user.uid, 'replies', replyDocRef.id),
-                { timestamp: replyData.timestamp }
+                { timestamp: replyData.timestamp, body: replyText }
             );
 
             // Increment replyCount in the parent forum document
