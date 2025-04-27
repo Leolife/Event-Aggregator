@@ -95,6 +95,8 @@ const VoteControls = ({ postId, userId }) => {
 
         const ref = isUpvote ? userUpvoteRef : userDownvoteRef;
         const field = isUpvote ? "upvoteCount" : "downvoteCount";
+
+        //Add additional/update doc information here
         await setDoc(ref, { votedAt: new Date(), body: text},  { merge: true });
         await updateDoc(postRef, { [field]: increment(1) });
 
