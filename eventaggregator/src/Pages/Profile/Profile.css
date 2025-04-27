@@ -203,6 +203,58 @@
     background-color: rgba(0, 0, 0, 0.8);
 }
 
+/* Three-dot menu styling */
+.profile-actions-dropdown {
+    position: absolute;
+    display: inline-block;
+    margin-top: 15px;
+    right: 20px;
+    top: 20px;
+}
+
+.three-dots-button {
+    background-color: #3ed0e4;
+    border: none;
+    cursor: pointer;
+    font-size: 24px;
+    padding: 5px 10px;
+    border-radius: 5px;
+    transition: background-color 0.2s;
+    transform: rotate(90deg);
+}
+
+.three-dots-button:hover {
+    background-color: #32b3c4;
+}
+
+.dropdown-menu {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    min-width: 150px;
+    background-color: #3ed0e4;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+    z-index: 10;
+    overflow: hidden;
+}
+
+.dropdown-item {
+    display: block;
+    width: 100%;
+    padding: 10px 15px;
+    text-align: left;
+    border-radius: 0;
+    border-color:#c71720;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s;
+}
+
+.dropdown-item:hover {
+    background-color: #32b3c4;
+}
+
 .friend-button-container {
     margin-top: 15px;
     display: flex;

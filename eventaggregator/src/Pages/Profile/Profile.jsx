@@ -39,6 +39,9 @@ export const Profile = ({ sidebar }) => {
     const [bio, setBio] = useState("");
     const [isFriend, setIsFriend] = useState(false);
     const [friendshipChecked, setFriendshipChecked] = useState(false);
+    
+    // State for the three-dot menu
+    const [showDropdown, setShowDropdown] = useState(false);
 
     const { userId } = useParams();
 
@@ -84,6 +87,20 @@ export const Profile = ({ sidebar }) => {
         };
         fetchProfileData();
     }, [userId]);
+
+    // Close dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (showDropdown && !event.target.closest('.profile-actions-dropdown')) {
+                setShowDropdown(false);
+            }
+        };
+
+        document.addEventListener('click', handleClickOutside);
+        return () => {
+            document.removeEventListener('click', handleClickOutside);
+        };
+    }, [showDropdown]);
 
     // Check if the current user is friends with the profile user
     const checkFriendshipStatus = async (currentUserId, profileUserId) => {
@@ -140,23 +157,28 @@ export const Profile = ({ sidebar }) => {
             console.log("Friend request sent successfully");
             
             const fromUserData = new UserData(user.uid);
-                      const senderName = user.displayName || await fromUserData.getName() || "Someone";
-                  
-                      console.log("Sending notification to", userId, "from", senderName);
-                  
-                      await sendInAppNotification(
-                        userId,
-                        "🫂 New Friend Request",
-                        `${senderName} sent you a friend request.`
-                      );
-                  
-                      console.log("Notification sent");
-            // Update UI to reflect the pending request
-            // This could be a "Request Pending" button or similar UI change
-            // For now, we'll just log the success
+            const senderName = user.displayName || await fromUserData.getName() || "Someone";
+            
+            console.log("Sending notification to", userId, "from", senderName);
+            
+            await sendInAppNotification(
+              userId,
+              "🫂 New Friend Request",
+              `${senderName} sent you a friend request.`
+            );
+            
+            console.log("Notification sent");
+            // Close the dropdown after sending request
+            setShowDropdown(false);
         } catch (error) {
             console.error("Error sending friend request:", error);
         }
+    };
+
+    // Toggle dropdown menu
+    const toggleDropdown = (e) => {
+        e.stopPropagation(); // Prevent event bubbling
+        setShowDropdown(!showDropdown);
     };
 
     // Callback to receive the new banner link from the modal
@@ -320,12 +342,21 @@ export const Profile = ({ sidebar }) => {
                                             <h2><span>30</span> Posts</h2>
                                         </div>
                                         
-                                        {/* Add Friend Button - Only shows when friendship status is checked, current user is not the profile owner and not already friends */}
-                                        {currentUser && !isOwner && !isFriend && friendshipChecked && (
-                                            <div className="friend-button-container">
-                                                <button className="add-friend-button" onClick={handleAddFriend}>
-                                                    Add Friend
+                                        {/* Three-dot menu for non-profile owners who aren't already friends */}
+                                        {currentUser && !isOwner && friendshipChecked && (
+                                            <div className="profile-actions-dropdown">
+                                                <button className="three-dots-button" onClick={toggleDropdown}>
+                                                    &#8226;&#8226;&#8226;
                                                 </button>
+                                                {showDropdown && (
+                                                    <div className="dropdown-menu">
+                                                        {!isFriend && (
+                                                            <button className="dropdown-item" onClick={handleAddFriend}>
+                                                                Add Friend
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                )}
                                             </div>
                                         )}
                                     </div>
