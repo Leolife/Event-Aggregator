@@ -129,7 +129,7 @@ const VoteControls = ({ postId, userId }) => {
 
         //Add additional/update doc information here
         await setDoc(ref, { 
-          otedAt: new Date(), 
+          votedAt: new Date(), 
           postId: postId, 
           body: text, 
           title: title 
