@@ -1,3 +1,4 @@
+
 .profile-container {
     display: flex;
     align-items: flex-start; /* Aligns elements at the top */
@@ -6,10 +7,11 @@
     position: relative;
 }
 
+
 .profile-header {
     margin: auto;
     width: 1280px;
-    background-color: #fff;
+    background-color: transparent !important;
 }
 
 .profile-content {
@@ -89,6 +91,7 @@
     transform: translate(-25%, -50%);
     object-fit: cover; /* ensures the image fills the container */
     z-index: 2;
+    border-color: var(--background-primary-color) !important;
 }
 
 .edit-profile-picture-button {

@@ -32,11 +32,12 @@
     text-overflow: ellipsis;
     word-break: break-word;
     white-space: nowrap;
+    color: var(--text-primary-color);
 }
 
 .tile .event-info {
     font-weight: 500;
-    color: #474747;
+    color: var(--text-light-color);
 }
 
 .tag-box {

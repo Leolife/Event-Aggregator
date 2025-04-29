@@ -1,5 +1,5 @@
 :root {
-  --primary: #3ed0e4;
+
   --secondary: #7c3aed;
   --background: #ffffff;
 }
@@ -38,3 +38,36 @@ button {
   white-space: nowrap;
 }
 
+
+label {
+  color: var(--text-light-color);
+}
+
+h1 {
+  color: var(--text-primary-color);
+}
+
+
+[data-theme="dark"] {
+  --background-primary-color: #121212;
+  --background-secondary-color: #181818; 
+  --text-primary-color: #ffffff;
+  --text-secondary-color: #fff;
+  --text-light-color: #cccccc;
+  --icon-primary-color: #ffffff;
+  --primary: #5c3ee4;
+  --primary-dark: #2e206e;
+  --primary-trans: rgba(131, 92, 204, 0.5);
+}
+
+[data-theme="light"] {
+  --background-primary-color: #ffffff;
+  --background-secondary-color: #f0f0f0;
+  --text-primary-color: #000000;
+  --text-secondary-color: #333;
+  --text-light-color: #7a7a7a;
+  --icon-primary-color: #5a5a5a;
+  --primary: #3ed0e4;
+  --primary-dark: #369eac;
+  --primary-trans: rgba(62, 208, 228, 0.5);
+}

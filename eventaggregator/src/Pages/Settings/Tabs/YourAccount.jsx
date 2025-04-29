@@ -11,58 +11,59 @@ import { generateEmailTemplate } from "../../../utils/emailTemplates";
 const sendEmailNotification = async (type, data = {}) => {
     const user = auth.currentUser;
     if (!user) {
-      console.error("❌ No user logged in. Cannot send email.");
-      return;
+        console.error("❌ No user logged in. Cannot send email.");
+        return;
     }
-  
+
     const email = user.email;
     const displayName = data.name || user.displayName || "User";
-  
+
     let subject = "Account Notification";
     let body = "Something in your account has been updated.";
-  
+
     switch (type) {
-      case "nameUpdate":
-        subject = "Your name was updated";
-        body = `Hi ${displayName}, your name was changed to: ${data.updatedValue}`;
-        break;
-      case "dobUpdate":
-        subject = "Your birthday was updated";
-        body = `Hi ${displayName}, your date of birth is now: ${data.updatedValue}`;
-        break;
-      case "passwordChange":
-        subject = "Your password was changed";
-        body = `Hi ${displayName}, your password has been successfully updated.`;
-        break;
-      case "accountDeletion":
-        subject = "Your account was deleted";
-        body = `Hi ${displayName}, your account has been permanently deleted.`;
-        break;
-      default:
-        break;
+        case "nameUpdate":
+            subject = "Your name was updated";
+            body = `Hi ${displayName}, your name was changed to: ${data.updatedValue}`;
+            break;
+        case "dobUpdate":
+            subject = "Your birthday was updated";
+            body = `Hi ${displayName}, your date of birth is now: ${data.updatedValue}`;
+            break;
+        case "passwordChange":
+            subject = "Your password was changed";
+            body = `Hi ${displayName}, your password has been successfully updated.`;
+            break;
+        case "accountDeletion":
+            subject = "Your account was deleted";
+            body = `Hi ${displayName}, your account has been permanently deleted.`;
+            break;
+        default:
+            break;
     }
-  
+
     try {
-      await addDoc(collection(firestore, "mail"), {
-        to: email,
-        message: {
-          subject,
-          text: body,
-          html: generateEmailTemplate({ subject, body, email }),
-        },
-      });
-      console.log("✅ Email queued successfully");
+        await addDoc(collection(firestore, "mail"), {
+            to: email,
+            message: {
+                subject,
+                text: body,
+                html: generateEmailTemplate({ subject, body, email }),
+            },
+        });
+        console.log("✅ Email queued successfully");
     } catch (err) {
-      console.error("❌ Failed to queue email:", err.message);
+        console.error("❌ Failed to queue email:", err.message);
     }
-  };
-  
+};
+
 
 const YourAccount = () => {
     const [userData, setUserData] = useState({});
     const [editMode, setEditMode] = useState(null);
     const [newData, setNewData] = useState({ oldPassword: "", newPassword: "", confirmPassword: "" });
     const [user, setUser] = useState(null);
+    const [theme, setTheme] = useState(true);
 
     // Initialize UserData instance when user is authenticated
     useEffect(() => {
@@ -77,11 +78,13 @@ const YourAccount = () => {
         return () => unsubscribe();
     }, []);
 
+
     // Fetch user data using UserData class
     const fetchData = async (userDataInstance) => {
         try {
             const data = await userDataInstance.getUserData();
             setUserData(data);
+            setTheme(data.theme)
             setNewData(data);
         } catch (error) {
             console.error("Error fetching user data:", error);
@@ -93,130 +96,153 @@ const YourAccount = () => {
         setNewData((prev) => ({ ...prev, [field]: value }));
     };
 
-   // Save updated user data
-   const handleSave = async (field) => {
-    if (!user) return console.error("User not authenticated.");
-  
-    if (!newData[field] || newData[field].trim() === "") {
-      alert(`${field} cannot be empty!`);
-      return;
-    }
-  
-    try {
-      const userDataInstance = new UserData(user.uid);
-      await userDataInstance.setUserData({ [field]: newData[field] });
-      setUserData((prev) => ({ ...prev, [field]: newData[field] }));
-      alert(`${field} updated successfully!`);
-      await sendEmailNotification(`${field}Update`, {
-        updatedValue: newData[field],
-        name: newData.name || userData.name
-      });
-      setEditMode(null);
-    } catch (error) {
-      console.error(`Error updating ${field}:`, error);
-      alert(`Failed to update ${field}: ${error.message}`);
-    }
-  };
-  
+    // Save updated user data
+    const handleSave = async (field) => {
+        if (!user) return console.error("User not authenticated.");
 
-       // Validate and update password
-       const handleSavePassword = async () => {
-           if (!user) return console.error("User not authenticated.");
-   
-           if (!newData.oldPassword || !newData.newPassword || !newData.confirmPassword) {
-               alert("All password fields must be filled!");
-               return;
-           }
-           if (newData.newPassword !== newData.confirmPassword) {
-               alert("New passwords do not match!");
-               return;
-           }
-           try {
-               const credential = EmailAuthProvider.credential(user.email, newData.oldPassword);
-               await reauthenticateWithCredential(user, credential);
-               await updatePassword(user, newData.newPassword);
-               alert("Password updated successfully!");
-               setEditMode(null);
-           } catch (error) {
-               alert(`Failed to update password: ${error.message}`);
-           }
-       };
+        if (!newData[field] || newData[field].trim() === "") {
+            alert(`${field} cannot be empty!`);
+            return;
+        }
+
+        try {
+            const userDataInstance = new UserData(user.uid);
+            await userDataInstance.setUserData({ [field]: newData[field] });
+            setUserData((prev) => ({ ...prev, [field]: newData[field] }));
+            alert(`${field} updated successfully!`);
+            await sendEmailNotification(`${field}Update`, {
+                updatedValue: newData[field],
+                name: newData.name || userData.name
+            });
+            setEditMode(null);
+        } catch (error) {
+            console.error(`Error updating ${field}:`, error);
+            alert(`Failed to update ${field}: ${error.message}`);
+        }
+    };
+
+    const handleTheme = async () => {
+        if (user) {
+           
+            const userData = new UserData(user.uid);
+            // Update the theme in backend
+            userData.setTheme(!theme)
+            setTheme(!theme)
+        }
+    };
+
+
+    // Validate and update password
+    const handleSavePassword = async () => {
+        if (!user) return console.error("User not authenticated.");
+
+        if (!newData.oldPassword || !newData.newPassword || !newData.confirmPassword) {
+            alert("All password fields must be filled!");
+            return;
+        }
+        if (newData.newPassword !== newData.confirmPassword) {
+            alert("New passwords do not match!");
+            return;
+        }
+        try {
+            const credential = EmailAuthProvider.credential(user.email, newData.oldPassword);
+            await reauthenticateWithCredential(user, credential);
+            await updatePassword(user, newData.newPassword);
+            alert("Password updated successfully!");
+            setEditMode(null);
+        } catch (error) {
+            alert(`Failed to update password: ${error.message}`);
+        }
+    };
 
     // Delete account
-        const handleDeleteAccount = async () => {
-            if (!window.confirm("Are you sure you want to delete your account? This action cannot be undone.")) return;
-    
-            const result = await deleteUserAccount();
-            if (result.success) {
-                alert("Account deleted successfully.");
-                window.location.href = "/";
-            } else {
-                alert(`Failed to delete account: ${result.error?.message || result.error}`);
-            }
-        };
-    
-        return (
-            <div className="YourAccount">
-                <h2>Account Settings</h2>
-    
-                <div className="personal-detail">
-                    <label>Name</label>
-                    {editMode === "name" ? (
-                        <div>
-                            <input type="text" value={newData.name || ""} onChange={(e) => handleChange("name", e.target.value)} />
-                            <button onClick={() => handleSave("name")}>Save</button>
-                            <button onClick={() => setEditMode(null)}>Cancel</button>
-                        </div>
-                    ) : (
-                        <div>
-                            <span>{userData.name || "Not Provided"}</span>
-                            <button onClick={() => setEditMode("name")}>Edit</button>
-                        </div>
-                    )}
-                </div>
-    
-                <div className="personal-detail">
-                    <label>Birthday</label>
-                    {editMode === "dob" ? (
-                        <div>
-                            <input type="date" value={newData.dob || ""} onChange={(e) => handleChange("dob", e.target.value)} />
-                            <button onClick={() => handleSave("dob")}>Save</button>
-                            <button onClick={() => setEditMode(null)}>Cancel</button>
-                        </div>
-                    ) : (
-                        <div>
-                            <span>{userData.dob || "Not Provided"}</span>
-                            <button onClick={() => setEditMode("dob")}>Edit</button>
-                        </div>
-                    )}
-                </div>
-    
-                <div className="personal-detail">
-                    <label>Email</label>
-                    <span>{userData.email || "Not Provided"}</span>
-                </div>
-    
-                <div className="personal-detail">
-                    <label>Password</label>
-                    {editMode === "password" ? (
-                        <div>
-                            <input type="password" placeholder="Old Password" value={newData.oldPassword} onChange={(e) => handleChange("oldPassword", e.target.value)} />
-                            <input type="password" placeholder="New Password" value={newData.newPassword} onChange={(e) => handleChange("newPassword", e.target.value)} />
-                            <input type="password" placeholder="Confirm New Password" value={newData.confirmPassword} onChange={(e) => handleChange("confirmPassword", e.target.value)} />
-                            <button onClick={handleSavePassword}>Save</button>
-                            <button onClick={() => setEditMode(null)}>Cancel</button>
-                        </div>
-                    ) : (
-                        <div>
-                            <span>********</span>
-                            <button onClick={() => setEditMode("password")}>Edit</button>
-                        </div>
-                    )}
-                </div>
-    
-                <button className="button delete-account" onClick={handleDeleteAccount}>Delete Account</button>
-            </div>
-        );
+    const handleDeleteAccount = async () => {
+        if (!window.confirm("Are you sure you want to delete your account? This action cannot be undone.")) return;
+
+        const result = await deleteUserAccount();
+        if (result.success) {
+            alert("Account deleted successfully.");
+            window.location.href = "/";
+        } else {
+            alert(`Failed to delete account: ${result.error?.message || result.error}`);
+        }
     };
-    
-    export default YourAccount;
+
+    return (
+        <div className="YourAccount">
+            <h2>Account Settings</h2>
+
+            <div className="personal-detail">
+                <label>Name</label>
+                {editMode === "name" ? (
+                    <div>
+                        <input type="text" value={newData.name || ""} onChange={(e) => handleChange("name", e.target.value)} />
+                        <button onClick={() => handleSave("name")}>Save</button>
+                        <button onClick={() => setEditMode(null)}>Cancel</button>
+                    </div>
+                ) : (
+                    <div>
+                        <span>{userData.name || "Not Provided"}</span>
+                        <button onClick={() => setEditMode("name")}>Edit</button>
+                    </div>
+                )}
+            </div>
+
+            <div className="personal-detail">
+                <label>Birthday</label>
+                {editMode === "dob" ? (
+                    <div>
+                        <input type="date" value={newData.dob || ""} onChange={(e) => handleChange("dob", e.target.value)} />
+                        <button onClick={() => handleSave("dob")}>Save</button>
+                        <button onClick={() => setEditMode(null)}>Cancel</button>
+                    </div>
+                ) : (
+                    <div>
+                        <span>{userData.dob || "Not Provided"}</span>
+                        <button onClick={() => setEditMode("dob")}>Edit</button>
+                    </div>
+                )}
+            </div>
+
+            <div className="personal-detail">
+                <label>Email</label>
+                <span>{userData.email || "Not Provided"}</span>
+            </div>
+
+            <div className="personal-detail">
+                <label>Password</label>
+                {editMode === "password" ? (
+                    <div>
+                        <input type="password" placeholder="Old Password" value={newData.oldPassword} onChange={(e) => handleChange("oldPassword", e.target.value)} />
+                        <input type="password" placeholder="New Password" value={newData.newPassword} onChange={(e) => handleChange("newPassword", e.target.value)} />
+                        <input type="password" placeholder="Confirm New Password" value={newData.confirmPassword} onChange={(e) => handleChange("confirmPassword", e.target.value)} />
+                        <button onClick={handleSavePassword}>Save</button>
+                        <button onClick={() => setEditMode(null)}>Cancel</button>
+                    </div>
+                ) : (
+                    <div>
+                        <span>********</span>
+                        <button onClick={() => setEditMode("password")}>Edit</button>
+                    </div>
+                )}
+            </div>
+
+            <div className="personal-detail">
+                <label>Theme</label>
+                <div className="toggle-container">
+                    <input
+                        type="checkbox"
+                        className="toggle"
+                        onChange={handleTheme}
+                        checked={theme}
+                    />
+                    <label htmlFor="check"> Dark Mode </label>
+                </div>
+            </div>
+
+            <button className="button delete-account" onClick={handleDeleteAccount}>Delete Account</button>
+        </div>
+    );
+};
+
+export default YourAccount;

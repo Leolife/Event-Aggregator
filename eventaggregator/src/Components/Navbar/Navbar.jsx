@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import '../../App.css';
 import './Navbar.css';
+import UserData from '../../utils/UserData';
 import { ReactComponent as MenuIcon } from '../../assets/menu-icon.svg';
 import { ReactComponent as SearchIcon } from '../../assets/search-icon.svg';
 import { ReactComponent as ProfileIcon } from '../../assets/profile-icon.svg';
@@ -31,11 +32,13 @@ const Navbar = ({ setSidebar }) => {
   const sortParam = searchParams.get('sort');
   const [events, setEvents] = useState([]);
   const [filteredEvents, setFilteredEvents] = useState([]);
+  const [profilePicture, setProfilePicture] = useState("");
+  const [username, setUsername] = useState("");
   const auth = getAuth();
 
   // Fetches event names attached to the forums
   useEffect(() => {
-    
+
     const loadEvents = async () => {
       const fetchedEvents = await fetchForumEvents();
       setEvents(fetchedEvents);
@@ -49,7 +52,7 @@ const Navbar = ({ setSidebar }) => {
     setIsOpen(true);
 
     // Below is Purely Debugging information for the user state (not critical for openModal)
-    
+
     // Check if the user is logged in before accessing uid
     if (auth.currentUser) {
       console.log("User:", auth.currentUser);
@@ -68,6 +71,8 @@ const Navbar = ({ setSidebar }) => {
       openModal('login');
     }
   }
+
+
 
   // Populates the search dropdown with event name suggestions
   useEffect(() => {
@@ -89,11 +94,16 @@ const Navbar = ({ setSidebar }) => {
 
   useEffect(() => {
     const auth = getAuth();
-
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setIsLoggedIn(!!user); // `true` if user exists, `false` otherwise
+      if (user) {
+        const userData = new UserData(user.uid);
+        const picture = await userData.getProfilePicture();
+        const username = await userData.getName();
+        setProfilePicture(picture)
+        setUsername(username)
+      }
     });
-
     return () => unsubscribe(); // Cleanup listener on unmount
   }, []);
 
@@ -111,17 +121,19 @@ const Navbar = ({ setSidebar }) => {
   return (
     <>
       <Overlays isOpen={isOpen} modalType={modalType} onClose={() => setIsOpen(false)} />
-      <nav className='flex-div'>
-        <div className='nav-left flex-div'>
+      <nav className='nav-bar'>
+        <div className='nav-left '>
           <MenuIcon className="menu-icon" onClick={() => setSidebar(prev => prev === false ? true : false)} />
           <Link to={'/'}><img className='logo' src={logo} alt="" /></Link>
-          <a href={() => false} className="nav-menu-title"><Link to={'/'}>Events</Link></a>
-          <a href={() => false} className="nav-menu-title"><Link to={'/forum'} style={{ color: 'inherit' }}> Forum </Link></a>
-          <a href={() => false} className="nav-menu-title" onClick={handleProfileClick} >Profile</a>
+          <div className="nav-menu-link-container">
+            <a href={() => false} className="nav-menu-link"><Link to={'/'} style={{ color: 'inherit' }}>Events</Link></a>
+            <a href={() => false} className="nav-menu-link"><Link to={'/forum'} style={{ color: 'inherit' }}> Forum </Link></a>
+            <a href={() => false} className="nav-menu-link" onClick={handleProfileClick} >Profile</a>
+          </div>
         </div>
-        <div className="nav-middle flex-div">
+        <div className="nav-middle">
           <div className="dropdown-search" ref={queryRef}>
-            <div className="search-box flex-div">
+            <div className="search-box">
               <SearchIcon className="search-icon" />
               <input autoComplete="off" id="search" type="text" placeholder='Search'
                 onInput={e => setSearchText(e.target.value) & setActive(e.target.value.length > 0)}  // If the user has typed into the search, display the dropdown
@@ -176,7 +188,7 @@ const Navbar = ({ setSidebar }) => {
           </div>
         </div>
 
-        <div className="nav-right flex-div">
+        <div className="nav-right">
           <Link to={'/debug'}><button className="button userdebug">UserDebug</button>
           </Link>
 
@@ -204,14 +216,31 @@ const Navbar = ({ setSidebar }) => {
             )}
           </div>
           {isLoggedIn && (
-              <NotificationDropdown />
-            )}
+            <NotificationDropdown />
+          )}
 
 
           <Overlays modalType={modalType} isOpen={isOpen} onClose={() => setIsOpen(false)} />
-          <ProfileIcon className="profile-icon" />
+            {/* If the user is logged in, replace the default profile icon with their profile picture */}
+          {profilePicture ? (
+            <div className='nav-user-container'>
+              <div className="nav-profile-picture-container">
+                <img
+                  // Display user's profile picture
+                  className="nav-profile-picture"
+                  src={profilePicture}
+                  alt="Profile Picture"
+                />
 
-          <Link to={'/settings'}><SettingsIcon className="settings-icon"></SettingsIcon></Link>
+              </div>
+              <label className='nav-profile-name'> {username} </label>
+            </div>
+          ) : (
+            // Display default profile icon
+            <ProfileIcon className="profile-icon" />
+          )}
+
+          <Link to={'/settings'}><SettingsIcon className="settings-icon" style={{ "display": isLoggedIn ? "inline" : "none" }}></SettingsIcon></Link>
         </div>
       </nav>
     </>

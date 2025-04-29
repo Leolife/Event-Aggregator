@@ -278,3 +278,13 @@
 .username-modal .update-username-btn:hover {
     background-color: #3bb3cb;
 }
+
+
+.settings-tabs {
+    background-color: var(--background-secondary-color) !important;
+}
+
+
+.content-tabs {
+    background-color: var(--background-primary-color) !important;
+}

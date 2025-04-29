@@ -6,7 +6,7 @@
 .YourAccount h2 {
     font-size: 2rem;
     margin-bottom: 1rem;
-    color: #333;
+    color: var(--text-secondary-color);
 }
 
 .button {
@@ -42,12 +42,12 @@
     display: block;
     font-size: 1.2rem;
     margin-bottom: 5px;
-    color: #333;
+    color: var(--text-secondary-color);
 }
 
 .personal-detail span {
     font-size: 1rem;
-    color: #666;
+    color: var(--text-light-color);
 }
 
 .personal-detail button {
@@ -96,4 +96,10 @@
 .success-message {
     color: green;
     margin-bottom: 10px;
+}
+
+.toggle-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }

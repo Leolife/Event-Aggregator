@@ -107,7 +107,6 @@ const styles = {
                         
                         ))}
                         <br/>
-                        <hr />
                     </div>
                     <div className="section-content">
                         <div className="settings-content">

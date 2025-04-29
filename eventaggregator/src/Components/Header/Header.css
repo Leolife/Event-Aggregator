@@ -17,7 +17,7 @@
 
 .dropdown-search .dropdown-content{
     margin-top: 2px;
-    background-color: white;
+    background-color: var(--background-primary-color);
     box-shadow: 0 5px 15px rgb(0 0 0 / 15%);
     border-radius: 5px;
     max-height: 160px;
@@ -47,11 +47,11 @@
 }
 
 .dropdown-sort .sortby {
-    background-color: white;
+    background-color: var(--background-primary-color);
     height: 32px;
     border-radius: 8px;
     width: max-content;
-    color: grey;
+    color: var(--text-secondary-color);
     font-weight: bold;
     border: none;
 }
@@ -77,7 +77,7 @@
 }
 
 .header .search-box {
-    background-color: white;
+    background-color: var(--background-primary-color);
     height: 32px;
     border-radius: 8px;
     padding: 14px;
@@ -93,10 +93,11 @@
     background: transparent;
     width: 180px;
     font-weight: bold;
+    color: var(--text-primary-color);
 }
 
 .header .search-icon {
     width: 16px;
     height: 16px;
-    stroke: grey;
+    stroke: var(--icon-primary-color);
 }

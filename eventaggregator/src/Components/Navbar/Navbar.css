@@ -1,12 +1,32 @@
 nav {
-    padding: 10px 2%;
+    padding: 6px 2%;
     justify-content: space-between;
     width: 100%;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-    background: #fff;
+    background: var(--background-secondary-color);
     position: sticky;
     top: 0;
     z-index: 10;
+}
+
+.nav-bar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.nav-left {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 20px;
+}
+
+.nav-menu-link-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 80px;
 }
 
 .nav-left .menu-icon {
@@ -18,18 +38,22 @@ nav {
 }
 
 .nav-left .logo {
+    left: 0px;
     width: 200px;
     height: 24px;
     padding: 0px 12px;
-    margin-left: 20px;
 }
 
 .nav-middle {
+    display: flex;
     width: 100%;
     justify-content: center;
 }
 
 .nav-middle .search-box {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
     border: 1px solid #ccc;
     margin-right: 15px;
     height: 40px;
@@ -46,18 +70,26 @@ nav {
     background: transparent;
     width: 400px;
     font-size: 16px;
+    color: var(--text-primary-color);
 }
 
 .nav-middle .search-icon {
     width: 20px;
     height: 20px;
-    stroke: grey;
+    stroke: var(--icon-primary-color);
 }
 
 .nav-middle .sliders-icon {
     width: 24px;
     height: 24px;
-    stroke: grey;
+    stroke: var(--icon-primary-color);
+}
+
+.nav-right {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
 }
 
 .nav-right .button{
@@ -91,16 +123,20 @@ nav {
     height: 30px;
 }
 
+.nav-right .settings-icon path{
+    fill: var(--icon-primary-color);
+}
+
 .nav-right .profile-icon path {
     stroke: black;
     stroke-width: 10%;
 }
 
-.nav-menu-title {
+.nav-menu-link {
     cursor: pointer;
-    margin-left: 80px;
     font-weight: bold;
     font-size: larger;
+    color: var(--text-primary-color);
 }
 
 .dropdown-search  .dropdown-content ul{
@@ -152,6 +188,32 @@ nav {
 
 
 .search-box .x-circle path {
-    stroke: grey;
+    stroke: var(--icon-primary-color);
     stroke-width: 5%;
+}
+
+.nav-profile-picture-container {
+    width: 42px;
+    height: 42px;
+}
+
+.nav-profile-picture{
+    width: 100%;
+    height: 100%;
+    border-radius: 100%;
+    object-fit: cover; /* ensures the image fills the container */
+}
+
+.nav-user-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.nav-profile-name {
+    font-size: large;
+}
+
+.nav-profile-name:hover {
+    text-decoration: underline;
 }

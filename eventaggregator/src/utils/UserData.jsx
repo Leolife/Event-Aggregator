@@ -157,8 +157,20 @@ class UserData {
 
     // Setter: Update the user's interests array
     async setInterests(newInterests) {
-        await this.setUserData({ interests: newInterests });
+        await this.setUserData({ theme: newInterests });
     }
+
+    // Getter: Fetch the user's theme
+    async getTheme() {
+        const userData = await this.getUserData();
+        return userData.theme || [];
+    }
+
+    // Setter: Update the user's theme
+    async setTheme(newTheme) {
+        await this.setUserData({ theme: newTheme });
+    }
+    
 
     // Getter: Fetch the user's bio
     async getBio() {

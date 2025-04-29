@@ -147,3 +147,42 @@ def reccomendation():
             return query(url,select,mode = 'POST'), 200
         case _:
             print('Mode does not match any specified method.')
+
+
+streams_URL = "https://api.twitch.tv/helix/streams?"
+headers = {
+    'Content-Type': 'application/json',
+    'Client-ID': 'ekp4auk5xo1dmmqdaz0a22aud0gym9',
+    'Authorization': 'Bearer ni31v213kg1jo0abtno66e6992l4gy'
+}
+user_logins = [
+    "RocketLeague",
+    "VALORANT_Americas",
+    "Rainbow6",
+    "ESLCS",
+    "PGL_Dota2",
+    "dota2_paragon_ru",
+    "otplol_",
+    "Gaules",
+    "ESLCSb",
+    "LCK",
+    "Halo",
+    "LEC",
+    "WorldofTanks",
+    "PGL_DOTA2EN2",
+    "LTANorth",
+    "VALORANT_EMEA",
+    "CroissantStrikeTV",
+    "dota2_paragon_ru2",
+    "LCK_Carry",
+    "Fortnite",
+    "TwitchRivals",
+    "VGBootCamp",
+    "Warframe"
+]
+params = {'user_login': user_logins}
+@app.get("/streams")
+def get_live():
+    """Get livestreams from the most popular esports channels on Twitch"""
+    response = requests.get(streams_URL,headers=headers, params=params)
+    return response.json()["data"]

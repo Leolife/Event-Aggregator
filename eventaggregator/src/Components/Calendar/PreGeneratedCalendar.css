@@ -39,7 +39,7 @@
 }
 
 .month-navigation button:hover {
-  background-color: #00b8e6;
+  background-color: var(--primary-dark);
 }
 
 .calendar-grid {

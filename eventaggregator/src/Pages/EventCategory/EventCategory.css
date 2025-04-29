@@ -1,7 +1,7 @@
 .event-card {
     width: 100%;
     height: 250px;
-    background-color: whitesmoke;
+    background-color: var(--background-secondary-color);
     display: flex;
     align-items: center;
     border-radius: 20px;
@@ -20,17 +20,17 @@
 
 .event-card .date-text {
     font-weight: bold;
-    color: rgb(65, 65, 65);
+    color: var(--text-light-color);
 }
 
 .event-card .location-text {
     font-size: small;
-    color: rgb(75, 75, 75);
+    color: var(--text-light-color);
 }
 
 .event-card .price {
     font-style: italic;
-    color: rgb(65, 65, 65);
+    color: var(--text-light-color);
 }
 
 .event-card .timestamp-container {

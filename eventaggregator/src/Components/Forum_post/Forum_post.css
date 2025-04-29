@@ -1,7 +1,7 @@
 .forum-post {
     display: flex;
     align-items: center;
-    background: white;
+    background: var(--background-secondary-color);
     padding: 16px;
     margin-top: 16px;
     margin-bottom: 16px;
@@ -46,10 +46,8 @@
 }
 
 .title-box {
-    background: #ffffff;
     padding: 12px;
     border-radius: 6px;
-    border: 1px solid #ffffff;
     margin-bottom: 8px;
     max-height: 135px;
 }
@@ -70,7 +68,7 @@
 .body-box {
     width: 250px;
     min-width: 250px;
-    background: #ffffff;
+    background: var(--background-primary-color);
     padding: 12px;
     border-radius: 6px;
     border: 1px solid #000000;
@@ -82,7 +80,7 @@
 
 .post-body {
     font-size: 18px;
-    color: #000000;
+    color: var(--text-primary-color);
     margin: 0;
     display: -webkit-box;
     line-clamp: 8;
@@ -103,7 +101,7 @@
 
 .post-meta {
     font-size: 20px;
-    color: #667;
+    color: var(--text-light-color);
 }
 
 .post-stats {
@@ -127,7 +125,7 @@
 
 .replyCount {
     font-size: 14px;
-    color: #667;
+    color: var(--text-light-color);
 }
 
 .linkable {
