@@ -193,11 +193,11 @@ def print_table():
     events_DB.print_table()
     return {'Message': 'ok'}, 200
 
-
 @app.get("/delete_table1234")
 def delete_table():
     events_DB.clear_table()
     return {'Message': 'ok'}, 200
+
 ########################################## Table Search
 @app.post("/search")
 def search_table():
@@ -228,6 +228,32 @@ def get_col():
         return {"error": "Request must be JSON"}, 415
     col_data = events_DB.select_column(col=col)
     return list(col_data), 200
+
+@app.post("/get_event")
+def get_event():
+    if request.is_json:
+        req = request.get_json()
+        if 'ID' not in req:
+            return {'Message':'Invalid Request'}, 400
+        row = req['ID']
+    else:
+        return {"error": "Request must be JSON"}, 415
+    col_data = events_DB.select_row(row = row)
+    return col_data, 200
+
+@app.post("/get_offset")
+def get_offset():
+    if request.is_json:
+        req = request.get_json()
+
+        if 'ID' not in req or 'LIMIT':
+            return {'Message':'Invalid Request'}, 400
+        row, offset = int(req['ID']), int(req['LIMIT'])
+    else:
+        return {"error": "Request must be JSON"}, 415
+    rows = [str(row + i) for i in range(offset)]
+    col_data = events_DB.select_rows(rows = rows)
+    return col_data, 200
 
 @app.post("/get_rows")
 def get_rows():
