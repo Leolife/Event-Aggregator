@@ -24,6 +24,7 @@ export const Home = ({ sidebar }) => {
     setSelectedTags(data)
   }
 
+  // Convert twitch stream start time to time ago
   function timeElapsed(startTime) {
     const start = new Date(startTime);
     const now = new Date();
@@ -43,6 +44,7 @@ export const Home = ({ sidebar }) => {
     }
   }
 
+  // Convert twitch viewer numbers to abbreviated number
   function convertToAbbreviation(number) {
     const formatter = new Intl.NumberFormat('en', {
         notation: 'compact',
@@ -60,6 +62,7 @@ export const Home = ({ sidebar }) => {
     console.log(streams)
   }, [streams])
 
+  // Fetch live events from the API
   useEffect(() => {
     async function fetchEvents() {
       const response = await fetch("/streams", {
@@ -69,6 +72,7 @@ export const Home = ({ sidebar }) => {
       const width = 440;
       const height = 248;
       const streams = data.map((stream) => {
+        // Set the thumbnail width and height 
         const thumbnail = `https://static-cdn.jtvnw.net/previews-ttv/live_user_${stream.user_login}-${width}x${height}.jpg`;
         return {
           ...stream,
@@ -118,7 +122,7 @@ export const Home = ({ sidebar }) => {
                 )
                 )
               ) : (
-                // Displays an error message if the streams have not loaded in
+                // Displays message if the streams have not loaded in
                 <label> No live events! </label>
               )}
             </div>

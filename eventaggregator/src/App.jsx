@@ -34,6 +34,7 @@ function App() {
     return () => unsubscribe();
   }, []);
 
+  // Fetch theme from user
   useEffect(() => {
     if (!user) return;
     const userDocRef = doc(firestore, 'users', user.uid);
@@ -55,6 +56,7 @@ function App() {
   }
 
   return (
+    // Set Theme based on stored theme
     <div className="App" data-theme={theme ? "dark" : "light"}>
 
       <Navbar setSidebar={setSidebar} user={user} />
