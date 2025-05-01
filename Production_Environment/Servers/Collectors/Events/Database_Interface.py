@@ -195,7 +195,7 @@ def print_table():
 
 @app.get("/delete_table1234")
 def delete_table():
-    events_DB.clear_table()
+    # events_DB.clear_table()
     return {'Message': 'ok'}, 200
 
 ########################################## Table Search
@@ -205,15 +205,17 @@ def search_table():
     if request.is_json:
         incoming_request = request.get_json()
         n = incoming_request['NUMBER']    
-        search_phrase = incoming_request['SEARCH']
+        search_phrase = incoming_request['QUERY']
     
     event_data: tuple = events_DB.select_title()
     scores  = [(event_id, jaro(search_phrase, title)) for event_id, title in event_data]
     scores = sorted(scores, key = lambda x : x[1],reverse=True)
     event_ids, _ = zip(*scores)
-    event_ids = event_ids[:n]
-
-    event_info = events_DB.select_rows(event_ids)
+    if n == 1:
+        event_info = events_DB.select_row(event_ids[0])
+    else:
+        event_ids = event_ids[:n]
+        event_info = events_DB.select_rows(event_ids)
     return event_info, 200
 
 
@@ -235,9 +237,15 @@ def get_event():
         req = request.get_json()
         if 'ID' not in req:
             return {'Message':'Invalid Request'}, 400
-        row = req['ID']
+        row:str = req['ID']
     else:
         return {"error": "Request must be JSON"}, 415
+    
+    if type(row) == str:
+        row = int(row) - 1
+    elif type(row) == int:
+        row -= 1
+
     col_data = events_DB.select_row(row = row)
     return col_data, 200
 
@@ -246,12 +254,12 @@ def get_offset():
     if request.is_json:
         req = request.get_json()
 
-        if 'ID' not in req or 'LIMIT':
+        if 'ID' not in req or 'LIMIT' not in req:
             return {'Message':'Invalid Request'}, 400
         row, offset = int(req['ID']), int(req['LIMIT'])
     else:
         return {"error": "Request must be JSON"}, 415
-    rows = [str(row + i) for i in range(offset)]
+    rows = tuple([str(row + i) for i in range(offset)])
     col_data = events_DB.select_rows(rows = rows)
     return col_data, 200
 
