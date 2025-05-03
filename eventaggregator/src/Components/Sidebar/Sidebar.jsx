@@ -156,7 +156,10 @@ const Sidebar = ({ sidebar }) => {
             <TriangleIcon className="triangle-icon" />
           </div>
           <div className="side-link">
-            <HeartIcon className="heart-icon" /> <p>Favorites</p>
+            <HeartIcon className="heart-icon" />
+            <Link to={'/mycalendars'}>
+              <p>Favorites</p>
+            </Link>
           </div>
         </div>
       </div>
