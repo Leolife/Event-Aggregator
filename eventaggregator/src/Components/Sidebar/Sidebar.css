@@ -9,16 +9,35 @@
     padding-top: 80px;
 }
 
-.side-link {
+.events-dropdown, .forums-dropdown, .profile-dropdown, .calendars-dropdown {
+    font-weight: bold;
     display: flex;
     align-items: center;
     height: 40px;
     width: 100%;
     flex-wrap: wrap;
+    color: #000000;
+    position: relative; /* Added for positioning the badge */
+}
+
+.side-link {
+    display: flex;
+    align-items: center;
+    height: 40px;
+    width: 100%;
     cursor: pointer;
+    flex-wrap: wrap;
     color: #5a5a5a;
     position: relative; /* Added for positioning the badge */
 }
+
+.side-link:hover {
+    padding-left: 10px;
+    border-radius: 10px;
+    background-color: #dadada;
+    transition: all 0.2s ease;
+}
+
 
 .side-link h3 {
     margin: 0;
