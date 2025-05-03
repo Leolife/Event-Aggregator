@@ -136,7 +136,7 @@ const CalendarEventModal = ({ isOpen, onClose, event, calendarId, onEventDelete,
                     </div>
                     
                     {event.description && (
-                        <div className="event-detail">
+                        <div className={`event-detail ${event.description.length > 1000 ? 'description' : ''}`}>
                             <span className="event-icon">📝-</span>
                             <div className="event-info">{event.description}</div>
                         </div>
