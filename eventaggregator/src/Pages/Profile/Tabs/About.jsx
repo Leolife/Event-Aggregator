@@ -2,7 +2,7 @@ import { auth } from '../../../firebase'; // Adjusted for your firebase.js locat
 import UserData from '../../../utils/UserData';
 import { useState } from 'react';
 import { getAuth } from 'firebase/auth';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import "./About.css"
 import EventCard from '../../../Components/Events/EventCard'
 const user = auth.currentUser;
@@ -54,7 +54,11 @@ function About({ editMode, bio, setBio, favorites }) {
             <hr />
             {/* Display the favorites section if the user has favorited events */}
             <div style={{ display: favorites?.eventsData ? "inline" : "none" }} className="profile-favorites">
-                <h2>Favorites</h2>
+                <div className="profile-favorites-button"> 
+                    <Link to={'/mycalendars'}>
+                    <h2>Favorites</h2>
+                    </Link>
+                </div>
                 <div className="favorites-container">
                     {userFavorites && userFavorites.length > 0 ? (
                         userFavorites.map((event) => (
