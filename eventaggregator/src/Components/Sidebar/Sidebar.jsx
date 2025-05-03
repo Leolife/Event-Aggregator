@@ -84,6 +84,15 @@ const Sidebar = ({ sidebar }) => {
     }
   };
 
+  const handleFavoritesClick = () => {
+    const auth = getAuth();
+    if (auth.currentUser) {
+      navigate('/mycalendars');
+    } else {
+      openModal('login')
+    }
+  };
+
   return (
     <>
       <Overlays isOpen={isOpen} modalType={modalType} onClose={() => setIsOpen(false)} />
@@ -148,18 +157,14 @@ const Sidebar = ({ sidebar }) => {
         </div>
         <hr />
         <div className="my-calendars">
-          <div className="side-link">
+          <div className="side-link" onClick={handleFavoritesClick}>
             <CalendarIcon className="calendar-icon" />
-            <Link to={'/mycalendars'}>
               <h3>My Calendars</h3>
-            </Link>
             <TriangleIcon className="triangle-icon" />
           </div>
-          <div className="side-link">
+          <div className="side-link" onClick={handleFavoritesClick}>
             <HeartIcon className="heart-icon" />
-            <Link to={'/mycalendars'}>
               <p>Favorites</p>
-            </Link>
           </div>
         </div>
       </div>

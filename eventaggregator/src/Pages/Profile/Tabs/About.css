@@ -21,6 +21,10 @@
     text-decoration: underline 2px;
 }
 
+.profile-favorites-button {
+    cursor: pointer;
+}
+
 .profile-favorites-button:hover {
     text-decoration: underline 2px;
 }
