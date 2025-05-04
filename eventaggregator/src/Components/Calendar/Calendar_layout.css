@@ -329,3 +329,39 @@
   transform: translateY(-2px);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
+
+.event-info {
+  font-size: 16px;
+  color: #333;
+  line-height: 1.5;
+}
+
+/* Add scrollable description for long text */
+.event-detail.description {
+  max-height: 300px;
+}
+
+.event-detail.description .event-info {
+  max-height: 280px;
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
+/* Custom scrollbar styling for description */
+.event-detail.description .event-info::-webkit-scrollbar {
+  width: 6px;
+}
+
+.event-detail.description .event-info::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.event-detail.description .event-info::-webkit-scrollbar-thumb {
+  background: #ddd;
+  border-radius: 4px;
+}
+
+.event-detail.description .event-info::-webkit-scrollbar-thumb:hover {
+  background: #ccc;
+}

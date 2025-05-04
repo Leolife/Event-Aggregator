@@ -1,14 +1,10 @@
-import { auth } from '../../../firebase'; // Adjusted for your firebase.js location
-import UserData from '../../../utils/UserData';
 import { useState } from 'react';
 import { getAuth } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import "./About.css"
 import EventCard from '../../../Components/Events/EventCard'
-const user = auth.currentUser;
-const userData = user ? new UserData(user.uid) : null;
+import Overlays from '../../../Components/Overlays';
 
-// import './About.css'
 function About({ editMode, bio, setBio, favorites }) {
     const navigate = useNavigate();
     const userFavorites = favorites.eventsData
@@ -23,7 +19,7 @@ function About({ editMode, bio, setBio, favorites }) {
     const openModal = (type) => {
         setModalType(type);
         setIsOpen(true);
-      };
+    };
 
     const handleFriendsClick = () => {
         const auth = getAuth();
@@ -34,7 +30,17 @@ function About({ editMode, bio, setBio, favorites }) {
         }
     };
 
+    const handleFavoritesClick = () => {
+        const auth = getAuth();
+        if (auth.currentUser) {
+            navigate('/mycalendars');
+        } else {
+            openModal('login')
+        }
+    };
+
     return (
+        <><Overlays isOpen={isOpen} modalType={modalType} onClose={() => setIsOpen(false)} />
         <div className="About">
             <h2>About</h2>
             {editMode ? (
@@ -54,7 +60,9 @@ function About({ editMode, bio, setBio, favorites }) {
             <hr />
             {/* Display the favorites section if the user has favorited events */}
             <div style={{ display: favorites?.eventsData ? "inline" : "none" }} className="profile-favorites">
-                <h2>Favorites</h2>
+                <div className="profile-favorites-button" onClick={handleFavoritesClick}> 
+                    <h2>Favorites</h2>
+                </div>
                 <div className="favorites-container">
                     {userFavorites && userFavorites.length > 0 ? (
                         userFavorites.map((event) => (
@@ -67,6 +75,7 @@ function About({ editMode, bio, setBio, favorites }) {
                 </div>
             </div>
         </div>
+        </>
     );
 }
 

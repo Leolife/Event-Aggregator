@@ -413,7 +413,12 @@ const Calendar_layout = ({ calendarTitle, calendarId, onChangeMonth, onDelete, i
                                             </p>
                                         )}
                                     </div>
-                                    <p className="event-description">{event.description}</p>
+                                    <p className="event-description">{event.description && (
+                                        <div className={`event-detail ${event.description.length > 750 ? 'description' : ''}`}>
+                                            <span className="event-icon">📝-</span>
+                                            <div className="event-info">{event.description}</div>
+                                        </div>
+                                    )}</p>
                                 </div>
                             ))}
                         </div>

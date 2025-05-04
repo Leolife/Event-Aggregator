@@ -84,13 +84,22 @@ const Sidebar = ({ sidebar }) => {
     }
   };
 
+  const handleFavoritesClick = () => {
+    const auth = getAuth();
+    if (auth.currentUser) {
+      navigate('/mycalendars');
+    } else {
+      openModal('login')
+    }
+  };
+
   return (
     <>
       <Overlays isOpen={isOpen} modalType={modalType} onClose={() => setIsOpen(false)} />
       <div className={`sidebar ${sidebar ? "" : "small-sidebar"}`}>
         <div className="events">
-          <div className="side-link">
-            <CalendarIcon className="calendar-icon" /><h3>Events</h3><TriangleIcon className="triangle-icon" />
+          <div className="events-dropdown">
+            <CalendarIcon className="calendar-icon" /><p>Events</p><TriangleIcon className="triangle-icon" />
           </div>
           <Link to={'/event/category/recommended'}>
             <div className="side-link">
@@ -105,8 +114,8 @@ const Sidebar = ({ sidebar }) => {
           <hr />
         </div>
         <div className="forums">
-          <div className="side-link">
-            <ForumsIcon className="forums-icon" /><h3>Forums</h3><TriangleIcon className="triangle-icon" />
+          <div className="forums-dropdown">
+            <ForumsIcon className="forums-icon" /><p>Forums</p><TriangleIcon className="triangle-icon" />
           </div>
           <div className="side-link"
             onClick={() => forumLink("recommended")}
@@ -126,8 +135,8 @@ const Sidebar = ({ sidebar }) => {
         </div>
         <hr />
         <div className="profile">
-          <div className="side-link">
-            <ProfileIcon className="profile-icon" /><h3>Profile</h3><TriangleIcon className="triangle-icon" />
+          <div className="profile-dropdown">
+            <ProfileIcon className="profile-icon" /><p>Profile</p><TriangleIcon className="triangle-icon" />
           </div>
 
           <div className="side-link"
@@ -148,15 +157,14 @@ const Sidebar = ({ sidebar }) => {
         </div>
         <hr />
         <div className="my-calendars">
-          <div className="side-link">
+          <div className="calendars-dropdown">
             <CalendarIcon className="calendar-icon" />
-            <Link to={'/mycalendars'}>
-              <h3>My Calendars</h3>
-            </Link>
+              <p>My Calendars</p>
             <TriangleIcon className="triangle-icon" />
           </div>
-          <div className="side-link">
-            <HeartIcon className="heart-icon" /> <p>Favorites</p>
+          <div className="side-link" onClick={handleFavoritesClick}>
+            <HeartIcon className="heart-icon" />
+              <p>Favorites</p>
           </div>
         </div>
       </div>
