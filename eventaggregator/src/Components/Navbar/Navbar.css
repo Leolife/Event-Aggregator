@@ -60,6 +60,10 @@ nav {
     stroke: grey;
 }
 
+.nav-right {
+    margin-left: 175px;
+}
+
 .nav-right .button{
     margin: 0px 2px;
     padding: 0px 20px;
@@ -98,9 +102,17 @@ nav {
 
 .nav-menu-title {
     cursor: pointer;
-    margin-left: 80px;
+    padding: 5px;
+    padding-left: 20px;
+    padding-right: 20px;
+    margin-left: 35px;
     font-weight: bold;
     font-size: larger;
+}
+
+.nav-menu-title:hover {
+    background-color: #dadada;
+    border-radius: 10px;
 }
 
 .dropdown-search  .dropdown-content ul{
