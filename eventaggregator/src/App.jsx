@@ -14,7 +14,7 @@ import { onAuthStateChanged } from 'firebase/auth';
 import Settings from './Pages/Settings/Settings';
 import TestUserData from './utils/Debuguser';
 import PreGeneratedCalendar from './Components/Calendar/PreGeneratedCalendar';
-
+import FullPostView  from '../src/Components/FullPostView/FullPostView.jsx'
 
 function App() {
 
@@ -52,6 +52,8 @@ function App() {
         <Route path="/event/:eventId" element={<EventPage sidebar={sidebar} user = {user} />} />
         <Route path='/debug' element={<TestUserData />}/>
         <Route path="/calendar-static/:calendarType" element={<PreGeneratedCalendar />} />
+        <Route path="/post/:postId" element={<FullPostView />} />
+
       </Routes>
       
     </div>

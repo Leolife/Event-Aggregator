@@ -4,6 +4,13 @@ import { ReactComponent as Logo } from '../../assets/calendar-icon.svg';
 import { auth, firestore } from '../../firebase'; // Adjust for your firebase.js location
 import { collection, addDoc, doc, setDoc, Timestamp, updateDoc } from 'firebase/firestore';
 import UserData from '../../utils/UserData';
+import { sendRandomEventSuggestions } from "../../utils/sendRandomEventSuggestion";
+
+const user = auth.currentUser;
+if (user) {
+  await sendRandomEventSuggestions(user.uid, user.email, user.displayName);
+}
+
 
 export const AddForumPost = ({ isOpen, onClose }) => {
     const [title, setTitle] = useState('');

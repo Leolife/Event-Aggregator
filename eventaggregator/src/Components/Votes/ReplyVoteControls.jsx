@@ -11,6 +11,8 @@ import {
 import UpvoteArrow from "../../assets/upvotearrow.png";
 import DownvoteArrow from "../../assets/downvotearrow.png";
 import "./VoteButton.css";
+import { sendInAppNotification } from '../../utils/notificationUtils'; 
+import UserData from "../../utils/UserData"; 
 
 const ReplyVoteControls = ({ postId, replyId, userId }) => {
   const [upvotes, setUpvotes] = useState(0);
@@ -21,6 +23,7 @@ const ReplyVoteControls = ({ postId, replyId, userId }) => {
   const [userUpvoted, setUserUpvoted] = useState(false);
   const [userDownvoted, setUserDownvoted] = useState(false);
   const db = getFirestore();
+  const [replyOwnerId, setReplyOwnerId] = useState("");
 
   useEffect(() => {
     const fetchVotes = async () => {
@@ -33,6 +36,7 @@ const ReplyVoteControls = ({ postId, replyId, userId }) => {
           setUpvotes(data.upvoteCount || 0);
           setDownvotes(data.downvoteCount || 0);
           setText(data.commentBody || "");
+          setReplyOwnerId(data.ownerId || "");
         }
 
         const postRef = doc(db, "forum", postId);
@@ -125,6 +129,26 @@ const ReplyVoteControls = ({ postId, replyId, userId }) => {
         } else {
           setDownvotes((prev) => prev + 1);
           setUserDownvoted(true);
+        }
+         //  Send Notification
+         if (userId !== replyOwnerId) {
+          const currentUserData = new UserData(userId);
+          const currentUserObj = await currentUserData.getUserData();
+          if (isUpvote) {
+            await sendInAppNotification(
+              replyOwnerId,
+              "👍 New Upvote on your Reply!",
+              `${currentUserObj.displayName || 'Someone'} upvoted your reply! Click to view.`,
+              `/fullpostview/${postId}`
+            );
+          } else {
+            await sendInAppNotification(
+              replyOwnerId,
+              "👎 Your Reply got a Downvote",
+              `Someone downvoted your reply. Click to view.`,
+              `/fullpostview/${postId}`
+            );
+          }
         }
       }
     } catch (error) {

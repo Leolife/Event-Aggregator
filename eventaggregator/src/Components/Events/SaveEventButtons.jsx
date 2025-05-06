@@ -4,6 +4,7 @@ import { ReactComponent as SaveIcon } from '../../assets/save-icon.svg';
 import { auth, firestore } from '../../firebase';
 import { collection, query, where, getDocs, updateDoc, doc, arrayUnion, arrayRemove } from 'firebase/firestore';
 import './SaveEventButtons.css'
+import { sendRandomEventSuggestions } from '../../utils/sendRandomEventSuggestion';
 
 
 const SaveEventButtons = ({user, event, favoritedEvents, onEventHeart, onEventAdd, showNotification}) => {
@@ -115,6 +116,9 @@ const SaveEventButtons = ({user, event, favoritedEvents, onEventHeart, onEventAd
 
             // Show success message
             showNotification("Event added to favorites!");
+
+            await sendRandomEventSuggestions(currentUser.uid, currentUser.email, currentUser.displayName);
+
 
         } catch (error) {
             console.error('Error adding event to favorites:', error);
