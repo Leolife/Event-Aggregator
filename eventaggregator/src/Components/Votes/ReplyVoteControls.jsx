@@ -11,34 +11,36 @@ import {
 import UpvoteArrow from "../../assets/upvotearrow.png";
 import DownvoteArrow from "../../assets/downvotearrow.png";
 import "./VoteButton.css";
+import { sendInAppNotification } from '../../utils/notificationUtils'; 
+import UserData from "../../utils/UserData"; 
 
 const ReplyVoteControls = ({ postId, replyId, userId }) => {
   const [upvotes, setUpvotes] = useState(0);
   const [downvotes, setDownvotes] = useState(0);
-  const [replyBody, setReplyBody] = useState("");
+  const [text, setText] = useState("");
   const [postTitle, setPostTitle] = useState("");
   const [postBody, setPostBody] = useState("");
   const [userUpvoted, setUserUpvoted] = useState(false);
   const [userDownvoted, setUserDownvoted] = useState(false);
   const db = getFirestore();
+  const [replyOwnerId, setReplyOwnerId] = useState("");
 
   useEffect(() => {
     const fetchVotes = async () => {
       try {
         const replyRef = doc(db, "forum", postId, "replies", replyId);
-        const postRef = doc(db, "forum", postId);
-
-        const [replySnap, postSnap] = await Promise.all([
-          getDoc(replyRef),
-          getDoc(postRef),
-        ]);
+        const replySnap = await getDoc(replyRef);
 
         if (replySnap.exists()) {
-          const replyData = replySnap.data();
-          setUpvotes(replyData.upvoteCount || 0);
-          setDownvotes(replyData.downvoteCount || 0);
-          setReplyBody(replyData.commentBody || "");
+          const data = replySnap.data();
+          setUpvotes(data.upvoteCount || 0);
+          setDownvotes(data.downvoteCount || 0);
+          setText(data.commentBody || "");
+          setReplyOwnerId(data.ownerId || "");
         }
+
+        const postRef = doc(db, "forum", postId);
+        const postSnap = await getDoc(postRef);
 
         if (postSnap.exists()) {
           const postData = postSnap.data();
@@ -110,16 +112,15 @@ const ReplyVoteControls = ({ postId, replyId, userId }) => {
         const ref = isUpvote ? userUpvoteRef : userDownvoteRef;
         const field = isUpvote ? "upvoteCount" : "downvoteCount";
 
-        // Save the post title, post body, and reply body when voting
-        await setDoc(ref, {
-          votedAt: new Date(),
+        //Add additional/update doc information here
+        await setDoc(ref, { 
+          votedAt: new Date(), 
           postId: postId,
           replyId: replyId,
           postTitle: postTitle,
           postBody: postBody,
-          replyBody: replyBody,
-        }, { merge: true });
-
+          replyBody: text, 
+        },  { merge: true });
         await updateDoc(replyRef, { [field]: increment(1) });
 
         if (isUpvote) {
@@ -128,6 +129,26 @@ const ReplyVoteControls = ({ postId, replyId, userId }) => {
         } else {
           setDownvotes((prev) => prev + 1);
           setUserDownvoted(true);
+        }
+         //  Send Notification
+         if (userId !== replyOwnerId) {
+          const currentUserData = new UserData(userId);
+          const currentUserObj = await currentUserData.getUserData();
+          if (isUpvote) {
+            await sendInAppNotification(
+              replyOwnerId,
+              "👍 New Upvote on your Reply!",
+              `${currentUserObj.displayName || 'Someone'} upvoted your reply! Click to view.`,
+              `/fullpostview/${postId}`
+            );
+          } else {
+            await sendInAppNotification(
+              replyOwnerId,
+              "👎 Your Reply got a Downvote",
+              `Someone downvoted your reply. Click to view.`,
+              `/fullpostview/${postId}`
+            );
+          }
         }
       }
     } catch (error) {
