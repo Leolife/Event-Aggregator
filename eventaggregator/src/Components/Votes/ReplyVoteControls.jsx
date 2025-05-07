@@ -11,8 +11,6 @@ import {
 import UpvoteArrow from "../../assets/upvotearrow.png";
 import DownvoteArrow from "../../assets/downvotearrow.png";
 import "./VoteButton.css";
-import { sendInAppNotification } from '../../utils/notificationUtils'; 
-import UserData from "../../utils/UserData"; 
 
 const ReplyVoteControls = ({ postId, replyId, userId }) => {
   const [upvotes, setUpvotes] = useState(0);
@@ -22,7 +20,6 @@ const ReplyVoteControls = ({ postId, replyId, userId }) => {
   const [postBody, setPostBody] = useState("");
   const [userUpvoted, setUserUpvoted] = useState(false);
   const [userDownvoted, setUserDownvoted] = useState(false);
-  const [replyOwnerId, setReplyOwnerId] = useState("");
   const db = getFirestore();
 
   useEffect(() => {
@@ -41,7 +38,6 @@ const ReplyVoteControls = ({ postId, replyId, userId }) => {
           setUpvotes(replyData.upvoteCount || 0);
           setDownvotes(replyData.downvoteCount || 0);
           setReplyBody(replyData.commentBody || "");
-          setReplyOwnerId(replyData.ownerId || "");
         }
 
         if (postSnap.exists()) {
@@ -114,13 +110,14 @@ const ReplyVoteControls = ({ postId, replyId, userId }) => {
         const ref = isUpvote ? userUpvoteRef : userDownvoteRef;
         const field = isUpvote ? "upvoteCount" : "downvoteCount";
 
+        // Save the post title, post body, and reply body when voting
         await setDoc(ref, {
           votedAt: new Date(),
-          postId,
-          replyId,
-          postTitle,
-          postBody,
-          replyBody,
+          postId: postId,
+          replyId: replyId,
+          postTitle: postTitle,
+          postBody: postBody,
+          replyBody: replyBody,
         }, { merge: true });
 
         await updateDoc(replyRef, { [field]: increment(1) });
@@ -131,27 +128,6 @@ const ReplyVoteControls = ({ postId, replyId, userId }) => {
         } else {
           setDownvotes((prev) => prev + 1);
           setUserDownvoted(true);
-        }
-
-        // Send Notification
-        if (userId !== replyOwnerId) {
-          const currentUserData = new UserData(userId);
-          const currentUserObj = await currentUserData.getUserData();
-          if (isUpvote) {
-            await sendInAppNotification(
-              replyOwnerId,
-              "👍 New Upvote on your Reply!",
-              `${currentUserObj.displayName || 'Someone'} upvoted your reply! Click to view.`,
-              `/fullpostview/${postId}`
-            );
-          } else {
-            await sendInAppNotification(
-              replyOwnerId,
-              "👎 Your Reply got a Downvote",
-              `Someone downvoted your reply. Click to view.`,
-              `/fullpostview/${postId}`
-            );
-          }
         }
       }
     } catch (error) {
