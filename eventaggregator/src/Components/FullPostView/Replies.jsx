@@ -7,6 +7,8 @@ import ForumData from '../../utils/ForumData';
 import UserData from '../../utils/UserData';
 import { formatDistanceToNowStrict } from 'date-fns';
 import ReplyVoteControls from '../Votes/ReplyVoteControls';
+import { sendInAppNotification } from '../../utils/notificationUtils';  
+
 
 const Replies = ({ postId }) => {
     const [replyText, setReplyText] = useState('');
@@ -34,6 +36,7 @@ const Replies = ({ postId }) => {
 
     const handleReplySubmit = async (e) => {
         e.preventDefault();
+        
         if (!replyText.trim()) return;
     
         if (!user) {
@@ -92,6 +95,13 @@ const Replies = ({ postId }) => {
             });
     
             setReplyText('');
+            if (user.uid !== postOwnerId) {
+                await sendInAppNotification(
+                    postOwnerId,
+                    "🗨️ New Reply to Your Post",
+                    `${userName || 'Someone'} replied: "${replyText.trim()}"`
+                );
+            }
         } catch (error) {
             console.error('Error adding reply:', error);
             alert('Failed to add reply. Please try again later.');

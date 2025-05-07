@@ -13,6 +13,7 @@ import DownvoteArrow from "../../assets/downvotearrow.png";
 import ForumData from "../../utils/ForumData";
 import UserData from "../../utils/UserData";
 import "./VoteButton.css";
+import { sendInAppNotification } from '../../utils/notificationUtils';
 
 const VoteControls = ({ postId, userId }) => {
   const [upvotes, setUpvotes] = useState(0);
@@ -142,6 +143,22 @@ const VoteControls = ({ postId, userId }) => {
         } else {
           setDownvotes((prev) => prev + 1);
           setUserDownvoted(true);
+        }
+        // Send notification to post owner
+        if (userId !== postOwnerId) { // don't notify yourself
+          if (isUpvote) {
+            await sendInAppNotification(
+              postOwnerId,
+              "Your post received an upvote!",
+              `User ${currentUserObj.displayName || 'Someone'} upvoted your post "${title}".`
+            );
+          } else {
+            await sendInAppNotification(
+              postOwnerId,
+              "Your post received a downvote",
+              `Someone downvoted your post "${title}".`
+            );
+          }
         }
       }
     } catch (error) {

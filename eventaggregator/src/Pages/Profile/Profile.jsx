@@ -217,7 +217,8 @@ export const Profile = ({ sidebar }) => {
             await sendInAppNotification(
               userId,
               "New Friend Request",
-              `${senderName} sent you a friend request.`
+              `${senderName} sent you a friend request.`,
+               "/friends?tab=requests"
             );
             
             console.log("Notification sent");

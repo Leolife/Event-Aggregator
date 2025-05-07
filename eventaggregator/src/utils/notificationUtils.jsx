@@ -1,22 +1,33 @@
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { firestore } from '../firebase';
 
-export const sendInAppNotification = async (userId, title, body = "") => {
-  console.log("Sending to:", userId);
+/**
+ * Sends an in-app notification to a user.
+ * 
+ * @param {string} userId - ID of the user to send the notification to.
+ * @param {string} title - Title of the notification.
+ * @param {string} body - Body text of the notification (optional).
+ * @param {string} link - URL or internal app route to navigate when user clicks (optional).
+ */
+export const sendInAppNotification = async (userId, title, body = "", link = "") => {
+  console.log("🔔 Sending notification to user:", userId);
 
   try {
     const notifRef = collection(firestore, `users/${userId}/notifications`);
-    console.log("Firestore path:", notifRef.path);
+    console.log("Firestore notifications path:", notifRef.path);
 
-    const result = await addDoc(notifRef, {
+    const notificationData = {
       title,
       body,
+      link, 
       timestamp: serverTimestamp(),
       read: false
-    });
+    };
 
-    console.log("Notification created:", result.id);
+    const result = await addDoc(notifRef, notificationData);
+
+    console.log("Notification created with ID:", result.id);
   } catch (err) {
-    console.error("Notification failed:", err.message);
+    console.error(" Failed to send notification:", err.message);
   }
 };
