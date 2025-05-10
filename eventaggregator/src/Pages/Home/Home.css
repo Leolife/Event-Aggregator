@@ -113,11 +113,81 @@
 }
 
 .live-feed {
-    margin-top: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); 
+    padding: 1rem;
 }
-.video-container {
+
+.live-card {
+    position: relative;
     width: 320px;
-    height: 250px;
+    height: 280px;
+    display: flex;
+    flex-direction: column;
+}
+
+.live-card-thumbnail {
+    width: 100%;
+    height: auto;
+    border-radius: 5px;
+    display: block;
+}
+
+.live-box {
+    position: absolute;
+    left: 5px;
+    top: 5px;
+    background-color: #f12b15;
+    color: white;
+    padding: 3px 4px;
+    border-radius: 3px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .live-box svg {
+    width: 20px;
+    height: 12px;
+  }
+
+.live-card-thumbnail-container:hover  {
+    transform: scale(1.05);
+  }
+
+.live-card-details {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.live-card-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    font-size: medium;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.live-card-broadcaster {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--secondary);
+}
+
+.live-card-game {
+    font-size: 0.9rem;
+}
+
+.live-card-viewers {
+    font-size: 0.9rem;
+}
+
+.live-card a {
+    display: block;
 }
 
 
