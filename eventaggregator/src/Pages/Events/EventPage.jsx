@@ -76,10 +76,6 @@ export const EventPage = ({ sidebar, user }) => {
     }
 
     useEffect(() => {
-        console.log(event)
-    }, [event])
-
-    useEffect(() => {
         async function fetchEvents() {
             const data = { ID: eventId };
             const response = await fetch("/get/single_event", {

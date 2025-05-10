@@ -5,7 +5,7 @@ import Sidebar from '../../Components/Sidebar/Sidebar'
 import Header from '../../Components/Header/Header'
 import AddToCalendarModal from '../../Components/Calendar/AddToCalendarModal';
 import { auth, firestore } from '../../firebase';
-import { collection, query, where, getDocs} from 'firebase/firestore';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 import { formatCategoryName, formatDateTime, formatLocation } from '../../utils/FormatData';
 import SaveEventButtons from '../../Components/Events/SaveEventButtons';
 import Alert from '../../Components/Notification/Alert';
@@ -58,6 +58,24 @@ export const EventCategory = ({ sidebar, user }) => {
         "Upcoming"
     ]
 
+    async function fetchEvents() {
+        const itemsPerPage = 7;
+        // Calculate START based on the current page
+        const START = 1;
+        const OFFSET = itemsPerPage;
+        const data = { START, OFFSET };
+        const response = await fetch("/get/offset", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        });
+        const fetchedEvents = await response.json()
+        setEvents(Object.values(fetchedEvents))
+    }
+
+
     // Fetch events from Firestore when component mounts and set user favorite events
     useEffect(() => {
         const getEvents = async () => {
@@ -83,28 +101,10 @@ export const EventCategory = ({ sidebar, user }) => {
                     .flatMap(doc => {
                         const data = doc.data();
                         const eventsData = data.eventsData || [];
-                        return eventsData.map(event => event.eventId);
+                        return eventsData.map(id => id);
                     })
                 setFavoritedEvents(userFavorites)
-
-                const fetchedEvents = eventsSnapshot.docs
-                    .map(doc => {
-                        const data = doc.data();
-                        return {
-                            id: doc.id || '',
-                            eventId: data.id || '',
-                            title: data.title || 'Unnamed Event',
-                            description: data.description || '',
-                            location: data.location || '',
-                            date: data.date || new Date().toISOString(),
-                            price: data.price != null ? data.price : 0,
-                            eventType: data.eventType || '',
-                            tags: data.tags || '',
-                            image: data.image || "https://i.scdn.co/image/ab67616d0000b273dbc606d7a57e551c5b9d4ee3",
-                            favorited: userFavorites.includes(data.id),
-                        };
-                    })
-                setEvents(fetchedEvents);
+                fetchEvents()
 
             } catch (error) {
                 console.error('Error fetching events:', error);
@@ -176,6 +176,8 @@ export const EventCategory = ({ sidebar, user }) => {
         fetchEvents();
     }, [])
 
+
+
     const handleStoreEvent = async (eventHash, event) => {
         const eventsCollection = collection(firestore, "events");
         const q = query(eventsCollection, where("id", '==', eventHash));
@@ -196,7 +198,7 @@ export const EventCategory = ({ sidebar, user }) => {
             setEvents([...events, newEvent])
             await addDoc(eventsCollection, newEvent);
             */
-            }
+        }
     }
     // Grabs selected tags from the header
     useEffect(() => {
@@ -207,19 +209,19 @@ export const EventCategory = ({ sidebar, user }) => {
             <Sidebar sidebar={sidebar} />
             <div className="events">
                 <Header title={formatCategoryName(categoryName)} sidebar={sidebar} sendData={sendData} options={options} />
-                
+
                 {/* ✅ New calendar button below header */}
                 <div className="calendar-link-container">
-                                    <button
-                                        className="calendar-link-button"
-                                        onClick={() =>
-                                            navigate(`/calendar-static/${encodeURIComponent(formatCategoryName(categoryName).toLowerCase())}`)}>
-                                        📅 View {formatCategoryName(categoryName)} Calendar
-                                    </button>
-                                </div>
+                    <button
+                        className="calendar-link-button"
+                        onClick={() =>
+                            navigate(`/calendar-static/${encodeURIComponent(formatCategoryName(categoryName).toLowerCase())}`)}>
+                        📅 View {formatCategoryName(categoryName)} Calendar
+                    </button>
+                </div>
 
                 <div className={`container ${sidebar ? "" : 'large-container'}`}>
-                    <Alert notification = {notification}> </Alert>
+                    <Alert notification={notification}> </Alert>
                     <div className="feed">
                         {events && events.length > 0 ? (
                             events

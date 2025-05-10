@@ -102,7 +102,7 @@ const CalendarEventModal = ({ isOpen, onClose, event, calendarId, onEventDelete,
     
     // Format date and location for display
     const formatLocation = () => {
-        return event.location || "No location specified";
+        return event.address1 || "No location specified";
     };
     
     // Get the date and time display

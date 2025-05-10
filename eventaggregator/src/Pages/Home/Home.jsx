@@ -64,8 +64,11 @@ export const Home = ({ sidebar }) => {
   useEffect(() => {
   }, [selectedTags])
 
+  // Fetch events from the API with a start and offset
+  // START is the starting index where OFFSET is how many events to fetch from that point
   async function fetchEvents() {
     const itemsPerPage = 7;
+    // Calculate START based on the current page
     const START = (currentPage - 1) * itemsPerPage + 1;
     const OFFSET = itemsPerPage;
     const data = { START, OFFSET };
@@ -102,8 +105,7 @@ export const Home = ({ sidebar }) => {
     fetchEvents();
   }, [])
 
-
-
+// Call fetchEvents whenever currentPage changes to turn the page
   useEffect(() => {
     fetchEvents()
   }, [currentPage])

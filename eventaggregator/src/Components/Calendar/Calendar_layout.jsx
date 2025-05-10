@@ -12,11 +12,11 @@ const Calendar_layout = ({ calendarTitle, calendarId, onChangeMonth, onDelete, i
     const [calendarEvents, setCalendarEvents] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
-    
+
     // State for event modal
     const [selectedEvent, setSelectedEvent] = useState(null);
     const [isEventModalOpen, setIsEventModalOpen] = useState(false);
-    
+
     // State for notifications - moved from modal to parent component
     const [notification, setNotification] = useState({ show: false, message: '', isError: false });
 
@@ -29,15 +29,28 @@ const Calendar_layout = ({ calendarTitle, calendarId, onChangeMonth, onDelete, i
         }, 3000);
     };
 
+    async function fetchEvent(eventId) {
+        const data = { ID: eventId };
+        const response = await fetch("/get/single_event", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        });
+        const fetchedEvent = await response.json()
+        return (Object.values(fetchedEvent)[0])
+    }
+
     // Fetch calendar events whenever calendar, currentDate or viewMode changes
     useEffect(() => {
         const fetchCalendarEvents = async () => {
             if (!calendarId || !user) return;
-            
+
             try {
                 setLoading(true);
                 setError('');
-                
+
                 // Find the calendar document
                 const calendarsCollection = collection(firestore, 'calendars');
                 const q = query(
@@ -45,37 +58,44 @@ const Calendar_layout = ({ calendarTitle, calendarId, onChangeMonth, onDelete, i
                     where("id", "==", calendarId),
                     where("uid", "==", user.uid)
                 );
-                
+
                 const querySnapshot = await getDocs(q);
-                
+
                 if (querySnapshot.empty) {
                     setError('Calendar not found');
                     setCalendarEvents([]);
                     return;
                 }
-                
+
                 // Get the calendar document
                 const calendarDoc = querySnapshot.docs[0];
                 const calendarData = calendarDoc.data();
-                
+
                 // Check if the calendar has events
                 const eventsData = calendarData.eventsData || [];
-                
+
                 // Format and store all events
-                const formattedEvents = eventsData.map(event => ({
-                    id: event.eventId,
-                    title: event.title || 'Unnamed Event',
-                    date: new Date(event.date),
-                    description: event.description || '',
-                    location: event.location || '',
-                    price: event.price != null ? event.price : 0,
-                    eventType: event.eventType || '',
-                    originalDate: event.date // Keep the original date string
-                }));
+                const currentYear = new Date().getFullYear();
+                const formattedEvents = await Promise.all(
+                    eventsData.map(async (eventId) => {
+                        const event = await fetchEvent(eventId);
+                        return {
+                            id: event.id,
+                            title: event.title || 'Unnamed Event',
+                            date: new Date(`${event.date || event.when}, ${currentYear}`),
+                            description: event.desc || '',
+                            address1: event.address1 || '',
+                            address2: event.address2 || '',
+                            mainpage: event.mainpage || '',
+                            image: event.image || '',
+                            thumb: event.thumb || '',
+                            originalDate: event.when || event.date,
+                        };
+                    }));
                 console.log(formattedEvents)
-                
+
                 setCalendarEvents(formattedEvents);
-                
+
                 // If we're in upcoming view, also update the upcoming events
                 if (viewMode === 'upcoming') {
                     setUpcomingEvents(formattedEvents.map(event => ({
@@ -94,7 +114,7 @@ const Calendar_layout = ({ calendarTitle, calendarId, onChangeMonth, onDelete, i
                 setLoading(false);
             }
         };
-        
+
         fetchCalendarEvents();
     }, [calendarId, user, currentDate, viewMode]);
 
@@ -121,13 +141,13 @@ const Calendar_layout = ({ calendarTitle, calendarId, onChangeMonth, onDelete, i
     // Function to handle event deletion (callback from modal)
     const handleEventDelete = (deletedEventId) => {
         // Update the calendar events list
-        setCalendarEvents(prev => 
+        setCalendarEvents(prev =>
             prev.filter(event => event.id !== deletedEventId)
         );
-        
+
         // Also update upcoming events if in that view
         if (viewMode === 'upcoming') {
-            setUpcomingEvents(prev => 
+            setUpcomingEvents(prev =>
                 prev.filter(event => event.id !== deletedEventId)
             );
         }
@@ -148,11 +168,11 @@ const Calendar_layout = ({ calendarTitle, calendarId, onChangeMonth, onDelete, i
         setCurrentDate(prevDate => {
             const newDate = new Date(prevDate);
             newDate.setMonth(newDate.getMonth() - 1);
-            
+
             if (onChangeMonth) {
                 onChangeMonth(newDate);
             }
-            
+
             return newDate;
         });
     };
@@ -161,11 +181,11 @@ const Calendar_layout = ({ calendarTitle, calendarId, onChangeMonth, onDelete, i
         setCurrentDate(prevDate => {
             const newDate = new Date(prevDate);
             newDate.setMonth(newDate.getMonth() + 1);
-            
+
             if (onChangeMonth) {
                 onChangeMonth(newDate);
             }
-            
+
             return newDate;
         });
     };
@@ -178,28 +198,28 @@ const Calendar_layout = ({ calendarTitle, calendarId, onChangeMonth, onDelete, i
     // Function to format date and time for display
     function formatDateTime(dateString, timeZone = "America/Los_Angeles") {
         if (!dateString) return "No date specified";
-        
+
         try {
             // Handle "Z" suffix if it's already present (ISO string)
             const dateToFormat = dateString.endsWith('Z') ? dateString : dateString + 'Z';
             const date = new Date(dateToFormat);
-            
+
             if (isNaN(date.getTime())) {
                 console.error("Invalid date:", dateString);
                 return "Invalid date";
             }
-            
-            const options = { 
-                weekday: "long", 
-                year: "numeric", 
-                month: "long", 
+
+            const options = {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
                 day: "numeric",
-                hour: "numeric", 
-                minute: "2-digit", 
+                hour: "numeric",
+                minute: "2-digit",
                 hour12: true,
                 timeZoneName: "short"
             };
-            
+
             return date.toLocaleString("en-US", options);
         } catch (error) {
             console.error("Error formatting date:", error, "Original:", dateString);
@@ -211,7 +231,7 @@ const Calendar_layout = ({ calendarTitle, calendarId, onChangeMonth, onDelete, i
     const getEventsForDate = (date) => {
         // Make sure we have a valid date for comparison
         if (!date || !calendarEvents.length) return [];
-        
+
         return calendarEvents.filter(event => {
             const eventDate = event.date;
             return (
@@ -243,13 +263,13 @@ const Calendar_layout = ({ calendarTitle, calendarId, onChangeMonth, onDelete, i
         const month = currentDate.getMonth();
         const daysInMonth = getDaysInMonth(year, month);
         const firstDayOfMonth = getFirstDayOfMonth(year, month);
-        
+
         // Get days from previous month
         const daysInPrevMonth = getDaysInMonth(year, month - 1);
-        
+
         // Create array of days
         const days = [];
-        
+
         // Add days from previous month
         for (let i = firstDayOfMonth - 1; i >= 0; i--) {
             const day = daysInPrevMonth - i;
@@ -262,7 +282,7 @@ const Calendar_layout = ({ calendarTitle, calendarId, onChangeMonth, onDelete, i
                 nextMonth: false
             });
         }
-        
+
         // Add days from current month
         for (let i = 1; i <= daysInMonth; i++) {
             const date = new Date(year, month, i);
@@ -274,11 +294,11 @@ const Calendar_layout = ({ calendarTitle, calendarId, onChangeMonth, onDelete, i
                 nextMonth: false
             });
         }
-        
+
         // Calculate how many days to show from next month (to complete the grid)
         const totalDaysDisplayed = Math.ceil((firstDayOfMonth + daysInMonth) / 7) * 7;
         const daysFromNextMonth = totalDaysDisplayed - days.length;
-        
+
         // Add days from next month
         for (let i = 1; i <= daysFromNextMonth; i++) {
             const date = new Date(year, month + 1, i);
@@ -290,11 +310,11 @@ const Calendar_layout = ({ calendarTitle, calendarId, onChangeMonth, onDelete, i
                 nextMonth: true
             });
         }
-        
+
         // Render the calendar grid
         const calendar = [];
         const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-        
+
         // Add header row with weekday names
         calendar.push(
             <div key="header" className="calendar-header">
@@ -305,42 +325,42 @@ const Calendar_layout = ({ calendarTitle, calendarId, onChangeMonth, onDelete, i
                 ))}
             </div>
         );
-        
+
         // Add day cells in rows of 7
         let rows = [];
         let cells = [];
-        
+
         days.forEach((day, i) => {
             const today = new Date();
-            const isToday = 
-                day.date.getDate() === today.getDate() && 
-                day.date.getMonth() === today.getMonth() && 
+            const isToday =
+                day.date.getDate() === today.getDate() &&
+                day.date.getMonth() === today.getMonth() &&
                 day.date.getFullYear() === today.getFullYear();
-                
+
             const dayClass = `calendar-day ${day.currentMonth ? 'current-month' : 'other-month'} ${isToday ? 'today' : ''}`;
-                
-            const isSelected = selectedDate && 
-                selectedDate.getDate() === day.day && 
-                selectedDate.getMonth() === (day.prevMonth 
-                ? currentDate.getMonth() - 1 
-                : day.nextMonth 
-                    ? currentDate.getMonth() + 1 
-                    : currentDate.getMonth());
-            
+
+            const isSelected = selectedDate &&
+                selectedDate.getDate() === day.day &&
+                selectedDate.getMonth() === (day.prevMonth
+                    ? currentDate.getMonth() - 1
+                    : day.nextMonth
+                        ? currentDate.getMonth() + 1
+                        : currentDate.getMonth());
+
             // Get events for this date
             const dayEvents = getEventsForDate(day.date);
-                    
+
             cells.push(
-                <div 
+                <div
                     key={i}
-                    className={`${dayClass} ${isSelected ? 'selected' : ''} ${dayEvents.length > 0 ? 'day-with-events' : ''}`} 
+                    className={`${dayClass} ${isSelected ? 'selected' : ''} ${dayEvents.length > 0 ? 'day-with-events' : ''}`}
                     onClick={() => handleDateClick(day.day)}
                 >
                     <div className="day-number">{day.day}</div>
                     <div className="events-container">
                         {dayEvents.map((event, index) => (
-                            <div 
-                                key={index} 
+                            <div
+                                key={index}
                                 className="event event-blue"
                                 onClick={(e) => handleEventClick(event, e)}
                             >
@@ -350,7 +370,7 @@ const Calendar_layout = ({ calendarTitle, calendarId, onChangeMonth, onDelete, i
                     </div>
                 </div>
             );
-            
+
             if ((i + 1) % 7 === 0) {
                 rows.push(
                     <div key={i} className="calendar-row">
@@ -360,13 +380,13 @@ const Calendar_layout = ({ calendarTitle, calendarId, onChangeMonth, onDelete, i
                 cells = [];
             }
         });
-        
+
         calendar.push(
             <div key="days" className="calendar-days">
                 {rows}
             </div>
         );
-        
+
         return calendar;
     };
 
@@ -378,7 +398,7 @@ const Calendar_layout = ({ calendarTitle, calendarId, onChangeMonth, onDelete, i
                     {loading ? (
                         <div className="loading-events">Loading events...</div>
                     ) : error ? (
-                        <div className="error-message" style={{color: 'red', textAlign: 'center'}}>
+                        <div className="error-message" style={{ color: 'red', textAlign: 'center' }}>
                             {error}
                         </div>
                     ) : upcomingEvents.length === 0 ? (
@@ -386,8 +406,8 @@ const Calendar_layout = ({ calendarTitle, calendarId, onChangeMonth, onDelete, i
                     ) : (
                         <div className="event-list">
                             {upcomingEvents.map(event => (
-                                <div 
-                                    key={event.id} 
+                                <div
+                                    key={event.id}
                                     className="upcoming-event-card"
                                     onClick={() => {
                                         setSelectedEvent(event);
@@ -400,7 +420,7 @@ const Calendar_layout = ({ calendarTitle, calendarId, onChangeMonth, onDelete, i
                                             <span className="event-icon">📅</span> {event.formattedDate}
                                         </p>
                                         <p className="event-location">
-                                            <span className="event-icon">📍</span> {event.location}
+                                            <span className="event-icon">📍</span> {event.address1}
                                         </p>
                                         {event.price > 0 && (
                                             <p className="event-price">
@@ -435,12 +455,12 @@ const Calendar_layout = ({ calendarTitle, calendarId, onChangeMonth, onDelete, i
                     {notification.message}
                 </div>
             )}
-            
+
             <div className="calendar-navigation">
                 <div className="calendar-title">
-                    {calendarTitle || 'Calendar'} 
+                    {calendarTitle || 'Calendar'}
                 </div>
-                
+
                 <div className="calendar-controls">
                     <button className="export-btn" onClick={handleExport}>Export (Google Calendar)</button>
                     {/* Only show delete button if this is not the Favorites calendar */}
@@ -449,7 +469,7 @@ const Calendar_layout = ({ calendarTitle, calendarId, onChangeMonth, onDelete, i
                     )}
                 </div>
             </div>
-            
+
             <div className="calendar-toolbar">
                 <div className="month-navigation">
                     <button className="nav-btn prev" onClick={goToPreviousMonth}>
@@ -460,17 +480,17 @@ const Calendar_layout = ({ calendarTitle, calendarId, onChangeMonth, onDelete, i
                         &gt;
                     </button>
                 </div>
-                
+
                 <div className="view-options">
                     <div className="timezone-display">PDT</div>
                     <div className="view-toggle">
-                        <button 
+                        <button
                             className={`view-btn ${viewMode === 'month' ? 'active' : ''}`}
                             onClick={() => switchViewMode('month')}
                         >
                             Month
                         </button>
-                        <button 
+                        <button
                             className={`view-btn ${viewMode === 'upcoming' ? 'active' : ''}`}
                             onClick={() => switchViewMode('upcoming')}
                         >
@@ -479,11 +499,11 @@ const Calendar_layout = ({ calendarTitle, calendarId, onChangeMonth, onDelete, i
                     </div>
                 </div>
             </div>
-            
+
             <div className="calendar-container">
                 {viewMode === 'month' ? renderCalendarDays() : renderUpcomingView()}
             </div>
-            
+
             {/* Calendar Event Modal */}
             <CalendarEventModal
                 isOpen={isEventModalOpen}

@@ -20,7 +20,6 @@ const SaveEventButtons = ({user, event, favoritedEvents, onEventHeart, onEventAd
         onEventAdd(event, true)
     };
 
-
     // Function to add event to the Favorites calendar when heart button is clicked
     const handleHeartClick = async (e, event) => {
         e.stopPropagation(); // Prevents navigating to event page when clicked
@@ -54,27 +53,16 @@ const SaveEventButtons = ({user, event, favoritedEvents, onEventHeart, onEventAd
             const calendarData = calendarDoc.data();
 
             // Create event data
-            const eventId = event.eventId;
-            const eventData = {
-                id: event.id,
-                eventId: eventId,
-                title: event.title || 'Unnamed Event',
-                description: event.description || '',
-                location: event.location || '',
-                date: event.date || new Date().toISOString(),
-                price: event.price != null ? event.price : 0,
-                eventType: event["event type"] || '',
-                tags: event.tags || '',
-                image: event.image || "https://i.scdn.co/image/ab67616d0000b273dbc606d7a57e551c5b9d4ee3"
-            };
+            const eventId = event.id;
+            console.log(eventId)
 
             // Check if the event is already in favorites 
             const alreadyFavorited = querySnapshot.docs.filter(doc => {
                 const eventsData = doc.data().eventsData || [];
-                return eventsData.some(event => event.eventId === eventId);
+                return eventsData.some(id  => id  === eventId);
             }).length === 1
             if (alreadyFavorited) {
-                const eventToRemove = calendarData.eventsData.find(e => e.eventId === eventId);
+                const eventToRemove = calendarData.eventsData.find(id => id === eventId);
 
                 if (!eventToRemove) {
                     return
@@ -96,12 +84,12 @@ const SaveEventButtons = ({user, event, favoritedEvents, onEventHeart, onEventAd
             // Update calendar document to include the new event
             if (!calendarData.eventsData) {
                 await updateDoc(calendarDocRef, {
-                    eventsData: [eventData]
+                    eventsData: arrayUnion(event.id)
                 });
             } else {
                 // Add event to existing events array
                 await updateDoc(calendarDocRef, {
-                    eventsData: arrayUnion(eventData)
+                    eventsData: arrayUnion(event.id)
                 });
             }
 
@@ -113,6 +101,7 @@ const SaveEventButtons = ({user, event, favoritedEvents, onEventHeart, onEventAd
 
             // Update the favorited events state
             onEventHeart([...favoritedEvents, eventId]);
+            console.log(favoritedEvents)
 
             // Show success message
             showNotification("Event added to favorites!");
@@ -128,11 +117,11 @@ const SaveEventButtons = ({user, event, favoritedEvents, onEventHeart, onEventAd
     return (
         <div className="add-options">
             <button
-                className={favoritedEvents.includes(event.eventId) ? 'heartfilled-btn' : 'heart-btn'}
+                className={favoritedEvents.includes(event.id) ? 'heartfilled-btn' : 'heart-btn'}
                 onClick={(e) => handleHeartClick(e, event)}
             >
                 <HeartIcon className="heart-icon" />
-                {favoritedEvents.includes(event.eventId) ? 'Unfavorite' : 'Favorite'}
+                {favoritedEvents.includes(event.id) ? 'Unfavorite' : 'Favorite'}
 
             </button>
             <button
