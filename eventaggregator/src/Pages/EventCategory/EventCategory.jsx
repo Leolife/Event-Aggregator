@@ -9,6 +9,7 @@ import { collection, query, where, getDocs } from 'firebase/firestore';
 import { formatCategoryName, formatDateTime, formatLocation } from '../../utils/FormatData';
 import SaveEventButtons from '../../Components/Events/SaveEventButtons';
 import Alert from '../../Components/Notification/Alert';
+import UserData from '../../utils/UserData';
 var hash = require('object-hash');
 
 export const EventCategory = ({ sidebar, user }) => {
@@ -24,8 +25,7 @@ export const EventCategory = ({ sidebar, user }) => {
     const [loading, setLoading] = useState(true);
     // State to track favorited events
     const [favoritedEvents, setFavoritedEvents] = useState([]);
-
-
+    
     // Combined notification state for both heart actions and calendar additions
     const [notification, setNotification] = useState({
         show: false,
@@ -153,56 +153,21 @@ export const EventCategory = ({ sidebar, user }) => {
         setIsAddToCalendarModalOpen(newModalOpen)
     }
 
-    // Fetches 10 random events from the API
-    useEffect(() => {
-        async function fetchEvents() {
-            const event = { NUMBER: 3 };
-            const response = await fetch("/events/random", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(event)
-            });
-            const data = await response.json()
-            data.forEach(item => {
-                item["image"] = "https://images.igdb.com/igdb/image/upload/t_1080p/" + item["image"] + ".jpg" //Attaches URL to the image ID
-                const eventHash = hash(item)
-                handleStoreEvent(eventHash, item)
-            })
-            //setEvents(data)
-
-        }
-        fetchEvents();
-    }, [])
-
-
-
-    const handleStoreEvent = async (eventHash, event) => {
-        const eventsCollection = collection(firestore, "events");
-        const q = query(eventsCollection, where("id", '==', eventHash));
-        const querySnapshot = await getDocs(q);
-        if (querySnapshot.empty) {
-            const newEvent = {
-                id: eventHash,
-                title: event.title || 'Unnamed Event',
-                description: event.description || '',
-                location: formatLocation(event),
-                date: event.date || new Date().toISOString(),
-                price: event.price != null ? event.price : 0,
-                eventType: event["event type"] || '',
-                tags: event.tags || '',
-                image: event.image || "https://i.scdn.co/image/ab67616d0000b273dbc606d7a57e551c5b9d4ee3"
-            };
-            /*
-            setEvents([...events, newEvent])
-            await addDoc(eventsCollection, newEvent);
-            */
-        }
-    }
     // Grabs selected tags from the header
     useEffect(() => {
     }, [selectedTags, selectedSort])
+
+    // Saves user interaction click and navigates to the event page
+    const handleClick = async (id) => {
+        navigate(`/event/${id}`)
+        const user = auth.currentUser;
+        console.log(user)
+        if (user) {
+            const userId = user.uid
+            const userData = new UserData(userId);
+            await userData.setEventClicks(id);
+        }
+    }
 
     return (
         <>
@@ -226,19 +191,19 @@ export const EventCategory = ({ sidebar, user }) => {
                         {events && events.length > 0 ? (
                             events
                                 .sort((a, b) => selectedSort === 1 ? new Date(a.date) - new Date(b.date) : 0) // If option 0, sort events alphebatically. If option 1, sort events by upcoming.
-                                .filter(x => selectedTags.length === 0 || selectedTags.some(tag => x.tags && x.tags.includes(tag.category))) // Filters the events by category tags the user has selected. If no tags are selected then displays all.
+                                //.filter(x => selectedTags.length === 0 || selectedTags.some(tag => x.tags && x.tags.includes(tag.category))) // Filters the events by category tags the user has selected. If no tags are selected then displays all.
                                 .map((event, index) => (
-                                    <div key={index} className="event-card" onClick={() => navigate(`/event/${event.id}`)}>
-                                        <div className='img-sizer'>
-                                            <img src={event.image} alt="" />
+                                    <div key={index} className="event-card" onClick={() => handleClick(event.id)}>
+                                        <div className='img-sizer' style={{ backgroundImage: `url(${event.thumb})` }}>
+                                            <div className="blur-layer"></div>
+                                            <img src={event.thumb} alt="" />
                                         </div>
                                         <div className="event-content">
                                             <div className="event-details">
                                                 <div className="event-name">
-                                                    <h2> {event.title} </h2>
+                                                    <h2 className='event-title'> {event.title} </h2>
                                                     <div className="category-box">
-                                                        <label className="event-type"> {event.eventType} </label>
-                                                        <div className="tag-box">
+                                                        <div className="tag-box" style={{ display: "none" }}>
                                                             {/* Checks if the event has tags associated with it */}
                                                             {event.tags &&
                                                                 // Converts the tag string into a JSON object
@@ -251,26 +216,24 @@ export const EventCategory = ({ sidebar, user }) => {
                                                             }
                                                         </div>
                                                     </div>
+
                                                 </div>
                                                 <div className="description-box">
-                                                    <span className="description"> {event.description}  </span>
+                                                    <span className="description" style={{ display: event.desc ? "inline" : "none" }}> {event.desc}  </span>
                                                 </div>
                                                 {/* Container for the date and location */}
                                                 <div className="timestamp-container">
                                                     <div className="event-date">
                                                         <span> 📅 </span>
-                                                        <label className="date-text"> {formatDateTime(event.date)} </label>
-                                                        <div className="event-location">
+                                                        <label className="date-text"> {event.when} </label>
+                                                        <div className="event-location" style={{ display: event.address1 ? "block" : "none" }}>
                                                             <span>📍</span>
-                                                            <label className="location-text"> {event.location} </label>
+                                                            <label className="location-text"> {event.address1} </label>
                                                         </div>
                                                     </div>
                                                 </div>
-
                                             </div>
                                             <div className="footer">
-                                                {/* If the price is 0, display it as free */}
-                                                <label className="price"> Price: {event.price === 0 ? "Free" : `$${event.price}`} </label>
                                                 <SaveEventButtons user={user} event={event} favoritedEvents={favoritedEvents}
                                                     onEventHeart={(newFavoritesList) => onEventHeart(newFavoritesList)}
                                                     onEventAdd={(newSelectedEvent, newModalOpen) => onEventAdd(newSelectedEvent, newModalOpen)}

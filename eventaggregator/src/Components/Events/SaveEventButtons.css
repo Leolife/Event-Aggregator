@@ -1,0 +1,68 @@
+
+.heart-btn .heart-icon {
+    color: white;
+    width: 25px;
+    height: 25px;
+}
+
+.heart-btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background-color: var(--secondary);
+}
+
+.heartfilled-btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background-color: pink !important;
+}
+
+.heartfilled-btn .heart-icon {
+    color: #ec77ae;
+    width: 25px;
+    height: 25px;
+}
+
+/* Add a visual effect for the heart button when clicked */
+.heart-btn:active .heart-icon path {
+    transform: translateY(1px);
+    /* Slight lift effect */
+}
+
+.heart-btn:hover {
+    transform: translateY(-1px);
+    /* Slight lift effect */
+}
+
+.export-btn {
+    color: white !important;
+}
+
+.export-btn:hover {
+    transform: translateY(-1px);
+    /* Slight lift effect */
+}
+
+.save-btn:hover {
+    transform: translateY(-1px);
+    /* Slight lift effect */
+    background-color: #6b34c9 !important;
+}
+
+.add-btn:hover {
+    transform: translateY(-1px);
+    /* Slight lift effect */
+}
+
+.add-options {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+    margin-right: 12px;
+}
+
+.add-options button {
+    border-radius: 8px;
+}
