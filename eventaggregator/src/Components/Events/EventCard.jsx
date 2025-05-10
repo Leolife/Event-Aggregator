@@ -4,20 +4,35 @@ import './EventCard.css'
 import { formatDateTime } from '../../utils/FormatData';
 import { ReactComponent as HeartIcon } from '../../assets/heart-icon.svg';
 import { ReactComponent as MessageIcon } from '../../assets/message-icon.svg';
+import { auth } from '../../firebase';
+import Placeholder from '../../assets/placeholder.png';
+import UserData from '../../utils/UserData';
 
-const EventCard = ({ event }) => {
-    console.log(event)
+
+
+
+const EventCard = ({event}) => {
     const navigate = useNavigate()
+    const handleClick = async () => {
+        navigate(`/event/${event.id}`)
+        const user = auth.currentUser;
+        if (auth.currentUser) {
+            const userId = user.uid
+            const userData = new UserData(userId);
+            await userData.setEventClicks(event.id);
+            console.log("Hey...")
+        }
+    }
     return (
-        <div className='event-card-container' onClick={() => navigate(`/event/${event.id}`)}>
+        <div className='event-card-container' onClick={handleClick}>
             <div className='event-card-thumb-container'>
-                <img src={event.image} alt="" />
+                <img src={event.image || event.thumb || Placeholder} alt={event.title || 'Event image'} />
             </div>
             <div className='event-card-info-container'>
                 <label className="event-card-date"> {formatDateTime(event.date)} </label>
                 <h3 className='event-card-title'> {event.title} </h3>
                 <label className='event-card-favorites'> </label>
-                <div className='event-card-interactions-container'>
+                <div className='event-card-interactions-container' style={{display: 'none'}}>
                     <div className='event-card-interactions'>
                         <MessageIcon> </MessageIcon>
                         <label> 0 </label>

@@ -1,4 +1,4 @@
-import { doc, getDoc, updateDoc, collection, query, where, getDocs } from "firebase/firestore";
+import { doc, getDoc, updateDoc, collection, query, where, getDocs, setDoc, increment } from "firebase/firestore";
 import { firestore } from "../firebase";
 
 class UserData {
@@ -40,17 +40,40 @@ class UserData {
     async getUserCalendarData() {
         try {
             const calendarsCollection = collection(firestore, 'calendars');
-            const userCalendarsQuery = query(calendarsCollection, where ('uid', '==', this.uid))
+            const userCalendarsQuery = query(calendarsCollection, where('uid', '==', this.uid))
             const calendarsSnapshot = await getDocs(userCalendarsQuery);
             const fetchedCalendars = calendarsSnapshot.docs
                 .map(doc => ({
-                    firestoreId: doc.id, 
+                    firestoreId: doc.id,
                     ...doc.data(),
                 }));
             return fetchedCalendars
         } catch (error) {
             console.error("Error fetching user data:", error);
             throw error;
+        }
+    }
+
+    // Setter: Update the user's event clicks
+    async setEventClicks(eventId) {
+        const usersRef = collection(firestore, "users");
+        const q = query(usersRef, where("uid", "==", this.uid));
+        const querySnapshot = await getDocs(q);
+        const userDoc = querySnapshot.docs[0];
+        const userDocRef = userDoc.ref;
+        // eventClicks document in user subcollection
+        const eventClickRef = doc(userDocRef, "eventClicks", String(eventId));
+        const eventDoc = await getDoc(eventClickRef);
+        if (eventDoc.exists()) {
+            // Increment the click count
+            await updateDoc(eventClickRef, {
+                clicks: increment(1),
+            });
+        } else {
+            // Create a new document with clicks = 1
+            await setDoc(eventClickRef, {
+                clicks: 1,
+            });
         }
     }
 

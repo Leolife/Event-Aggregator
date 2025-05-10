@@ -7,6 +7,7 @@ import { collection, query, where, getDocs } from 'firebase/firestore';
 import { formatDateTime } from '../../utils/FormatData'
 import SaveEventButtons from '../../Components/Events/SaveEventButtons';
 import AddToCalendarModal from '../../Components/Calendar/AddToCalendarModal';
+import Placeholder from '../../assets/placeholder.png';
 import Alert from '../../Components/Notification/Alert';
 
 export const EventPage = ({ sidebar, user }) => {
@@ -71,64 +72,29 @@ export const EventPage = ({ sidebar, user }) => {
     const onEventAdd = (newSelectedEvent, newModalOpen) => {
         setSelectedEvent(newSelectedEvent)
         setIsAddToCalendarModalOpen(newModalOpen)
+
     }
 
     useEffect(() => {
-        const getEvents = async () => {
-            try {
-                setLoading(true);
-                const eventsCollection = collection(firestore, 'events');
-                const calendarsCollection = collection(firestore, "calendars");
-                const currentUser = user || auth.currentUser;
-                const q = query(
-                    calendarsCollection,
-                    where("uid", "==", currentUser.uid),
-                    where("name", "==", "Favorites"),
-                    where("isDefault", "==", true)
-                );
-                const eventQuery = query(
-                    eventsCollection,
-                    where("__name__", "==", eventId)
-                )
-                const eventsSnapshot = await getDocs(eventQuery);
-                const calendarSnapshot = await getDocs(q);
+        console.log(event)
+    }, [event])
 
-                const userFavorites = calendarSnapshot.docs
-                    .flatMap(doc => {
-                        const data = doc.data();
-                        const eventsData = data.eventsData || [];
-                        return eventsData.map(event => event.eventId);
-                    })
-                setFavoritedEvents(userFavorites)
+    useEffect(() => {
+        async function fetchEvents() {
+            const data = { ID: eventId };
+            const response = await fetch("/get/single_event", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            });
+            const fetchedEvent = await response.json()
+            setEvent(Object.values(fetchedEvent)[0])
+        }
+        fetchEvents();
+    }, [])
 
-                const fetchedEvents = eventsSnapshot.docs
-                    .flatMap(doc => {
-                        const data = doc.data();
-                        return {
-                            id: doc.id || '',
-                            eventId: data.id || '',
-                            title: data.title || 'Unnamed Event',
-                            description: data.description || '',
-                            location: data.location || '',
-                            date: data.date || new Date().toISOString(),
-                            price: data.price != null ? data.price : 0,
-                            eventType: data.eventType || '',
-                            tags: data.tags || '',
-                            image: data.image || "https://i.scdn.co/image/ab67616d0000b273dbc606d7a57e551c5b9d4ee3",
-                            favorited: userFavorites.includes(data.id) ? false : true
-                        };
-                    })
-                setEvent(fetchedEvents[0]);
-
-            } catch (error) {
-                console.error('Error fetching events:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        getEvents();
-    }, [user, eventId]);
     return (
         <>
             <Sidebar sidebar={sidebar} />
@@ -139,17 +105,13 @@ export const EventPage = ({ sidebar, user }) => {
                         <div className='event-info'>
                             <div className='img-section'>
                                 <div className='img-sizer'>
-                                    <img src={event.image} alt="" />
+                                    <img src={event.thumb || Placeholder} alt={event.title || 'Event image'} />
                                 </div>
                             </div>
                             <div className='event-info-section'>
                                 <div className='event-header-section'>
                                     <h2 className='event-time'> 📅 {formatDateTime(event.date)} </h2>
                                     <h1 className='event-title'> {event.title} </h1>
-                                    <div className='event-type-section'>
-                                        <h2 className='event-type'> {event.eventType} </h2>
-                                        <h2 className="price"> • {event.price === 0 ? "Free" : `$${event.price}`} </h2>
-                                    </div>
                                     <div className='event-buttons'>
                                         <div className='event-tabs'>
                                             <button className='event-tab-btn'> About </button>
@@ -165,11 +127,11 @@ export const EventPage = ({ sidebar, user }) => {
                                 <div className='event-about'>
                                     <div className='event-description-section'>
                                         <h1 className='event-header'> Desciption </h1>
-                                        <p className='event-description'> {event.description} </p>
+                                        <p className='event-description'> {event.desc} </p>
                                     </div>
                                     <div className='event-location-section'>
                                         <h1 className='event-header'> Location </h1>
-                                        <p className='event-location'> 📍 {event.location} </p>
+                                        <p className='event-location'> 📍 {event.address1} </p>
                                     </div>
                                 </div>
                             </div>

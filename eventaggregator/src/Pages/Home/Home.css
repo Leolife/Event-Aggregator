@@ -119,3 +119,27 @@
     width: 320px;
     height: 250px;
 }
+
+
+.all-events-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.all-events-feed {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+    padding: 1rem;
+  }
+
+.event-nav {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 2px;
+}
+
+.event-nav-btn {
+    padding-left: 16px;
+    padding-right: 16px;
+}
