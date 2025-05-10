@@ -68,15 +68,16 @@ def format_output(items: list):
     for item in items:
         assert(len(item) == 11)
         results[item[0]] = {
-            'Title': item[1],
-            'Date' : item[2],
-            'Mainpage' : item[3],
+            'id' : item[0],
+            'title': item[1],
+            'date' : item[2],
+            'mainpage' : item[3],
             'address1' : item[4],
             'address2' : item[5],
             'when'     : item[6],
-            'Thumb'    : item[7],
-            'Image'    : item[8],
-            'Desc'     : item[9]
+            'thumb'    : item[7],
+            'image'    : item[8],
+            'desc'     : item[9]
     }
     return results
 
@@ -103,7 +104,7 @@ def get_events():
         "ID"  : incoming_request['ID']
     }
     items: list[tuple] = query(url, data, mode='POST')
-    return items
+    return format_output(items)
 
 @app.post("/get/offset")
 def get_offset():
@@ -126,7 +127,7 @@ def get_offset():
         "LIMIT" : incoming_request['OFFSET']
     }
     items: list[tuple] = query(url, data, mode='POST')
-    return items
+    return format_output(items)
 
 
 @app.post("/search")
