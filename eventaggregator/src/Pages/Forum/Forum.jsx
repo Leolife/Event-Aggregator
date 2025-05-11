@@ -83,17 +83,17 @@ export const Forum = ({ sidebar }) => {
                 post.title.toLowerCase().includes(queryParam.toLowerCase()) ||
                 post.body.toLowerCase().includes(queryParam.toLowerCase())
             );
-            setFilteredPosts(sortedPosts);
         }
         if (queryParam && selectedType === "comments") {
-            console.log("im here!")     
             sortedReplies = sortedReplies.filter(reply =>
                 reply.commentBody.toLowerCase().includes(queryParam.toLowerCase())
             )
             setFilteredReplies(sortedReplies)
-        } else if (!queryParam) {
-            setFilteredPosts(posts)
         }
+        if (selectedType !== "comments") {
+            setFilteredPosts(sortedPosts);
+        }
+
     }, [selectedSort, selectedType, posts, replies, queryParam])
 
     useEffect(() => {
