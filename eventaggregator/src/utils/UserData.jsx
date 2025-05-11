@@ -216,14 +216,17 @@ class UserData {
 
     // Getter: Fetch the user's Favorites calendars
     async getFavorites() {
-        const eventsData = (await this.getUserCalendarData()).filter(calendar => calendar.name === "Favorites")[0].eventsData;
-        if (!eventsData || !Array.isArray(eventsData)) return [];
-        
-        const eventInfoList = await Promise.all(
-            eventsData.slice(0, 5).map(eventId => this.fetchEvent(eventId))
-        );
+        const favorites = (await this.getUserCalendarData()).filter(calendar => calendar.name === "Favorites")[0];
+        if (favorites) {
+            const eventsData = favorites.eventsData
+            if (!eventsData || !Array.isArray(eventsData)) return [];
 
-        return eventInfoList;
+            const eventInfoList = await Promise.all(
+                eventsData.slice(0, 5).map(eventId => this.fetchEvent(eventId))
+            );
+
+            return eventInfoList;
+        }
     }
 
 }
