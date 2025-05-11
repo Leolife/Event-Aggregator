@@ -1,3 +1,4 @@
 node_modules/
 .venv
 .env
+Production_Environment/Servers/Collectors/UserBase/Data/event-aggregator-service-Account-Key.json
