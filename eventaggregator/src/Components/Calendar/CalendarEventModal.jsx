@@ -54,7 +54,7 @@ const CalendarEventModal = ({ isOpen, onClose, event, calendarId, onEventDelete,
             }
             
             // Find the event to remove
-            const eventToRemove = currentData.eventsData.find(e => e.eventId === event.id);
+            const eventToRemove = currentData.eventsData.find(e => e === event.id);
             
             if (!eventToRemove) {
                 onNotification({ 

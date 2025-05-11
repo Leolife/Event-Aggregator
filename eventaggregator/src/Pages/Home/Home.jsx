@@ -1,6 +1,5 @@
 //home.jsx
 import React, { useState, useEffect } from 'react'
-import PropTypes from "prop-types";
 import './Home.css'
 import Sidebar from '../../Components/Sidebar/Sidebar'
 import Header from '../../Components/Header/Header'
@@ -8,26 +7,44 @@ import { eventInfo } from './TempEvents'
 import EventTile from '../../Components/Events/CategoryCard'
 import EventCard from '../../Components/Events/EventCard';
 import { ReactComponent as LiveIcon } from '../../assets/live-icon.svg';
+import HeaderFilters from '../../Components/Header/HeaderFilters'
 
 
 export const Home = ({ sidebar }) => {
 
-  // Stores the tags the user has selected
+  // Stores the tags the user has selected in the header filters
   const [selectedTags, setSelectedTags] = useState([]);
+  // Stores the sort the user has selected in the header filters
+  const [selectedSort, setSelectedSort] = useState([]);
+  // Stores the current event pagination 
   const [currentPage, setCurrentPage] = useState(1)
+  // Stores the events fetched from the API
   const [events, setEvents] = useState([{}])
+  // Stores the streams fetched from the API
   const [streams, setStreams] = useState([]);
+  // Stores all the stream tags
+  const [tags, setTags] = useState([]);
+  // The total event pages
   const totalPages = 5
 
-  // Sort options located in the header
+  // Sort options located in the header filters
   const options = [
-    "Recommended For You",
-    "All"
+    "Viewers (High to Low)",
+    "Viewers (Low to High)",
+    "Recently Started"
   ]
 
-  // Retrives tags from the header
-  function sendData(data) {
-    setSelectedTags(data)
+  const sortOptions = {
+    "0": (a, b) => b.viewer_count - a.viewer_count,
+    "1": (a, b) => a.viewer_count - b.viewer_count,
+    "2": (a, b) => new Date(b.started_at) - new Date(a.started_at),
+  };
+
+  // Retrives tags and sort from the header
+  function sendData(fetchedTags, fetchedSorts) {
+    console.log(fetchedSorts)
+    setSelectedTags(fetchedTags)
+    setSelectedSort(fetchedSorts)
   }
 
   // Convert twitch stream start time to time ago
@@ -62,12 +79,12 @@ export const Home = ({ sidebar }) => {
   }
 
   useEffect(() => {
-  }, [selectedTags])
+  }, [selectedTags, selectedSort])
 
   // Fetch events from the API with a start and offset
   // START is the starting index where OFFSET is how many events to fetch from that point
   async function fetchEvents() {
-    const itemsPerPage = 7;
+    const itemsPerPage = 14;
     // Calculate START based on the current page
     const START = (currentPage - 1) * itemsPerPage + 1;
     const OFFSET = itemsPerPage;
@@ -83,29 +100,37 @@ export const Home = ({ sidebar }) => {
     setEvents(Object.values(fetchedEvents))
   }
 
+
   // Fetch live events from the API
   useEffect(() => {
-    async function fetchEvents() {
+    async function fetchLiveEvents() {
       const response = await fetch("/streams", {
         method: "GET",
       });
       const data = await response.json()
       const width = 440;
       const height = 248;
+      const uniqueTags = new Set();
       const streams = data.map((stream) => {
         // Set the thumbnail width and height 
         const thumbnail = `https://static-cdn.jtvnw.net/previews-ttv/live_user_${stream.user_login}-${width}x${height}.jpg`;
+        const topTags = stream.tags.slice(0, 3);
+        // Takes the top 3 tags and places it into a unique set
+        stream.tags.slice(0, 3).forEach(tag => uniqueTags.add(tag));
         return {
           ...stream,
           thumbnail, // attach the new thumbnail url
+          tags: topTags
         };
       })
+      // Store the streams and tags
       setStreams(streams)
+      setTags(Array.from(uniqueTags));
     }
-    fetchEvents();
+    fetchLiveEvents();
   }, [])
 
-// Call fetchEvents whenever currentPage changes to turn the page
+  // Call fetchEvents whenever currentPage changes to turn the page
   useEffect(() => {
     fetchEvents()
   }, [currentPage])
@@ -116,7 +141,7 @@ export const Home = ({ sidebar }) => {
     <>
       <Sidebar sidebar={sidebar} />
       <div className="home">
-        <Header title={"All Categories"} sidebar={sidebar} sendData={sendData} options={options} />
+        <Header title="All Events" sidebar={sidebar} />
         <div className={`container ${sidebar ? "" : 'large-container'}`}>
           <div className='all-events-container'>
             <div className='all-events-feed'>
@@ -129,6 +154,8 @@ export const Home = ({ sidebar }) => {
                 <label> Error Loading Events </label>
               )}
             </div>
+            {/* The navigation buttons for scrolling the event pages */}
+            {/* Previous Button */}
             <div className='event-nav'>
               <button
                 className='event-nav-btn'
@@ -136,7 +163,7 @@ export const Home = ({ sidebar }) => {
                 style={{ visibility: currentPage === 1 ? 'hidden' : 'visible' }}>
                 Prev
               </button>
-
+              {/* Page number buttons */}
               {[...Array(totalPages)].map((_, index) => {
                 const page = index + 1;
                 return (
@@ -152,7 +179,7 @@ export const Home = ({ sidebar }) => {
                   </button>
                 );
               })}
-
+              {/* Next Button */}
               <button
                 className='event-nav-btn'
                 onClick={() => setCurrentPage(currentPage + 1)}
@@ -161,21 +188,31 @@ export const Home = ({ sidebar }) => {
               </button>
             </div>
           </div>
+        </div>
+        <Header title="All Categories" sidebar={sidebar} />
+        <div className={`container ${sidebar ? "" : 'large-container'}`}>
           <div className="feed-container">
             <div className="feed">
               {/* Filters the event tiles based on selected category tags */}
-              {eventInfo.filter(e => selectedTags.length === 0 || selectedTags.some(tag => e.tags.includes(tag.category)))
-                .map((tile, index) => (
+              {
+                eventInfo.map((tile, index) => (
                   <EventTile key={index} {...tile} />
                 ))}
             </div>
           </div>
+        </div>
+        <Header title="Live Events" sidebar={sidebar}>
+          <HeaderFilters tags={tags} options={options} sendData={sendData} />
+        </Header>
+        <div className={`container ${sidebar ? "" : 'large-container'}`}>
           {/* Display live ongoing events*/}
           <div className='live-feed-container'>
-            <h1 className='live-events'> 🔴 Live Events </h1>
             <div className='live-feed'>
               {streams && streams.length > 0 ? (
-                streams.map((stream, index) => (
+                streams.filter(e => 
+                  selectedTags.length === 0 || selectedTags.some(tag => e.tags.includes(tag.category)))
+                  .sort(sortOptions[selectedSort])
+                  .map((stream, index) => (
                   <div className='live-card'>
                     <div className='live-card-thumbnail-container'>
                       {/* Link to the Twitch Stream when user clicks on the thumbnail */}
@@ -189,6 +226,14 @@ export const Home = ({ sidebar }) => {
                       <label className='live-card-broadcaster'> {stream.user_name} </label>
                       <label className='live-card-game'> {stream.game_name} </label>
                       <label className='live-card-viewers'>  {convertToAbbreviation(stream.viewer_count)} watching • {timeElapsed(stream.started_at)}  </label>
+                    </div>
+                    <div className="tag-box">
+                      {/* Displays the first 3 tags below the stream */}
+                      {stream.tags.map((tag, index) => (
+                        <div key={index} className="tag">
+                          <label className="tag-name">{tag}</label>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 )
