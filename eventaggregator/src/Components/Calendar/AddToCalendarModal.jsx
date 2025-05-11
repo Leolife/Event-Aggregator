@@ -111,15 +111,15 @@ const AddToCalendarModal = ({ isOpen, onClose, event, user, onSuccess, onError }
                 return parts.join(', ');
             };
             
-            // Create event data
+            // Create event data - always store as full object, not just ID
             const eventData = {
-                eventId: `event-${Date.now()}`,
+                eventId: event.id || event.eventId || `event-${Date.now()}`,
                 title: event.title || 'Unnamed Event',
                 description: event.description || '',
                 location: safeLocation(),
                 date: event.date || new Date().toISOString(),
                 price: event.price != null ? event.price : 0,
-                eventType: event["event type"] || '',
+                eventType: event.eventType || '',
                 tags: event.tags || '',
                 createdAt: new Date().toISOString(),
             };
