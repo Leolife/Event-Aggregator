@@ -144,7 +144,7 @@ export const EventCategory = ({ sidebar, user }) => {
         };
 
         getEvents();
-    }, [user]);
+    }, [user, queryParam]);
 
     // Retrieves tags and sort options from the header
     function sendData(tags_data, sort_data) {
