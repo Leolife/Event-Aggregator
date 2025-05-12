@@ -154,7 +154,7 @@ def search_func():
     items: list[tuple] = query(url, data, mode='POST')
 
 
-    return jsonify(items), 200
+    return jsonify(format_output(items)), 200
 
 @app.post("/recc")
 def reccomendation():

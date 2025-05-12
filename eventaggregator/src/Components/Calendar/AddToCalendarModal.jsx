@@ -19,13 +19,13 @@ const getColorForCalendar = (calendarName) => {
         '#9B59B6', // Violet
         '#F1C40F'  // Yellow
     ];
-    
+
     // Simple hash function to get consistent color for the same name
     let hash = 0;
     for (let i = 0; i < calendarName.length; i++) {
         hash = calendarName.charCodeAt(i) + ((hash << 5) - hash);
     }
-    
+
     return colors[Math.abs(hash) % colors.length];
 };
 
@@ -46,8 +46,8 @@ const AddToCalendarModal = ({ isOpen, onClose, event, user, onSuccess, onError }
                 const calendarsCollection = collection(firestore, 'calendars');
                 const q = query(calendarsCollection, where("uid", "==", user.uid));
                 const querySnapshot = await getDocs(q);
-                
-                const userCalendars = querySnapshot.docs.map(doc => {
+
+                const userCalendars = querySnapshot.docs.filter(doc => (doc.data().name || 'Unnamed Calendar') !== 'Favorites').map(doc => {
                     const data = doc.data();
                     return {
                         id: data.id || doc.id,
@@ -56,7 +56,7 @@ const AddToCalendarModal = ({ isOpen, onClose, event, user, onSuccess, onError }
                         color: getColorForCalendar(data.name || 'Unnamed Calendar')
                     };
                 });
-                
+
                 setCalendars(userCalendars);
                 // If there are calendars, preselect the first one
                 if (userCalendars.length > 0) {
@@ -89,10 +89,10 @@ const AddToCalendarModal = ({ isOpen, onClose, event, user, onSuccess, onError }
         try {
             setSaving(true);
             setError('');
-            
+
             console.log('Adding event to calendar:', selectedCalendar);
             console.log('Event data:', event);
-            
+
             // Find the selected calendar document
             const selectedCalendarObj = calendars.find(cal => cal.id === selectedCalendar);
             if (!selectedCalendarObj) {
@@ -106,12 +106,12 @@ const AddToCalendarModal = ({ isOpen, onClose, event, user, onSuccess, onError }
                 const city = typeof event.city === 'string' ? event.city : String(event.city || '');
                 const state = typeof event.state === 'string' ? event.state : String(event.state || '');
                 const zip = typeof event.zipcode === 'string' ? event.zipcode : String(event.zipcode || '');
-                
+
                 const parts = [address, city, state, zip].filter(part => part && part.trim && part.trim() !== '');
                 return parts.join(', ');
             };
-            
-            // Create event data - always store as full object, not just ID
+          
+            // Create event data
             const eventData = {
                 eventId: event.id || event.eventId || `event-${Date.now()}`,
                 title: event.title || 'Unnamed Event',
@@ -123,57 +123,50 @@ const AddToCalendarModal = ({ isOpen, onClose, event, user, onSuccess, onError }
                 tags: event.tags || '',
                 createdAt: new Date().toISOString(),
             };
-            
+
             console.log('Formatted event data:', eventData);
-            
+
             // Update the calendar document to include the new event
             const calendarsCollection = collection(firestore, 'calendars');
             const q = query(
-                calendarsCollection, 
+                calendarsCollection,
                 where("id", "==", selectedCalendar)
             );
-            
+
             const querySnapshot = await getDocs(q);
-            
+
             if (!querySnapshot.empty) {
                 const calendarDoc = querySnapshot.docs[0];
                 const calendarData = calendarDoc.data();
-                
+
                 // Check if events array exists, if not create one
-                if (!calendarData.eventsData) {
+                const alreadyExists = calendarData.eventsData?.includes(event.id);
+                if (!alreadyExists) {
                     await updateDoc(doc(firestore, 'calendars', calendarDoc.id), {
-                        eventsData: [eventData]
-                    });
-                } else {
-                    // Add event to existing events array
-                    await updateDoc(doc(firestore, 'calendars', calendarDoc.id), {
-                        eventsData: arrayUnion(eventData)
+                        eventsData: arrayUnion(event.id),
+                        // Increment the events count and upcoming count
+                        events: (calendarData.events || 0) + 1,
+                        upcoming: (calendarData.upcoming || 0) + 1
                     });
                 }
-                
-                // Increment the events count and upcoming count
-                await updateDoc(doc(firestore, 'calendars', calendarDoc.id), {
-                    events: (calendarData.events || 0) + 1,
-                    upcoming: (calendarData.upcoming || 0) + 1
-                });
                 
                 console.log('Calendar updated with new event');
             } else {
                 throw new Error('Calendar document not found');
             }
-            
+
             // Call the success callback with the calendar name
             if (onSuccess) {
                 onSuccess(selectedCalendarObj.name);
             }
-            
+
             // Close the modal
             onClose();
-            
+
         } catch (error) {
             console.error('Error adding event to calendar:', error);
             setError('Failed to add event to calendar. Please try again.');
-            
+
             // Call the error callback
             if (onError) {
                 onError('Failed to add event to calendar. Please try again.');
@@ -199,7 +192,7 @@ const AddToCalendarModal = ({ isOpen, onClose, event, user, onSuccess, onError }
         <div className="modal-overlay">
             <div className="add-to-calendar-modal">
                 <h2>Which calendar would you like to add this event to?</h2>
-                
+
                 {loading ? (
                     <div className="loading-spinner">Loading your calendars...</div>
                 ) : calendars.length === 0 ? (
@@ -210,13 +203,13 @@ const AddToCalendarModal = ({ isOpen, onClose, event, user, onSuccess, onError }
                 ) : (
                     <div className="calendar-list">
                         {calendars.map(calendar => (
-                            <div 
-                                key={calendar.id} 
+                            <div
+                                key={calendar.id}
                                 className={`calendar-option ${selectedCalendar === calendar.id ? 'selected' : ''}`}
                                 onClick={() => handleCalendarSelect(calendar.id)}
                             >
-                                <div 
-                                    className="calendar-icon" 
+                                <div
+                                    className="calendar-icon"
                                     style={{ backgroundColor: calendar.color }}
                                 >
                                     {getFirstLetter(calendar.name)}
@@ -230,19 +223,19 @@ const AddToCalendarModal = ({ isOpen, onClose, event, user, onSuccess, onError }
                         ))}
                     </div>
                 )}
-                
+
                 {error && (
-                    <div className="error-message" style={{color: 'red', textAlign: 'center', margin: '10px 0'}}>
+                    <div className="error-message" style={{ color: 'red', textAlign: 'center', margin: '10px 0' }}>
                         {error}
                     </div>
                 )}
-                
+
                 <div className="modal-actions">
                     <button className="cancel-btn" onClick={onClose}>
                         Cancel
                     </button>
-                    <button 
-                        className="confirm-btn" 
+                    <button
+                        className="confirm-btn"
                         onClick={handleConfirm}
                         disabled={!selectedCalendar || loading || saving}
                     >

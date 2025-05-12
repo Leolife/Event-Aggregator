@@ -87,6 +87,15 @@ const Navbar = ({ setSidebar }) => {
     })
   }
 
+  function eventNav(query) {
+    navigate({
+      pathname: "event/category/search",
+      search: createSearchParams(
+        Object.fromEntries(Object.entries({ q: query }).filter(([_, v]) => v != null)) // If any of these parameters are empty, then don't include them
+      ).toString()
+    })
+  }
+
   useEffect(() => {
     const auth = getAuth();
 
@@ -137,7 +146,9 @@ const Navbar = ({ setSidebar }) => {
             {isActive &&
               <div className="dropdown-content">
                 <ul>
-                  <li className="dropdown-item">
+                  <li className="dropdown-item"onClick={() =>
+                    eventNav(searchText)
+                    & setActive(false)} >
                     {/* Search in events */}
                     <a href={() => false} className="dropdown-anchor" onClick={() => setActive(false)}>
                       <span className="dropdown-icons"> <EventIcon className="event-icon" /> </span>
@@ -177,8 +188,6 @@ const Navbar = ({ setSidebar }) => {
         </div>
 
         <div className="nav-right flex-div">
-          <Link to={'/debug'}><button className="button userdebug">UserDebug</button>
-          </Link>
 
           <div className="user-login">
             {!isLoggedIn && (

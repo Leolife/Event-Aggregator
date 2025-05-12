@@ -1,8 +1,10 @@
 .event-card-container {
     width: 200px;
-    height: 250px;
+    height: 220px;
     cursor: pointer;
 }
+
+
 
 .event-card-thumb-container {
     width: 100%;
@@ -16,6 +18,10 @@
     height: 100%;
     object-fit: cover;
 }
+
+.event-card-thumb-container:hover  {
+    transform: scale(1.05);
+  }
 
 .event-card-info-container {
     margin-top: 10px;
@@ -33,6 +39,10 @@
     color:midnightblue;
     height: 35px;
     overflow: hidden;
+}
+
+.event-card-container:hover .event-card-title {
+    text-decoration: underline;
 }
 
 .event-card-date {

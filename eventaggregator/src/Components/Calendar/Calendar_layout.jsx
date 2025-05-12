@@ -30,6 +30,7 @@ const Calendar_layout = ({ calendarTitle, calendarId, onChangeMonth, onDelete, i
         }, 3000);
     };
 
+    // Get event information by ID
     async function fetchEvent(eventId) {
         try {
             const data = { ID: eventId };

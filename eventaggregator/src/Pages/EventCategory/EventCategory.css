@@ -12,6 +12,17 @@
     padding: 16px;
 }
 
+.event-card:hover {
+    transform: scale(1.01);
+}
+
+.event-card:hover .event-title {
+    transform: scale(1.01);
+    text-decoration: underline;
+}
+
+
+
 .event-card .event-content {
     width: 80%;
     height: 100%;
@@ -168,4 +179,28 @@
     100% {
         opacity: 0;
     }
+}
+
+.calendar-link-container {
+    display: flex;
+    justify-content: flex-end;
+    margin: 10px 20px;
+}
+
+.calendar-link-button {
+    background-color: #7c3aed;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.calendar-link-button:hover {
+    background-color: #6b34c9;
+    transform: translateY(-1px);
 }

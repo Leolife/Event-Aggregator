@@ -101,7 +101,6 @@ const SaveEventButtons = ({user, event, favoritedEvents, onEventHeart, onEventAd
 
             // Update the favorited events state
             onEventHeart([...favoritedEvents, eventId]);
-            console.log(favoritedEvents)
 
             // Show success message
             showNotification("Event added to favorites!");

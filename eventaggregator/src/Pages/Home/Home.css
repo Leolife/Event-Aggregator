@@ -114,16 +114,20 @@
 
 .live-feed {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); 
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); 
     padding: 1rem;
 }
 
 .live-card {
     position: relative;
     width: 320px;
-    height: 280px;
+    height: 320px;
     display: flex;
     flex-direction: column;
+}
+
+.live-card:hover .live-card-title {
+    text-decoration: underline;
 }
 
 .live-card-thumbnail {

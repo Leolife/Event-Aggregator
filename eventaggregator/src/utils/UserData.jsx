@@ -10,6 +10,7 @@ class UserData {
         this.userRef = doc(firestore, "users", this.uid); // Direct reference using UID as document ID
     }
 
+
     // Getter: Fetch user data from Firestore
     async getUserData() {
         try {
@@ -183,6 +184,18 @@ class UserData {
         await this.setUserData({ interests: newInterests });
     }
 
+    // Getter: Fetch the user's interests array
+    async getQuestionnaire() {
+        const userData = await this.getUserData();
+        const interests = (userData.questionnaire || [])["eventType"]
+        return interests;
+    }
+
+    // Setter: Update the user's interests array
+    async setQuestionnaire(newQuestionnaire) {
+        await this.setUserData({ questionnaire: newQuestionnaire });
+    }
+
     // Getter: Fetch the user's bio
     async getBio() {
         const userData = await this.getUserData();
@@ -200,10 +213,41 @@ class UserData {
         return calendarData || [];
     }
 
+    async fetchEvent(eventId) {
+        const data = { ID: eventId };
+        const response = await fetch("/get/single_event", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        });
+        const fetchedEvent = await response.json()
+        return (Object.values(fetchedEvent)[0])
+    }
+
+
     // Getter: Fetch the user's Favorites calendars
     async getFavorites() {
-        const calendarData = (await this.getUserCalendarData()).filter(calendar => calendar.name === "Favorites")[0];
-        return calendarData || [];
+        const favorites = (await this.getUserCalendarData()).filter(calendar => calendar.name === "Favorites")[0];
+        if (favorites) {
+            const eventsData = favorites.eventsData
+            if (!eventsData || !Array.isArray(eventsData)) return [];
+
+            const eventInfoList = await Promise.all(
+                eventsData.slice(0, 5).map(eventId => this.fetchEvent(eventId))
+            );
+
+            return eventInfoList;
+        }
+    }
+
+    async isFavorite(id) {
+        const favorites = (await this.getUserCalendarData()).filter(calendar => calendar.name === "Favorites")[0];
+        if (favorites) {
+            const eventsData = favorites.eventsData || [];
+            return eventsData.includes(id);
+        }
     }
 
 }

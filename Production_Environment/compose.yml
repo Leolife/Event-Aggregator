@@ -75,6 +75,20 @@ services:
     
     expose:
       - 5003
+  user_firebase_api:
+    build: ./Servers/Collectors/UserBase/Data
+    volumes:
+      - type: bind
+        source: ./Servers/Collectors/UserBase/Data
+        target: /app
+    networks:
+      main_network:
+        ipv4_address: 192.168.150.7
+    ports:
+      - 5005:5005
+    expose:
+      - 5005
+
 
 networks:
   main_network:

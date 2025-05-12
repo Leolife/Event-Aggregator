@@ -7,7 +7,6 @@ import Overlays from '../../../Components/Overlays';
 
 function About({ editMode, bio, setBio, favorites }) {
     const navigate = useNavigate();
-    const userFavorites = favorites.eventsData
     const handleBioChange = (e) => {
         setBio(e.target.value);
     };
@@ -21,6 +20,7 @@ function About({ editMode, bio, setBio, favorites }) {
         setIsOpen(true);
     };
 
+    // Navigates to the friends list page
     const handleFriendsClick = () => {
         const auth = getAuth();
         if (auth.currentUser) {
@@ -30,6 +30,7 @@ function About({ editMode, bio, setBio, favorites }) {
         }
     };
 
+    // Navigates to the user's favorites
     const handleFavoritesClick = () => {
         const auth = getAuth();
         if (auth.currentUser) {
@@ -41,40 +42,40 @@ function About({ editMode, bio, setBio, favorites }) {
 
     return (
         <><Overlays isOpen={isOpen} modalType={modalType} onClose={() => setIsOpen(false)} />
-        <div className="About">
-            <h2>About</h2>
-            {editMode ? (
-                <textarea className="userBioChange"
-                    value={bio}
-                    onChange={handleBioChange}
-                    rows="5"
-                    cols="50"
-                />
-            ) : (
-                <p className="userBio">{bio}</p>
-            )}
-            <hr />
-            <div className="profile-friends" onClick={handleFriendsClick} >
-                <h2>Friends</h2> 
-            </div>
-            <hr />
-            {/* Display the favorites section if the user has favorited events */}
-            <div style={{ display: favorites?.eventsData ? "inline" : "none" }} className="profile-favorites">
-                <div className="profile-favorites-button" onClick={handleFavoritesClick}> 
-                    <h2>Favorites</h2>
+            <div className="About">
+                <h2>About</h2>
+                {editMode ? (
+                    <textarea className="userBioChange"
+                        value={bio}
+                        onChange={handleBioChange}
+                        rows="5"
+                        cols="50"
+                    />
+                ) : (
+                    <p className="userBio">{bio}</p>
+                )}
+                <hr />
+                <div className="profile-friends" onClick={handleFriendsClick} >
+                    <h2>Friends</h2>
                 </div>
-                <div className="favorites-container">
-                    {userFavorites && userFavorites.length > 0 ? (
-                        userFavorites.map((event) => (
-                            <EventCard event={event}> </EventCard>
-                        ))
-                    ) : (
-                        // Displays an error message if the events have not loaded in
-                        <label> Error Loading Events </label>
-                    )}
+                <hr />
+                {/* Display the favorites section if the user has favorited events */}
+                <div style={{ display: favorites? "inline" : "none" }} className="profile-favorites">
+                    <div className="profile-favorites-button" onClick={handleFavoritesClick}>
+                        <h2>Favorites</h2>
+                    </div>
+                    <div className="favorites-container">
+                        {favorites && favorites.length > 0 ? (
+                            favorites.map((event) => (
+                                <EventCard event={event}> </EventCard>
+                            ))
+                        ) : (
+                            // Displays an error message if the events have not loaded in
+                            <label> Loading Events </label>
+                        )}
+                    </div>
                 </div>
             </div>
-        </div>
         </>
     );
 }

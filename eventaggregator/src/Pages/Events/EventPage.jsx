@@ -106,13 +106,9 @@ export const EventPage = ({ sidebar, user }) => {
                             </div>
                             <div className='event-info-section'>
                                 <div className='event-header-section'>
-                                    <h2 className='event-time'> 📅 {formatDateTime(event.date)} </h2>
+                                    <h2 className='event-time'> 📅 {event.when} </h2>
                                     <h1 className='event-title'> {event.title} </h1>
                                     <div className='event-buttons'>
-                                        <div className='event-tabs'>
-                                            <button className='event-tab-btn'> About </button>
-                                            <button className='event-tab-btn'> Discussions </button>
-                                        </div>
                                         <SaveEventButtons user={user} event={event} favoritedEvents={favoritedEvents}
                                             onEventHeart={(newFavoritesList) => onEventHeart(newFavoritesList)}
                                             onEventAdd={(newSelectedEvent, newModalOpen) => onEventAdd(newSelectedEvent, newModalOpen)}
@@ -124,6 +120,13 @@ export const EventPage = ({ sidebar, user }) => {
                                     <div className='event-description-section'>
                                         <h1 className='event-header'> Desciption </h1>
                                         <p className='event-description'> {event.desc} </p>
+                                        {event.mainpage && (
+                                            <p>
+                                                <a className='event-url' href={event.mainpage} target="_blank" rel="noopener noreferrer">
+                                                    Visit main page
+                                                </a>
+                                            </p>
+                                        )}
                                     </div>
                                     <div className='event-location-section'>
                                         <h1 className='event-header'> Location </h1>

@@ -8,6 +8,10 @@ import './AddPostButton'
 import './AddPostButton.css'
 import Replies from '../../Components/FullPostView/Replies';
 import AddPostButton from './AddPostButton';
+import UserData from '../../utils/UserData';
+import { auth } from '../../firebase';
+import Interests from '../Settings/Tabs/Interests';
+const user = auth.currentUser
 
 export const Forum = ({ sidebar }) => {
     // The search parameters in the URL
@@ -22,6 +26,7 @@ export const Forum = ({ sidebar }) => {
     const [filteredPosts, setFilteredPosts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [replies, setReplies] = useState([]);
+    const [interest, setInterest] = useState([]);
     const [filteredReplies, setFilteredReplies] = useState([])
 
 
@@ -61,8 +66,31 @@ export const Forum = ({ sidebar }) => {
         setSearchParams(Object.fromEntries(Object.entries({ q: queryParam, type: type, sort: selectedSort }).filter(([_, v]) => v != null)));
     }
 
+    // Ranks forums based on interest
+    const getInterestScore = (post) => {
+        const combined = `${post.title} ${post.body} ${post.eventName}`.toLowerCase();
+        const matches = combined.match(new RegExp(interest, 'g')); // global match
+        return matches ? matches.length : 0; // number of times interest appears
+    };
+
+    // Fetches user interests for recommended forums
+    useEffect(() => {
+        const getInterests = async () => {
+            const user = auth.currentUser
+            if (user) {
+                const userId = user.uid
+                const userData = new UserData(userId);
+                console.log(userId)
+                const userInterests = await userData.getQuestionnaire();
+                setInterest(userInterests)
+            }
+        }
+        getInterests()
+    }, [auth.currentUser])
+
 
     useEffect(() => {
+
         // Sorts the forum posts when the search parameters change 
         let sortedPosts = [...posts];
         let sortedReplies = [...replies];
@@ -72,8 +100,14 @@ export const Forum = ({ sidebar }) => {
             sortedPosts.sort((a, b) => calcHottness(b) - calcHottness(a))
         } else if (selectedSort === "latest") { // Sort by Latest
             sortedPosts.sort((a, b) => a.timestamp - b.timestamp);
-        } else if (selectedSort === "comment") // Sort by Reply Count
-            sortedPosts.sort((a, b) => b.replyCount - a.replyCount);
+        } else if (selectedSort === "comment") { // Sort by Reply Count
+            sortedPosts.sort((a, b) => b.replyCount - a.replyCount)
+        } else if (selectedSort === "recommended") { // Sort by user's itnerests 
+            if (interest) {
+                sortedPosts.sort((a, b) => getInterestScore(b) - getInterestScore(a));
+            }
+        }
+
 
         // Filters the forums based on the search query    
         if (queryParam && selectedType === "posts") {
@@ -83,17 +117,17 @@ export const Forum = ({ sidebar }) => {
                 post.title.toLowerCase().includes(queryParam.toLowerCase()) ||
                 post.body.toLowerCase().includes(queryParam.toLowerCase())
             );
-            setFilteredPosts(sortedPosts);
         }
         if (queryParam && selectedType === "comments") {
-            console.log("im here!")     
             sortedReplies = sortedReplies.filter(reply =>
                 reply.commentBody.toLowerCase().includes(queryParam.toLowerCase())
             )
             setFilteredReplies(sortedReplies)
-        } else if (!queryParam) {
-            setFilteredPosts(posts)
         }
+        if (selectedType !== "comments") {
+            setFilteredPosts(sortedPosts);
+        }
+
     }, [selectedSort, selectedType, posts, replies, queryParam])
 
     useEffect(() => {

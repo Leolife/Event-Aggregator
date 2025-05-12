@@ -36,6 +36,7 @@ const Signup = ({ isOpen, onClose }) => {
                 profileBanner: "",
                 profilePicture: "",
                 interests: [],
+                questionnaire: [],
                 createdAt: new Date(), // Optionally, add a timestamp
             });
 

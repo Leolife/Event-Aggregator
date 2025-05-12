@@ -84,3 +84,8 @@
     padding-left: 16px;
     padding-right: 16px;
 }
+
+.event-url {
+    color: blueviolet;
+    text-decoration: underline;   
+}
