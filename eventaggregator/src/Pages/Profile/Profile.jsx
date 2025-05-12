@@ -38,6 +38,7 @@ export const Profile = ({ sidebar }) => {
 
     const [bio, setBio] = useState("");
     const [isFriend, setIsFriend] = useState(false);
+    const [friendsCount, setFriendsCount] = useState(0)
     const [friendshipChecked, setFriendshipChecked] = useState(false);
     
     // State for the three-dot menu
@@ -94,6 +95,7 @@ export const Profile = ({ sidebar }) => {
             const userBio = await userData.getBio();
             const userFavorites = await userData.getFavorites();
             const userCalendars = await userData.getCalendars();
+            const friendsCount = await userData.getFriendsCount();
 
             setProfileName(userName);
             setProfilePicture(picture);
@@ -101,6 +103,7 @@ export const Profile = ({ sidebar }) => {
             setProfileFavorites(userFavorites);
             setProfileCalendars(userCalendars);
             setBio(userBio);
+            setFriendsCount(friendsCount)
 
             if (user) {
                 setTempProfileBanner(banner); // Initialize temp banner
@@ -440,8 +443,7 @@ export const Profile = ({ sidebar }) => {
                                         </div>
                                         {!isBlocked && (
                                             <div className="header-details">
-                                                <h2><span>30</span> Friends</h2>
-                                                <h2><span>30</span> Posts</h2>
+                                                <h2> {friendsCount} Friends</h2>
                                             </div>
                                         )}
                                         
