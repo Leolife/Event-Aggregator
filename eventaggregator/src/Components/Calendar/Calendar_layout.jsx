@@ -85,7 +85,7 @@ const Calendar_layout = ({ calendarTitle, calendarId, onChangeMonth, onDelete, i
                             title: event.title || 'Unnamed Event',
                             date: new Date(`${event.date || event.when}, ${currentYear}`),
                             description: event.desc || '',
-                            address1: event.address1 || '',
+                            address1: event.address1 || 'No location specified',
                             address2: event.address2 || '',
                             mainpage: event.mainpage || '',
                             image: event.image || '',
@@ -101,7 +101,7 @@ const Calendar_layout = ({ calendarTitle, calendarId, onChangeMonth, onDelete, i
                 if (viewMode === 'upcoming') {
                     setUpcomingEvents(formattedEvents.map(event => ({
                         ...event,
-                        formattedDate: formatDateTime(event.originalDate)
+                        formattedDate: event.originalDate
                     })));
                 }
             } catch (error) {
