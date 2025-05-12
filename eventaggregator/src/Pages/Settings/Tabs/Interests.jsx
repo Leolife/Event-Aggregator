@@ -29,9 +29,6 @@ function Interests() {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-
-
-
     useEffect(() => {
         const fetchInterests = async () => {
             const user = auth.currentUser;

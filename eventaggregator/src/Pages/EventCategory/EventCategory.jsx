@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom';
 import './EventCategory.css';
 import Sidebar from '../../Components/Sidebar/Sidebar'
 import Header from '../../Components/Header/Header'
@@ -25,6 +26,9 @@ export const EventCategory = ({ sidebar, user }) => {
     const [loading, setLoading] = useState(true);
     // State to track favorited events
     const [favoritedEvents, setFavoritedEvents] = useState([]);
+    const [searchParams, setSearchParams] = useSearchParams();
+    // Get the search paramater
+    const queryParam = searchParams.get('q');
     
     // Combined notification state for both heart actions and calendar additions
     const [notification, setNotification] = useState({
@@ -33,7 +37,7 @@ export const EventCategory = ({ sidebar, user }) => {
         isError: false
     });
 
-
+    
     // Function to show notification
     const showNotification = (message, isError = false) => {
         setNotification({
@@ -57,6 +61,25 @@ export const EventCategory = ({ sidebar, user }) => {
         "All",
         "Upcoming"
     ]
+
+
+    // fetch events by query
+    // Takes a search query and returns 5 events
+    async function fetchEventSearch(query) { 
+        const itemsPerPage = 5; 
+        const QUERY = query; 
+        const NUMBER = itemsPerPage; 
+        const data = { QUERY, NUMBER };
+        const response = await fetch("/search", { 
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        });
+        const fetchedSearchedEvents = await response.json()
+        setEvents(Object.values(fetchedSearchedEvents)) 
+    }
 
     async function fetchEvents() {
         const itemsPerPage = 7;
@@ -104,8 +127,15 @@ export const EventCategory = ({ sidebar, user }) => {
                         return eventsData.map(id => id);
                     })
                 setFavoritedEvents(userFavorites)
-                fetchEvents()
 
+                // If the user searched, then display the events based on query
+                if (queryParam) {
+                    fetchEventSearch(queryParam)
+                } else {
+                    // Otherwise display events normally
+                    fetchEvents()
+                }
+            
             } catch (error) {
                 console.error('Error fetching events:', error);
             } finally {
