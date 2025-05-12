@@ -69,3 +69,20 @@
     flex-direction: column;
     gap: 20px;
 }
+
+.Interests {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px; 
+  cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] { 
+  flex: none;
+}

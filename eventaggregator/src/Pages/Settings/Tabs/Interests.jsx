@@ -67,8 +67,7 @@ function Interests() {
             const userData = new UserData(user.uid);
             await userData.setQuestionnaire(formData); // Save to Firebase
         }
-
-        console.log("Submitted Questionnaire:", formData);
+        alert('Thank you for telling us your interests! :)');
     };
 
 
@@ -165,8 +164,8 @@ function Interests() {
                     </select>
                 </h2>
 
-                <div className='event-features'>
-                    <h2> Event Features (Select all that Apply) </h2>
+                <div className="event-features">
+                    <h2>Event Features (Select all that Apply)</h2>
                     {[
                         { label: 'High-profile participants (teams/performers)', value: 'high-profile' },
                         { label: 'Popular locations', value: 'popular-location' },
@@ -174,7 +173,7 @@ function Interests() {
                         { label: 'Family-friendly', value: 'family' },
                         { label: 'Accessibility', value: 'accessibility' }
                     ].map(({ label, value }) => (
-                        <label key={value}>
+                        <label key={value} className="checkbox-label">
                             <input
                                 type="checkbox"
                                 value={value}
@@ -193,7 +192,6 @@ function Interests() {
                         </label>
                     ))}
                 </div>
-
 
 
                 <button type="submit">Submit</button>
