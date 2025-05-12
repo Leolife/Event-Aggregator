@@ -53,8 +53,18 @@ const CalendarEventModal = ({ isOpen, onClose, event, calendarId, onEventDelete,
                 return;
             }
             
-            // Find the event to remove
-            const eventToRemove = currentData.eventsData.find(e => e === event.id);
+            // Find the event to remove - handle both ID and object formats
+            let eventToRemove;
+            const eventId = event.id || event.eventId;
+            
+            // Check if eventsData contains objects or just IDs
+            if (typeof currentData.eventsData[0] === 'object') {
+                // Events are stored as objects
+                eventToRemove = currentData.eventsData.find(e => e.eventId === eventId);
+            } else {
+                // Events are stored as IDs
+                eventToRemove = eventId;
+            }
             
             if (!eventToRemove) {
                 onNotification({ 
@@ -87,10 +97,10 @@ const CalendarEventModal = ({ isOpen, onClose, event, calendarId, onEventDelete,
 
             // Notify parent component to refresh events
             if (onEventDelete) {
-                onEventDelete(event.id);
+                onEventDelete(eventId);
             }
             
-        } catch (error) {
+                } catch (error) {
             console.error("Error deleting event:", error);
             onNotification({ 
                 show: true, 

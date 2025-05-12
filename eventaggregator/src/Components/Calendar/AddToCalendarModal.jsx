@@ -110,16 +110,16 @@ const AddToCalendarModal = ({ isOpen, onClose, event, user, onSuccess, onError }
                 const parts = [address, city, state, zip].filter(part => part && part.trim && part.trim() !== '');
                 return parts.join(', ');
             };
-
+          
             // Create event data
             const eventData = {
-                eventId: `event-${Date.now()}`,
+                eventId: event.id || event.eventId || `event-${Date.now()}`,
                 title: event.title || 'Unnamed Event',
                 description: event.description || '',
                 location: safeLocation(),
                 date: event.date || new Date().toISOString(),
                 price: event.price != null ? event.price : 0,
-                eventType: event["event type"] || '',
+                eventType: event.eventType || '',
                 tags: event.tags || '',
                 createdAt: new Date().toISOString(),
             };
