@@ -20,7 +20,6 @@ const EventCard = ({event}) => {
             const userId = user.uid
             const userData = new UserData(userId);
             await userData.setEventClicks(event.id);
-            console.log("Hey...")
         }
     }
     return (

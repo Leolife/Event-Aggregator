@@ -127,7 +127,7 @@ function Interests() {
                     <select name="eventType" value={formData.eventType} onChange={handleChange} required>
                         <option value="" disabled>Select one</option>
                         <option value="esports">Esports tournaments</option>
-                        <option value="concerts">Concerts/Music events</option>
+                        <option value="concerts">Concert events</option>
                         <option value="community">Local community events</option>
                         <option value="international">International events</option>
                         <option value="sports">Sports events</option>

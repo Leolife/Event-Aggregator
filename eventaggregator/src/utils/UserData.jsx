@@ -187,7 +187,8 @@ class UserData {
     // Getter: Fetch the user's interests array
     async getQuestionnaire() {
         const userData = await this.getUserData();
-        return userData.questionnaire || [];
+        const interests = (userData.questionnaire || [])["eventType"]
+        return interests;
     }
 
     // Setter: Update the user's interests array
