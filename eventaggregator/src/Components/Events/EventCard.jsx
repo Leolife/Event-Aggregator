@@ -29,7 +29,7 @@ const EventCard = ({event}) => {
                 <img src={event.image || event.thumb || Placeholder} alt={event.title || 'Event image'} />
             </div>
             <div className='event-card-info-container'>
-                <label className="event-card-date"> {formatDateTime(event.date)} </label>
+                <label className="event-card-date"> {event.when} </label>
                 <h3 className='event-card-title'> {event.title} </h3>
                 <label className='event-card-favorites'> </label>
                 <div className='event-card-interactions-container' style={{display: 'none'}}>

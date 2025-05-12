@@ -63,3 +63,9 @@
 .delete-button:hover {
     background-color: darkred;
 }
+
+.questionnaire {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}

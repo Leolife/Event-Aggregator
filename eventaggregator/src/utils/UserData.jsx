@@ -184,6 +184,17 @@ class UserData {
         await this.setUserData({ interests: newInterests });
     }
 
+    // Getter: Fetch the user's interests array
+    async getQuestionnaire() {
+        const userData = await this.getUserData();
+        return userData.questionnaire || [];
+    }
+
+    // Setter: Update the user's interests array
+    async setQuestionnaire(newQuestionnaire) {
+        await this.setUserData({ questionnaire: newQuestionnaire });
+    }
+
     // Getter: Fetch the user's bio
     async getBio() {
         const userData = await this.getUserData();
@@ -214,6 +225,7 @@ class UserData {
         return (Object.values(fetchedEvent)[0])
     }
 
+
     // Getter: Fetch the user's Favorites calendars
     async getFavorites() {
         const favorites = (await this.getUserCalendarData()).filter(calendar => calendar.name === "Favorites")[0];
@@ -226,6 +238,14 @@ class UserData {
             );
 
             return eventInfoList;
+        }
+    }
+
+    async isFavorite(id) {
+        const favorites = (await this.getUserCalendarData()).filter(calendar => calendar.name === "Favorites")[0];
+        if (favorites) {
+            const eventsData = favorites.eventsData || [];
+            return eventsData.includes(id);
         }
     }
 
