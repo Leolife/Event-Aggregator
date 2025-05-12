@@ -188,8 +188,6 @@ const Navbar = ({ setSidebar }) => {
         </div>
 
         <div className="nav-right flex-div">
-          <Link to={'/debug'}><button className="button userdebug">UserDebug</button>
-          </Link>
 
           <div className="user-login">
             {!isLoggedIn && (
